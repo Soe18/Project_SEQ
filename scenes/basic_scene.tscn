@@ -1258,16 +1258,16 @@ shape = SubResource("RectangleShape2D_p7vtj")
 script = ExtResource("7_1cuyb")
 
 [node name="Marker2D" type="Marker2D" parent="Enemy_container"]
-position = Vector2(707, 519)
+position = Vector2(-937, 785)
 
 [node name="Marker2D2" type="Marker2D" parent="Enemy_container"]
-position = Vector2(933, 509)
+position = Vector2(754, -483)
 
 [node name="Marker2D3" type="Marker2D" parent="Enemy_container"]
-position = Vector2(1353, 509)
+position = Vector2(964, 959)
 
 [node name="Marker2D4" type="Marker2D" parent="Enemy_container"]
-position = Vector2(402, 504)
+position = Vector2(-1023, -438)
 
 [connection signal="select_character" from="GUI" to="." method="_on_gui_select_character"]
 [connection signal="pressed" from="GUI/Select_stancil" to="GUI" method="_on_select_stancil_pressed"]
