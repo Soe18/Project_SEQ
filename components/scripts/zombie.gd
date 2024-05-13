@@ -24,6 +24,8 @@ var sprinting = false
 @onready var sprint_area = $Sprint_Area
 @onready var sprint_collider = $Sprint_Area/Skill_collider
 
+@onready var update_direction_timer = $UpdateDirection
+
 var player_entered = false
 var player_in_atk_range = false
 
@@ -44,7 +46,7 @@ func _ready():
 	$HealthBar.max_value = MAX_HEALTH
 	set_health_bar()
 	_on_update_direction_timeout()
-	$UpdateDirection.start()
+	update_direction_timer.start()
 	sprite.play("idle")
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -110,9 +112,9 @@ func choose_atk():
 	var rng = randi_range(0,100)
 	if rng >= 0 and rng < 10:
 		choosed_atk = Atk_Selected.IDLE
-	elif rng >= 10 and rng < 75:
+	elif rng >= 10 and rng < 85:
 		choosed_atk = Atk_Selected.BASIC_ATK
-	elif rng >= 75:
+	elif rng >= 85:
 		choosed_atk = Atk_Selected.SPRINT
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
@@ -156,13 +158,12 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_state, dmg, sec):
+func _on_player_take_dmg(str, atk_str, sec):
 	if is_in_atk_range and !grabbed:
-		health -= dmg
+		health -= get_parent().get_parent().calculate_dmg(str, atk_str, 121)
 		set_health_bar()
+		#print("take dmg: "+str(dmg))
 		moving = false
-		sprinting = false
-		$Charge_Time.stop()
 		stun_timer.wait_time = sec
 		stun_timer.start()
 		sprite.play("damaged")
@@ -246,7 +247,7 @@ func _on_timer_timeout():
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
-		$UpdateDirection.stop()
+		update_direction_timer.stop()
 		player_entered = true
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
@@ -259,7 +260,7 @@ func _on_area_of_detection_body_entered(body):
 
 func _on_area_of_detection_body_exited(body):
 	if body == player:
-		$UpdateDirection.start()
+		update_direction_timer.start()
 		player_entered = false
 
 'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
@@ -279,7 +280,7 @@ func _on_update_direction_timeout():
 	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
 	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
 	var new_update_time = randf_range(3,6)
-	$UpdateDirection.wait_time = new_update_time
+	update_direction_timer.wait_time = new_update_time
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
@@ -303,6 +304,7 @@ func _on_sprint_area_body_entered(body):
 		player_in_atk_range = true
 		emit_signal("take_dmg", 15, 2)
 		$Inhale_time.start(0.5)
+		$Update_Atk.start(0.5)
 
 func _on_sprint_area_body_exited(body):
 	if body == player:

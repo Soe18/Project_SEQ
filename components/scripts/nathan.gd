@@ -424,17 +424,17 @@ func _on_sk_1_time_timeout():
 func evade():
 	$Player_collider.disabled = true
 	if move_vertical == Move_Keys.UP:
-		velocity.y += -30
+		velocity.y += -25
 	elif move_vertical == Move_Keys.DOWN:
-		velocity.y += 30
+		velocity.y += 25
 	if move_horizontal == Move_Keys.LEFT:
-		velocity.x += -30
+		velocity.x += -25
 	elif move_horizontal == Move_Keys.RIGHT:
-		velocity.x += 30
+		velocity.x += 25
 	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == false:
-		velocity.x += 30
+		velocity.x += 25
 	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == true:
-		velocity.x += -30
+		velocity.x += -25
 	move_and_slide()
 
 'METODO CHE SPOSTA IL PLAYER DURANTE LA SKILL1'
@@ -465,15 +465,14 @@ func _on_enemy_is_in_atk_range(is_in, body):
 		is_self_in_atk_range = false
 
 func _on_enemy_take_dmg(dmg, sec):
-	if is_self_in_atk_range:
-		health -= dmg
-		set_health_bar()
-		#print("take dmg: "+str(dmg))
-		emit_signal("set_idle")
-		sprite.play("damaged")
-		can_move = false
-		stun_timer.wait_time = sec
-		stun_timer.start()
+	health -= dmg
+	set_health_bar()
+	#print("take dmg: "+str(dmg))
+	emit_signal("set_idle")
+	sprite.play("damaged")
+	can_move = false
+	stun_timer.wait_time = sec
+	stun_timer.start()
 
 func set_health_bar():
 	$HealthBar.value = health

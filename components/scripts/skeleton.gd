@@ -20,6 +20,7 @@ var choosed_atk
 @onready var basic_atk_collider = $Basic_atk_Area/Skill_collider
 @onready var stun_timer = $Stun
 @onready var sprite_collider = $Collider
+@onready var update_direction_timer = $UpdateDirection
 
 var player_entered = false
 var player_in_atk_range = false
@@ -41,7 +42,7 @@ func _ready():
 	$HealthBar.max_value = MAX_HEALTH
 	set_health_bar()
 	_on_update_direction_timeout()
-	$UpdateDirection.start()
+	update_direction_timer.start()
 	sprite.play("idle")
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -53,7 +54,7 @@ func _ready():
 		allora fa partire il metodo grab()'
 
 func _physics_process(_delta):
-	if player_entered and moving:
+	if player_entered and moving and not parring:
 		chase_player()
 		if choosed_atk == Atk_Selected.BASIC_ATK and $Basic_atk_Cooldown.is_stopped():
 			basic_atk()
@@ -95,12 +96,12 @@ func chase_player():
 		sprite.play("idle")
 
 func choose_atk():
-	var rng = randi_range(0,Atk_Selected.size())
-	if rng == 0:
+	var rng = randi_range(0,100)
+	if rng >= 0 and rng < 10:
 		choosed_atk = Atk_Selected.IDLE
-	elif rng == 1:
+	elif rng >= 10 and rng < 65:
 		choosed_atk = Atk_Selected.BASIC_ATK
-	elif rng == 2:
+	elif rng >= 65:
 		choosed_atk = Atk_Selected.PARRY
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
@@ -144,9 +145,9 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_state, dmg, sec):
+func _on_player_take_dmg(str, atk_str, sec):
 	if is_in_atk_range and !grabbed and not parring:
-		health -= dmg
+		health -= get_parent().get_parent().calculate_dmg(str, atk_str, 121)
 		set_health_bar()
 		#print("take dmg: "+str(dmg))
 		moving = false
@@ -235,7 +236,7 @@ func _on_timer_timeout():
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
-		$UpdateDirection.stop()
+		update_direction_timer.stop()
 		player_entered = true
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
@@ -248,7 +249,7 @@ func _on_area_of_detection_body_entered(body):
 
 func _on_area_of_detection_body_exited(body):
 	if body == player:
-		$UpdateDirection.start()
+		update_direction_timer.start()
 		player_entered = false
 
 'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
@@ -268,7 +269,7 @@ func _on_update_direction_timeout():
 	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
 	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
 	var new_update_time = randf_range(3,6)
-	$UpdateDirection.wait_time = new_update_time
+	update_direction_timer.wait_time = new_update_time
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'

@@ -639,7 +639,7 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3sm70"]
 radius = 21.0
-height = 152.0
+height = 130.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o6h04"]
 atlas = ExtResource("15_2wlen")
@@ -779,7 +779,7 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill_1_area"]
-position = Vector2(29, 0)
+position = Vector2(36, 2)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_3sm70")
 disabled = true
@@ -849,7 +849,7 @@ one_shot = true
 wait_time = 3.955
 one_shot = true
 
-[node name="Ult_cooldown" type="Timer" parent="."]
+[node name="Ulti_cooldown" type="Timer" parent="."]
 wait_time = 8.412
 one_shot = true
 
@@ -883,6 +883,6 @@ one_shot = true
 [connection signal="timeout" from="Skill1_cooldown" to="." method="_on_skill_1_cooldown_timeout" flags=18]
 [connection signal="timeout" from="Skill2_cooldown" to="." method="_on_skill_2_cooldown_timeout" flags=18]
 [connection signal="timeout" from="Eva_cooldown" to="." method="_on_eva_cooldown_timeout" flags=18]
-[connection signal="timeout" from="Ult_cooldown" to="." method="_on_ult_cooldown_timeout" flags=18]
+[connection signal="timeout" from="Ulti_cooldown" to="." method="_on_ult_cooldown_timeout" flags=18]
 [connection signal="timeout" from="Combo_time" to="." method="_on_comb_time_timeout" flags=18]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]

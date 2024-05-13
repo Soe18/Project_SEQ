@@ -2,13 +2,27 @@ extends CharacterBody2D
 
 var char_name = "Rufus"
 
+var vit : int = 200
+@export var current_vit : int = vit
+var str : int = 100
+@export var current_str : int = str
+var tem : int = 121
+@export var current_tem : int = tem
+var des : int = 145
+@export var current_des : int = des
+var pbc : int = 30
+@export var current_pbc : int = pbc
+var efc : float = 1.5
+@export var current_efc : int = efc
+
+
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(atk_state, dmg, sec_stun)
+signal take_dmg(str, atk_str, sec_stun)
 signal set_idle()
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
@@ -16,15 +30,11 @@ var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 const OK_MULTIPLYER = 350.0
 const ACCELERATION_INCREASE = 10.0
 const MAX_ACCELERATION = 10000.0
-const MAX_HEALTH = 100
-
-var health = 100
 
 var initial_y_position = 0
 
 var atk_state = Atk_States.IDLE
 
-var acceleration_value = 0.0
 var move_state = Moving_States.IDLE
 var move_horizontal = null
 var move_vertical = null
@@ -56,6 +66,12 @@ var ult_moving_mod
 @onready var ult_collider = $Ult_area/Ult_collider
 @onready var ult_effect = $Ult_area/Effect
 
+@onready var skill1_cooldown = $Skill1_cooldown
+@onready var skill2_cooldown = $Skill2_cooldown
+@onready var eva_cooldown = $Eva_cooldown
+@onready var ulti_cooldown = $Ulti_cooldown
+
+
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
 		esegue il metodo per muoversi
@@ -67,8 +83,7 @@ var ult_moving_mod
 
 @warning_ignore("unused_parameter")
 func _ready():
-	health = MAX_HEALTH
-	$HealthBar.max_value = MAX_HEALTH
+	$HealthBar.max_value = vit
 	set_health_bar()
 
 func _physics_process(_delta):
@@ -208,6 +223,7 @@ func base_atk():
 		sprite.play("base atk5")
 	
 	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk1"]:
+		skill1_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK1
 		skill1_area.process_mode = Node.PROCESS_MODE_INHERIT
@@ -218,7 +234,7 @@ func base_atk():
 		move_vertical = null
 	
 	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["eva"]:
-		$Eva_cooldown.start()
+		eva_cooldown.start()
 		cooldown_state["eva"] = true
 		can_move = false
 		atk_state = Atk_States.EVA
@@ -228,6 +244,7 @@ func base_atk():
 		is_evading = true
 	
 	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk2"]:
+		skill2_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
@@ -238,6 +255,7 @@ func base_atk():
 		move_vertical = null
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
+		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
 		sprite.play("charging_ult")
@@ -267,7 +285,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", atk_state, 2, 2.1)
+		emit_signal("take_dmg", current_str, 5, 2.1)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -292,7 +310,7 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", atk_state, 200, 6)
+		emit_signal("take_dmg", current_str, 70, 6)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -305,22 +323,22 @@ func _on_ult_area_body_exited(body):
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		emit_signal("take_dmg", atk_state, 9, 0.4)
+		emit_signal("take_dmg", current_str, 5, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		emit_signal("take_dmg", atk_state, 10, 0.4)
+		emit_signal("take_dmg", current_str, 5, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		emit_signal("take_dmg", atk_state, 10, 0.4)
+		emit_signal("take_dmg", current_str, 5, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		emit_signal("take_dmg", atk_state, 11, 0.5)
+		emit_signal("take_dmg", current_str, 6, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
@@ -338,7 +356,7 @@ func _on_sprite_2d_animation_finished():
 
 func _on_sprite_2d_frame_changed():
 	if sprite.frame == 4 and sprite.animation == "base atk5":
-		emit_signal("take_dmg", atk_state, 12, 0.5)
+		emit_signal("take_dmg", current_str, 8, 0.5)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
 		sprite.pause()
@@ -347,10 +365,10 @@ func _on_sprite_2d_frame_changed():
 
 func _on_effect_frame_changed():
 	if skill1_effect.frame%2 == 0 and atk_state == Atk_States.SK1:
-		emit_signal("take_dmg", atk_state, 30, 0.6)
+		emit_signal("take_dmg", current_str, 20, 0.6)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
-		emit_signal("take_dmg", atk_state, 16, 1.4)
+		emit_signal("take_dmg", current_str, 17, 1.4)
 
 func ult_moving():
 	$Player_collider.disabled = true
@@ -397,17 +415,14 @@ func _on_ult_time_timeout():
 '  -- quando finisce l\'effetto della skill allora disattivo l\'area e setto ad idle --  '
 func _on_effect_animation_finished():
 	if atk_state == Atk_States.SK1:
-		$Skill1_cooldown.start()
 		cooldown_state["sk1"] = true
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK2:
-		$Skill2_cooldown.start()
 		cooldown_state["sk2"] = true
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.ULT:
-		$Ult_cooldown.start()
 		cooldown_state["ult"] = true
 		$Ult_area/Ult_time.start()
 
@@ -449,7 +464,7 @@ func _on_ult_cooldown_timeout():
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(dmg, sec):
-	health -= dmg
+	current_vit -= dmg
 	set_health_bar()
 	#print("take dmg: "+str(dmg))
 	emit_signal("set_idle")
@@ -459,8 +474,8 @@ func _on_enemy_take_dmg(dmg, sec):
 	$Stun.start()
 
 func set_health_bar():
-	$HealthBar.value = health
-	if health <= 0:
+	$HealthBar.value = current_vit
+	if current_vit <= 0:
 		queue_free()
 
 func _on_stun_timeout():

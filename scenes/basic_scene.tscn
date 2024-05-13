@@ -1171,7 +1171,7 @@ size = Vector2(1523, 2715)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ojwx3"]
 size = Vector2(5512.13, 1345.5)
 
-[node name="Node2D" type="Node2D"]
+[node name="Scene_manager" type="Node2D"]
 script = ExtResource("1_37lom")
 metadata/_edit_vertical_guides_ = []
 metadata/_edit_horizontal_guides_ = []
@@ -1239,37 +1239,53 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(3014, -11)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
-position = Vector2(882, 207)
+position = Vector2(-148, 228)
 shape = SubResource("RectangleShape2D_p7vtj")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="RigidBody2D"]
-position = Vector2(-2335.13, 2161)
+position = Vector2(-2282, 1830)
 shape = SubResource("RectangleShape2D_ojwx3")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="RigidBody2D"]
-position = Vector2(-2358, -1613)
+position = Vector2(-2331, -1154)
 shape = SubResource("RectangleShape2D_ojwx3")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="RigidBody2D"]
-position = Vector2(-5614, 228)
+position = Vector2(-4829, 265)
 shape = SubResource("RectangleShape2D_p7vtj")
 
 [node name="Enemy_container" type="Node2D" parent="."]
 script = ExtResource("7_1cuyb")
 
-[node name="Marker2D" type="Marker2D" parent="Enemy_container"]
-position = Vector2(-937, 785)
+[node name="Round_cooldown" type="Timer" parent="Enemy_container"]
+wait_time = 4.0
+one_shot = true
 
-[node name="Marker2D2" type="Marker2D" parent="Enemy_container"]
-position = Vector2(754, -483)
+[node name="Spawnpoint" type="Marker2D" parent="Enemy_container"]
+position = Vector2(575, 496)
 
-[node name="Marker2D3" type="Marker2D" parent="Enemy_container"]
-position = Vector2(964, 959)
+[node name="Spawnpoint2" type="Marker2D" parent="Enemy_container"]
+position = Vector2(978, 496)
 
-[node name="Marker2D4" type="Marker2D" parent="Enemy_container"]
-position = Vector2(-1023, -438)
+[node name="Spawnpoint3" type="Marker2D" parent="Enemy_container"]
+position = Vector2(1119, 496)
+
+[node name="Spawnpoint4" type="Marker2D" parent="Enemy_container"]
+position = Vector2(1271, 496)
+
+[node name="Spawnpoint5" type="Marker2D" parent="Enemy_container"]
+position = Vector2(443, 496)
+
+[node name="Spawnpoint6" type="Marker2D" parent="Enemy_container"]
+position = Vector2(1415, 496)
+
+[node name="Spawnpoint7" type="Marker2D" parent="Enemy_container"]
+position = Vector2(800, 496)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [connection signal="select_character" from="GUI" to="." method="_on_gui_select_character"]
 [connection signal="pressed" from="GUI/Select_stancil" to="GUI" method="_on_select_stancil_pressed"]
 [connection signal="pressed" from="GUI/Select_rufus" to="GUI" method="_on_select_rufus_pressed"]
 [connection signal="pressed" from="GUI/Select_nathan" to="GUI" method="_on_select_nathan_pressed"]
+[connection signal="timeout" from="Enemy_container/Round_cooldown" to="Enemy_container" method="_on_round_cooldown_timeout"]

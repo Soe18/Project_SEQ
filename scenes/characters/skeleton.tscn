@@ -205,14 +205,13 @@ script = ExtResource("1_dah7i")
 position = Vector2(7.15256e-07, 3)
 scale = Vector2(0.128125, 0.128125)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"attack"
+animation = &"idle"
 autoplay = "idle"
-frame = 3
-frame_progress = 1.0
 
 [node name="Collider" type="CollisionShape2D" parent="."]
 position = Vector2(-3.5, 15.5)
 shape = SubResource("RectangleShape2D_sb3xy")
+debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
@@ -243,12 +242,13 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
+debug_color = Color(1, 0, 0, 0.0784314)
 
 [node name="Effect" type="AnimatedSprite2D" parent="Basic_atk_Area"]
 position = Vector2(49, 12)
 scale = Vector2(0.0875, 0.133333)
 sprite_frames = SubResource("SpriteFrames_g7j7j")
-animation = &"effect"
+animation = &"idle"
 autoplay = "idle"
 flip_h = true
 

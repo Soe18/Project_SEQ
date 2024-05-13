@@ -2,6 +2,7 @@ extends Node2D
 
 var player
 var paused = false
+var connected = false
 
 'func _ready():
 	for i in get_child_count():
@@ -22,6 +23,13 @@ func _process(delta):
 	elif Input.is_action_just_pressed("pause") and paused:
 		paused = false
 		pause_game(paused)
+	
+	if player != null:
+		if not enemy_container.fighting:
+			connected = false
+		if enemy_container.fighting and not connected:
+			connect_enemies_with_player()
+			connected = true
 
 'ISTANZIA IL PLAYER IN BASE ALLA SELEZIONE DEL NODO GUI
 	in base al pulsante selezionato carica la sua scena e la istanzia
@@ -45,10 +53,14 @@ func _on_gui_select_character(char):
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1, 1)
 	var camera = Camera2D.new()
+	player.add_child(camera,true)
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
-		player.scale = Vector2(1.7, 1.7)
-	player.add_child(camera,true)
+		player.scale = Vector2(1.2, 1.2)
+		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
+	if char == "rufus":
+		find_child("CanvasLayer").add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
+		find_child("CanvasLayer").get_child(0).player = player
 	connect_enemies_with_player()
 	find_child("GUI").queue_free()
 	
@@ -68,7 +80,6 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
 			if player.char_name == "Nathan":
 				player.grab.connect(current_node._on_player_grab)
-				player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 
 func pause_game(get_paused):
 	for i in get_child_count():
@@ -76,3 +87,8 @@ func pause_game(get_paused):
 			get_child(i).process_mode = Node.PROCESS_MODE_DISABLED
 		else:
 			get_child(i).process_mode = Node.PROCESS_MODE_ALWAYS
+
+func calculate_dmg(str, atk_str, def):
+	var dmg = (str * atk_str) / def + randi_range(0, 8)
+	print(dmg)
+	return dmg

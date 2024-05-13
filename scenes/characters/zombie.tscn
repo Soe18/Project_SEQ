@@ -280,6 +280,7 @@ flip_h = true
 process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Sprint_Area"]
+visible = false
 position = Vector2(-5, 17.25)
 shape = SubResource("RectangleShape2D_fhhjd")
 debug_color = Color(1, 1, 0, 0.054902)

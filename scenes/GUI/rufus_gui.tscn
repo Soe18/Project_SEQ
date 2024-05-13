@@ -1,0 +1,104 @@
+[gd_scene load_steps=8 format=3 uid="uid://cp64rsm1umaj0"]
+
+[ext_resource type="Script" path="res://components/scripts/rufus_gui.gd" id="1_3rxhd"]
+[ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="2_rdasp"]
+[ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="3_2maji"]
+[ext_resource type="Texture2D" uid="uid://bciywb7l5cwth" path="res://components/sprites/GUI/player_GUI/rufus/Skill2_GUI_rufus.png" id="4_7cjmb"]
+[ext_resource type="Texture2D" uid="uid://bflcuuauxyxfi" path="res://components/sprites/GUI/player_GUI/rufus/Eva_GUI_rufus.png" id="5_lwiw5"]
+[ext_resource type="Texture2D" uid="uid://cega3rs3chnkn" path="res://components/sprites/GUI/player_GUI/rufus/Ulti_GUI_rufus.png" id="6_8rr55"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bpvag"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3rxhd")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1932.0
+offset_top = -586.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_bpvag")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer"]
+clip_contents = true
+layout_mode = 2
+columns = 4
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Skill1_cooldown" type="TextureProgressBar" parent="PanelContainer/MarginContainer/GridContainer/Control"]
+layout_mode = 2
+offset_left = 1462.0
+offset_top = 378.0
+offset_right = 1942.0
+offset_bottom = 858.0
+scale = Vector2(0.329, 0.329)
+step = 0.001
+allow_greater = true
+fill_mode = 5
+texture_under = ExtResource("3_2maji")
+texture_progress = ExtResource("2_rdasp")
+
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Skill2_cooldown" type="TextureProgressBar" parent="PanelContainer/MarginContainer/GridContainer/Control2"]
+layout_mode = 2
+offset_left = 1501.0
+offset_top = 171.0
+offset_right = 1981.0
+offset_bottom = 651.0
+scale = Vector2(0.329, 0.329)
+step = 0.001
+allow_greater = true
+fill_mode = 5
+texture_under = ExtResource("4_7cjmb")
+texture_progress = ExtResource("2_rdasp")
+
+[node name="Control3" type="Control" parent="PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Eva_cooldown" type="TextureProgressBar" parent="PanelContainer/MarginContainer/GridContainer/Control3"]
+layout_mode = 2
+offset_left = 1707.0
+offset_top = 133.0
+offset_right = 2187.0
+offset_bottom = 613.0
+scale = Vector2(0.329, 0.329)
+step = 0.001
+allow_greater = true
+fill_mode = 5
+texture_under = ExtResource("5_lwiw5")
+texture_progress = ExtResource("2_rdasp")
+
+[node name="Control4" type="Control" parent="PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Ulti_cooldown" type="TextureProgressBar" parent="PanelContainer/MarginContainer/GridContainer/Control4"]
+layout_mode = 2
+offset_left = 1629.0
+offset_top = 295.0
+offset_right = 2109.0
+offset_bottom = 775.0
+scale = Vector2(0.465, 0.465)
+step = 0.001
+allow_greater = true
+fill_mode = 5
+texture_under = ExtResource("6_8rr55")
+texture_progress = ExtResource("2_rdasp")
