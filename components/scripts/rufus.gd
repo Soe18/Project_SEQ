@@ -2,18 +2,18 @@ extends CharacterBody2D
 
 var char_name = "Rufus"
 
-var vit : int = 200
-@export var current_vit : int = vit
-var str : int = 100
-@export var current_str : int = str
-var tem : int = 121
-@export var current_tem : int = tem
-var des : int = 145
-@export var current_des : int = des
-var pbc : int = 30
-@export var current_pbc : int = pbc
-var efc : float = 1.5
-@export var current_efc : int = efc
+@export var vit : int = 200
+var current_vit = vit
+@export var str : int = 150
+var current_str = str
+@export var tem : int = 121
+var current_tem = tem
+@export var des : int = 145
+var current_des = des
+@export var pbc : int = 30
+var current_pbc = pbc
+@export var efc : float = 1.5
+var current_efc = efc
 
 
 enum Moving_States {IDLE, RUNNING}
@@ -71,6 +71,8 @@ var ult_moving_mod
 @onready var eva_cooldown = $Eva_cooldown
 @onready var ulti_cooldown = $Ulti_cooldown
 
+@onready var stun_timer = $Stun
+
 
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
@@ -89,7 +91,7 @@ func _ready():
 func _physics_process(_delta):
 	if can_move:
 		move()
-	if $Stun.is_stopped():
+	if stun_timer.is_stopped():
 		base_atk()
 	if is_evading:
 		evade()
@@ -463,15 +465,15 @@ func _on_ult_cooldown_timeout():
 	cooldown_state["ult"] = false
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(dmg, sec):
-	current_vit -= dmg
+func _on_enemy_take_dmg(str, atk_str, sec):
+	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem)
 	set_health_bar()
 	#print("take dmg: "+str(dmg))
 	emit_signal("set_idle")
 	sprite.play("damaged")
 	can_move = false
-	$Stun.wait_time = sec
-	$Stun.start()
+	stun_timer.wait_time = sec
+	stun_timer.start()
 
 func set_health_bar():
 	$HealthBar.value = current_vit

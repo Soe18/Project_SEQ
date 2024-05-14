@@ -233,7 +233,6 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Collider" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(-3.5, 15.5)
 shape = SubResource("RectangleShape2D_sb3xy")
 debug_color = Color(0.0196078, 0.611765, 0.611765, 0.419608)

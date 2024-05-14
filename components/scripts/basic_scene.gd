@@ -53,6 +53,7 @@ func _on_gui_select_character(char):
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1, 1)
 	var camera = Camera2D.new()
+	camera.zoom = Vector2(1.5,1.5)
 	player.add_child(camera,true)
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
@@ -60,9 +61,10 @@ func _on_gui_select_character(char):
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 	if char == "rufus":
 		find_child("CanvasLayer").add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
-		find_child("CanvasLayer").get_child(0).player = player
+		find_child("CanvasLayer").get_child(find_child("CanvasLayer").get_child_count()-1).player = player
+		find_child("CanvasLayer").get_child(find_child("CanvasLayer").get_child_count()-1).player_death.connect(self._on_player_death)
 	connect_enemies_with_player()
-	find_child("GUI").queue_free()
+	find_child("GUI").visible = false
 	
 'METODO CHE CONNETTE I SEGNALI AL PLAYER
 	cicla ogni nodo figlio della root nella scena,
@@ -88,7 +90,10 @@ func pause_game(get_paused):
 		else:
 			get_child(i).process_mode = Node.PROCESS_MODE_ALWAYS
 
-func calculate_dmg(str, atk_str, def):
-	var dmg = (str * atk_str) / def + randi_range(0, 8)
+func calculate_dmg(str, atk_str, tem):
+	var dmg = round((str * atk_str) / tem + randi_range(0, 8))
 	print(dmg)
 	return dmg
+
+func _on_player_death():
+	find_child("GUI").visible = true

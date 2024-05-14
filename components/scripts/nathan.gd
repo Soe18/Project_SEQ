@@ -2,6 +2,19 @@ extends CharacterBody2D
 
 var char_name = "Nathan"
 
+@export var vit : int = 270
+var current_vit = vit
+@export var str : int = 138
+var current_str = str
+@export var tem : int = 162
+var current_tem = tem
+@export var des : int = 145
+var current_des = des
+@export var pbc : int = 30
+var current_pbc = pbc
+@export var efc : float = 1.5
+var current_efc = efc
+
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 
@@ -18,9 +31,7 @@ var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 const OK_MULTIPLYER = 450.0
 const ACCELERATION_INCREASE = 10.0
 const MAX_ACCELERATION = 10000.0
-const MAX_HEALTH = 100
 
-var health = 100
 var is_self_in_atk_range = false
 
 var atk_state = Atk_States.IDLE
@@ -70,8 +81,7 @@ var atk_anim_finished = true
 @warning_ignore("unused_parameter") # c'è sta cosa altrimenti mi da fastidio "l'errore"
 
 func _ready():
-	health = MAX_HEALTH
-	$HealthBar.max_value = MAX_HEALTH
+	$HealthBar.max_value = vit
 	set_health_bar()
 
 func _physics_process(_delta):
@@ -272,7 +282,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", atk_state, 12, 2.1)
+		emit_signal("take_dmg", current_str, 12, 2.1)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -283,7 +293,7 @@ func _on_eva_area_body_exited(body):
 func _on_skill_1_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", atk_state, 30, 2)
+		emit_signal("take_dmg", current_str, 30, 2)
 		skill1_area.find_child("Sk1_time").wait_time = 0.4
 		skill1_area.find_child("Sk1_time").start()
 		emit_signal("is_in_atk_range", false, body)
@@ -304,7 +314,7 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", atk_state, 150, 6)
+		emit_signal("take_dmg", current_str, 150, 6)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -317,22 +327,22 @@ func _on_ult_area_body_exited(body):
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		emit_signal("take_dmg", atk_state, 9, 0.5)
+		emit_signal("take_dmg", current_str, 9, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		emit_signal("take_dmg", atk_state, 10, 0.5)
+		emit_signal("take_dmg", current_str, 10, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		emit_signal("take_dmg", atk_state, 10, 0.5)
+		emit_signal("take_dmg", current_str, 10, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		emit_signal("take_dmg", atk_state, 11, 0.5)
+		emit_signal("take_dmg", current_str, 11, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
@@ -424,17 +434,17 @@ func _on_sk_1_time_timeout():
 func evade():
 	$Player_collider.disabled = true
 	if move_vertical == Move_Keys.UP:
-		velocity.y += -25
+		velocity.y += -15
 	elif move_vertical == Move_Keys.DOWN:
-		velocity.y += 25
+		velocity.y += 15
 	if move_horizontal == Move_Keys.LEFT:
-		velocity.x += -25
+		velocity.x += -15
 	elif move_horizontal == Move_Keys.RIGHT:
-		velocity.x += 25
+		velocity.x += 15
 	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == false:
-		velocity.x += 25
+		velocity.x += 15
 	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == true:
-		velocity.x += -25
+		velocity.x += -15
 	move_and_slide()
 
 'METODO CHE SPOSTA IL PLAYER DURANTE LA SKILL1'
@@ -464,8 +474,8 @@ func _on_enemy_is_in_atk_range(is_in, body):
 	else:
 		is_self_in_atk_range = false
 
-func _on_enemy_take_dmg(dmg, sec):
-	health -= dmg
+func _on_enemy_take_dmg(str, atk_str, sec):
+	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem)
 	set_health_bar()
 	#print("take dmg: "+str(dmg))
 	emit_signal("set_idle")
@@ -475,8 +485,8 @@ func _on_enemy_take_dmg(dmg, sec):
 	stun_timer.start()
 
 func set_health_bar():
-	$HealthBar.value = health
-	if health <= 0:
+	$HealthBar.value = current_vit
+	if current_vit <= 0:
 		queue_free()
 
 func _on_stun_timeout():

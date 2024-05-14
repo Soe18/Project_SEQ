@@ -2,7 +2,7 @@ extends Node2D
 
 var markers = []
 var active_markers = []
-var possible_enemies = ["res://scenes/characters/zombie.tscn","res://scenes/characters/skeleton.tscn"]
+var possible_enemies = ["res://scenes/characters/zombie.tscn","res://scenes/characters/skeleton.tscn", "res://scenes/characters/giant.tscn"]
 @onready var time_between_rounds = $Round_cooldown
 
 var fighting
@@ -29,7 +29,7 @@ func _on_round_cooldown_timeout():
 
 func activate_markers():
 	active_markers.clear()
-	for i in randi_range(1,markers.size()-1):
+	for i in randi_range(1,markers.size()):
 		var out = false
 		while not out:
 			var marker = markers.pick_random()
@@ -39,6 +39,7 @@ func activate_markers():
 	
 	for i in active_markers:
 		add_child(load(possible_enemies.pick_random()).instantiate(),true)
+		#add_child(load(possible_enemies[1]).instantiate(),true)
 		get_child(get_child_count()-1).position = i.position
 
 

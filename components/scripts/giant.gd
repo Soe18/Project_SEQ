@@ -1,10 +1,10 @@
 extends CharacterBody2D
 
-@export var vit : int = 200
+@export var vit : int = 500
 var current_vit = vit
-@export var str : int = 110
+@export var str : int = 200
 var current_str = str
-@export var tem : int = 100
+@export var tem : int = 148
 var current_tem = tem
 @export var des : int = 145
 var current_des = des
@@ -13,13 +13,9 @@ var current_pbc = pbc
 @export var efc : float = 1.5
 var current_efc = efc
 
-var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
-var parring = false
-var dying = false
-var soul_out = false
 
 signal take_dmg(str, atk_str, sec_stun)
 
@@ -27,14 +23,24 @@ var player_position
 var target_position
 var player
 
-enum Atk_Selected {IDLE, BASIC_ATK, PARRY}
+var attacking = false
+
+enum Atk_Selected {IDLE, PUNCH, EARTHQUAKE, GIGAGRAB}
 var choosed_atk
 
 @onready var sprite = $Sprite2D
-@onready var basic_atk_effect = $Basic_atk_Area/Effect
-@onready var basic_atk_collider = $Basic_atk_Area/Skill_collider
+
+@onready var punch_area = $Punch_Area
+@onready var punch_collider = $Punch_Area/Skill_collider
+@onready var punch_effect = $Punch_Area/Effect
+
+@onready var earthquake_area = $Earthquake_Area
+@onready var earthquake_collider = $Earthquake_Area/Skill_collider
+@onready var earthquake_effect = $Earthquake_Area/Effect
+
 @onready var stun_timer = $Stun
 @onready var sprite_collider = $Collider
+
 @onready var update_direction_timer = $UpdateDirection
 
 var player_entered = false
@@ -63,22 +69,20 @@ func _ready():
 	controlla se è grabbato
 		allora fa partire il metodo grab()'
 
-func _physics_process(_delta):
-	if dying or soul_out:
-		pass
-	elif parring:
-		pass
-	elif player_entered and moving:
+func _physics_process(delta):
+	if player_entered and moving:
 		chase_player()
-		if choosed_atk == Atk_Selected.BASIC_ATK and $Basic_atk_Cooldown.is_stopped():
-			basic_atk()
-		elif choosed_atk == Atk_Selected.PARRY and $Parry_Cooldown.is_stopped():
-			parry()
+		if choosed_atk == Atk_Selected.PUNCH and $Punch_Cooldown.is_stopped():
+			punch()
+		if choosed_atk == Atk_Selected.EARTHQUAKE and $Earthquake_Cooldown.is_stopped() and stun_timer.is_stopped():
+			earthquake()
 	elif not player_entered and moving:
 		wander()
-	elif not player_entered and not moving and not parring:
+	elif not player_entered and not moving and not attacking:
 		sprite.play("idle")
-	if grabbed:
+		punch_effect.play("idle")
+		earthquake_effect.play("idle")
+	elif grabbed:
 		is_grabbed()
 
 'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -89,41 +93,41 @@ func _physics_process(_delta):
 
 func flip():
 	if target_position.x < 0:
-		basic_atk_effect.position = Vector2(-49, 12)
-		basic_atk_effect.flip_h = false
+		punch_collider.position = Vector2(-50, 13)
+		punch_effect.position = Vector2(-59,-5)
+		punch_effect.flip_h = true
 		sprite.flip_h = true
-		basic_atk_collider.position = Vector2(-73.5, 5.5)
 	elif target_position.x > 0:
-		basic_atk_effect.position = Vector2(49, 12)
-		basic_atk_effect.flip_h = true
+		punch_collider.position = Vector2(50, 13)
+		punch_effect.position = Vector2(59,-5)
+		punch_effect.flip_h = false
 		sprite.flip_h = false
-		basic_atk_collider.position = Vector2(73.5, 5.5)
 
 func chase_player():
 	player_position = player.position
 	target_position = (player_position - position).normalized()
 	flip()
-	if position.distance_to(player_position) > 100:
+	if position.distance_to(player_position) > 200:
 		sprite.play("running")
-		move_and_collide(target_position * 3)
-	elif position.distance_to(player_position) <= 100 and sprite.animation == "running":
+		move_and_collide(target_position * 1.5)
+	elif position.distance_to(player_position) <= 200 and sprite.animation == "running":
 		sprite.play("idle")
 
 func choose_atk():
 	var rng = randi_range(0,100)
-	if rng >= 0 and rng < 10:
+	if rng >= 0 and rng < 15:
 		choosed_atk = Atk_Selected.IDLE
-	elif rng >= 10 and rng < 65:
-		choosed_atk = Atk_Selected.BASIC_ATK
-	elif rng >= 65:
-		choosed_atk = Atk_Selected.PARRY
+	elif rng >= 15 and rng < 85:
+		choosed_atk = Atk_Selected.PUNCH
+	elif rng >= 85:
+		choosed_atk = Atk_Selected.EARTHQUAKE
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
 
 func wander():
 	sprite.play("running")
 	flip()
-	move_and_collide(target_position * 2)
+	move_and_collide(target_position * 1)
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -154,30 +158,22 @@ func _on_player_is_in_atk_range(is_in, body):
 	se il nodo è in range e non è grabbato
 		allora sottraggo alla vita il danno
 		setto la barra della vita con il nuovo valore
+		# print di debug #
 		impedisco al nodo di muoversi mentre viene attaccato
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
 func _on_player_take_dmg(str, atk_str, sec):
-	if dying and not soul_out:
-		pass
-	elif is_in_atk_range and !grabbed and not parring:
-		health -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
-		moving = false
-		if health > 0:
-			stun_timer.wait_time = sec
-			stun_timer.start()
-			sprite.play("damaged")
-		elif health <= 0 and not dying:
-			dying = true
-			if not sprite.animation == "dying":
-				sprite.play("dying")
-			health = 1
-			sprite_collider.process_mode = Node.PROCESS_MODE_DISABLED
-			$Soul_delay_time.start()
+	if is_in_atk_range and !grabbed:
+		sprite.position = Vector2(0,0)
+		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
+		health -= dmg
 		set_health_bar()
-	elif is_in_atk_range and !grabbed and parring:
-		$Inhale_time.start(0.8)
+		if dmg >= 25:
+			attacking = false
+			moving = false
+			stun_timer.start(sec)
+			sprite.play("damaged")
 
 'DIGEST DEL SENGALE DEL PLAYER "grab"
 {
@@ -204,11 +200,10 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
 		_on_player_take_dmg(current_str, 13, 0.1)
-		if health > 0:
-			moving = false
-			grabbed = true
-			sprite.visible = false
-			sprite_collider.disabled = true
+		moving = false
+		grabbed = true
+		sprite.visible = false
+		sprite_collider.disabled = true
 	if !is_been_grabbed and grabbed:
 		moving = true
 		grabbed = false
@@ -230,8 +225,7 @@ func is_grabbed():
 	setto il movimento a true'
 
 func _on_stun_timeout():
-	if not dying:
-		_on_inhale_time_timeout()
+	_on_inhale_time_timeout()
 
 'DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
 	il valore della barra diventa uguale a quello della vita attuale
@@ -239,10 +233,9 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	if soul_out:
+	$HealthBar.value = health
+	if health <= 0:
 		queue_free()
-	else:
-		$HealthBar.value = health
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
 	setto le collisioni a true'
@@ -276,6 +269,24 @@ func _on_area_of_detection_body_exited(body):
 		update_direction_timer.start()
 		player_entered = false
 
+func _on_punch_area_body_entered(body):
+	if body == player:
+		print("pugno entrato")
+		player_in_atk_range = true
+
+func _on_punch_area_body_exited(body):
+	if body == player:
+		print("pugno uscito")
+		player_in_atk_range = false
+
+func _on_earthquake_area_body_entered(body):
+	if body == player:
+		player_in_atk_range = true
+
+func _on_earthquake_area_body_exited(body):
+	if body == player:
+		player_in_atk_range = false
+
 'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
 	ferma il movimento
 	fa partire il tempo di fermo
@@ -296,65 +307,66 @@ func _on_update_direction_timeout():
 	update_direction_timer.wait_time = new_update_time
 # -------- SIGNAL DIGEST -------- #
 
+func _on_sprite_2d_animation_finished():
+	if sprite.animation == "punch":
+		_on_inhale_time_timeout()
+
+func _on_sprite_2d_frame_changed():
+	if (sprite.animation == "earthquake" and sprite.frame == 2) or (sprite.animation == "earthquake" and sprite.frame == 4) or (sprite.animation == "earthquake" and sprite.frame == 8):
+		if earthquake_effect.is_playing():
+			earthquake_effect.stop()
+			earthquake_effect.play("effect")
+		else:
+			earthquake_effect.play("effect")
+
+'FUNZIONE PER L\'ATTACCO PUGNO'
+
+func punch():
+	if stun_timer.is_stopped() and not grabbed:
+		$Punch_Cooldown.start()
+		attacking = true
+		if sprite.flip_h:
+			sprite.position = Vector2(-40,0)
+		else:
+			sprite.position = Vector2(40,0)
+		moving = false
+		sprite.play("punch")
+		punch_effect.play("effect")
+		punch_area.process_mode = Node.PROCESS_MODE_ALWAYS
+
+func _on_effect_animation_finished():
+	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
+		emit_signal("take_dmg", str, 25, 2.4)
+		_on_inhale_time_timeout()
+	if earthquake_effect.animation == "effect":
+		_on_inhale_time_timeout()
+
+func _on_effect_frame_changed():
+	if earthquake_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
+		emit_signal("take_dmg", str, 0.1, 0.3)
+
+'FUNZIONE PER L\'ATTACCO TERREMOTO'
+
+func earthquake():
+	if player_entered and stun_timer.is_stopped() and not grabbed:
+		$Earthquake_Cooldown.start()
+		attacking = true
+		moving = false
+		sprite.play("earthquake")
+		earthquake_area.process_mode = Node.PROCESS_MODE_ALWAYS
+
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
 func _on_inhale_time_timeout():
+	sprite.position = Vector2(0,0)
 	moving = true
-	dying = false
-	soul_out = false
-	if parring:
-		parring = false
-		sprite.play("idle")
-
-func _on_basic_atk_area_body_entered(body):
-	if body == player:
-		player_in_atk_range = true
-
-func _on_basic_atk_area_body_exited(body):
-	if body == player:
-		player_in_atk_range = false
-
-func _on_effect_animation_finished():
-	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, 5, 1)
-	basic_atk_effect.play("idle")
+	attacking = false
+	punch_area.process_mode = Node.PROCESS_MODE_DISABLED
+	earthquake_area.process_mode = Node.PROCESS_MODE_DISABLED
 	sprite.play("idle")
-	
-func basic_atk():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
-		basic_atk_effect.play("effect")
-		sprite.play("attack")
-	$Basic_atk_Cooldown.start()
-
-func parry():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
-		parring = true
-		sprite.play("parry")
-		$Inhale_time.start(3)
-	$Parry_Cooldown.start()
+	punch_effect.play("idle")
+	earthquake_effect.play("idle")
 
 func _on_update_atk_timeout():
 	choose_atk()
 	$Update_Atk.start()
-
-func _on_soul_delay_time_timeout():
-	sprite.play("soul_spawning")
-
-func _on_soul_respawn_time_timeout():
-	dying = true
-	soul_out = false
-	sprite.speed_scale = 0.5
-	sprite.play_backwards("dying")
-
-func _on_sprite_2d_animation_finished():
-	if sprite.animation == "soul_spawning":
-		dying = false
-		soul_out = true
-		sprite.play("soul_idle")
-		$Soul_respawn_time.start()
-	
-	if sprite.animation == "dying" and sprite.speed_scale == 0.5 and dying:
-		sprite.speed_scale = 1
-		health = vit/3
-		set_health_bar()
-		_on_inhale_time_timeout()

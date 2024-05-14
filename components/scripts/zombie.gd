@@ -1,11 +1,24 @@
 extends CharacterBody2D
 
+@export var vit : int = 150
+var current_vit = vit
+@export var str : int = 125
+var current_str = str
+@export var tem : int = 121
+var current_tem = tem
+@export var des : int = 145
+var current_des = des
+@export var pbc : int = 30
+var current_pbc = pbc
+@export var efc : float = 1.5
+var current_efc = efc
+
 var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
 
-signal take_dmg(dmg, sec_stun)
+signal take_dmg(str, atk_str, sec_stun)
 
 var player_position
 var target_position
@@ -29,11 +42,6 @@ var sprinting = false
 var player_entered = false
 var player_in_atk_range = false
 
-'const SPEED = 300.0
-const JUMP_VELOCITY = -400.0'
-
-const MAX_HEALTH = 300
-
 var health
 
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -42,8 +50,8 @@ var health
 	setta la barra della salute'
 
 func _ready():
-	health = MAX_HEALTH
-	$HealthBar.max_value = MAX_HEALTH
+	health = vit
+	$HealthBar.max_value = vit
 	set_health_bar()
 	_on_update_direction_timeout()
 	update_direction_timer.start()
@@ -160,7 +168,7 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(str, atk_str, sec):
 	if is_in_atk_range and !grabbed:
-		health -= get_parent().get_parent().calculate_dmg(str, atk_str, 121)
+		health -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
 		set_health_bar()
 		#print("take dmg: "+str(dmg))
 		moving = false
@@ -192,7 +200,7 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
-		_on_player_take_dmg(1, 13, 0.1)
+		_on_player_take_dmg(current_str, 13, 0.1)
 		moving = false
 		sprinting = false
 		grabbed = true
@@ -302,7 +310,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_sprint_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
-		emit_signal("take_dmg", 15, 2)
+		emit_signal("take_dmg",current_str, 15, 2)
 		$Inhale_time.start(0.5)
 		$Update_Atk.start(0.5)
 
@@ -312,7 +320,7 @@ func _on_sprint_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", 5, 1)
+		emit_signal("take_dmg",current_str, 5, 1)
 		$Basic_atk_Cooldown.start()
 	basic_atk_effect.play("idle")
 	sprite.play("idle")
