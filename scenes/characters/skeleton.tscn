@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://dc4r0c3q4h1vo"]
+[gd_scene load_steps=48 format=3 uid="uid://dc4r0c3q4h1vo"]
 
 [ext_resource type="Script" path="res://components/scripts/skeleton.gd" id="1_dah7i"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_apuag"]
@@ -244,8 +244,14 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
 size = Vector2(59, 97)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0p46"]
+bg_color = Color(0.219608, 0.219608, 0.219608, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vdg0j"]
+bg_color = Color(1, 0, 0.0352941, 1)
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 621.039
+radius = 818.022
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kr4ka"]
 size = Vector2(63.5, 120)
@@ -324,6 +330,8 @@ offset_left = -50.0
 offset_top = -57.0
 offset_right = 48.0
 offset_bottom = -38.0
+theme_override_styles/background = SubResource("StyleBoxFlat_x0p46")
+theme_override_styles/fill = SubResource("StyleBoxFlat_vdg0j")
 max_value = 150.0
 rounded = true
 show_percentage = false

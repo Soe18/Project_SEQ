@@ -4,6 +4,7 @@ var markers = []
 var active_markers = []
 var possible_enemies = ["res://scenes/characters/zombie.tscn","res://scenes/characters/skeleton.tscn", "res://scenes/characters/giant.tscn"]
 @onready var time_between_rounds = $Round_cooldown
+signal round_changed()
 
 var fighting
 # Called when the node enters the scene tree for the first time.
@@ -25,11 +26,36 @@ func _process(delta):
 func _on_round_cooldown_timeout():
 	activate_markers()
 	fighting = true
-
+	emit_signal("round_changed")
 
 func activate_markers():
 	active_markers.clear()
-	for i in randi_range(1,markers.size()):
+	
+	var round_count = get_parent().round_gui.round_count
+	
+	var min_count = ceil(round_count/2)
+	
+	if min_count < 1:
+		min_count = 1
+	elif min_count > markers.size():
+		min_count = markers.size()
+	
+	if min_count == 1 and round_count > 2:
+		min_count = 2
+	
+	var max_count = round_count
+	if max_count < 1:
+		max_count = 1
+	elif max_count > markers.size():
+		max_count = markers.size()
+	
+	var enemy_count = randi_range(min_count, max_count)
+	print("round_count = " + str(round_count))
+	print("min_count = " + str(min_count))
+	print("max_count = " + str(max_count))
+	print("enemy_count = " + str(enemy_count))
+	
+	for i in enemy_count:
 		var out = false
 		while not out:
 			var marker = markers.pick_random()
@@ -39,7 +65,7 @@ func activate_markers():
 	
 	for i in active_markers:
 		add_child(load(possible_enemies.pick_random()).instantiate(),true)
-		#add_child(load(possible_enemies[1]).instantiate(),true)
+		#add_child(load(possible_enemies[2]).instantiate(),true)
 		get_child(get_child_count()-1).position = i.position
 
 

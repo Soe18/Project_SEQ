@@ -1,15 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://bm7culrlwfwta"]
+[gd_scene load_steps=3 format=3 uid="uid://bm7culrlwfwta"]
+
+[ext_resource type="Script" path="res://components/scripts/basic_scene_GUI.gd" id="1_356s4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_60f8n"]
-bg_color = Color(0.901961, 0.0470588, 0.2, 1)
+bg_color = Color(0.384314, 0.0470588, 0.243137, 1)
 
-[node name="Control" type="Control"]
+[node name="Round_GUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_356s4")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -27,7 +30,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_60f8n")
 [node name="CenterContainer" type="CenterContainer" parent="MarginContainer/PanelContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/PanelContainer/CenterContainer"]
+[node name="Round_displayer" type="Label" parent="MarginContainer/PanelContainer/CenterContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 54
+theme_override_font_sizes/font_size = 29
 text = "Ondata: 1"

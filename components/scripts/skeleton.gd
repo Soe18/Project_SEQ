@@ -40,16 +40,13 @@ var choosed_atk
 var player_entered = false
 var player_in_atk_range = false
 
-var health
-
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
 	setta la vita attuale a quella massima
 	imposta il valore massimo della barra della salute al massimo
 	setta la barra della salute'
 
 func _ready():
-	health = vit
-	$HealthBar.max_value = vit
+	$HealthBar.max_value = current_vit
 	set_health_bar()
 	_on_update_direction_timeout()
 	update_direction_timer.start()
@@ -162,17 +159,17 @@ func _on_player_take_dmg(str, atk_str, sec):
 	if dying and not soul_out:
 		pass
 	elif is_in_atk_range and !grabbed and not parring:
-		health -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
+		current_vit -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
 		moving = false
-		if health > 0:
+		if current_vit > 0:
 			stun_timer.wait_time = sec
 			stun_timer.start()
 			sprite.play("damaged")
-		elif health <= 0 and not dying:
+		elif current_vit <= 0 and not dying:
 			dying = true
 			if not sprite.animation == "dying":
 				sprite.play("dying")
-			health = 1
+			current_vit = 1
 			sprite_collider.process_mode = Node.PROCESS_MODE_DISABLED
 			$Soul_delay_time.start()
 		set_health_bar()
@@ -204,7 +201,7 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
 		_on_player_take_dmg(current_str, 13, 0.1)
-		if health > 0:
+		if current_vit > 0:
 			moving = false
 			grabbed = true
 			sprite.visible = false
@@ -242,7 +239,7 @@ func set_health_bar():
 	if soul_out:
 		queue_free()
 	else:
-		$HealthBar.value = health
+		$HealthBar.value = current_vit
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
 	setto le collisioni a true'
@@ -355,6 +352,6 @@ func _on_sprite_2d_animation_finished():
 	
 	if sprite.animation == "dying" and sprite.speed_scale == 0.5 and dying:
 		sprite.speed_scale = 1
-		health = vit/3
+		current_vit = vit
 		set_health_bar()
 		_on_inhale_time_timeout()

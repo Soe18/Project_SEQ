@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cp64rsm1umaj0"]
+[gd_scene load_steps=9 format=3 uid="uid://cp64rsm1umaj0"]
 
 [ext_resource type="Script" path="res://components/scripts/rufus_gui.gd" id="1_3rxhd"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="2_rdasp"]
@@ -7,7 +7,13 @@
 [ext_resource type="Texture2D" uid="uid://bflcuuauxyxfi" path="res://components/sprites/GUI/player_GUI/rufus/Eva_GUI_rufus.png" id="5_lwiw5"]
 [ext_resource type="Texture2D" uid="uid://cega3rs3chnkn" path="res://components/sprites/GUI/player_GUI/rufus/Ulti_GUI_rufus.png" id="6_8rr55"]
 
-[node name="Control" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dcn56"]
+bg_color = Color(0.219608, 0.219608, 0.219608, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n23eg"]
+bg_color = Color(1, 0, 0.0352941, 1)
+
+[node name="Rufus_GUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -88,3 +94,51 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("6_8rr55")
 texture_progress = ExtResource("2_rdasp")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+grow_horizontal = 0
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 135
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Health_bar" type="ProgressBar" parent="MarginContainer/PanelContainer/Control"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -542.0
+offset_bottom = 59.0
+grow_horizontal = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_dcn56")
+theme_override_styles/fill = SubResource("StyleBoxFlat_n23eg")
+step = 1.0
+rounded = true
+show_percentage = false
+
+[node name="Health_label" type="Label" parent="MarginContainer/PanelContainer/Control/Health_bar"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 35
+text = "444/444"

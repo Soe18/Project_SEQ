@@ -117,9 +117,9 @@ func choose_atk():
 	var rng = randi_range(0,100)
 	if rng >= 0 and rng < 15:
 		choosed_atk = Atk_Selected.IDLE
-	elif rng >= 15 and rng < 85:
+	elif rng >= 15 and rng <= 72:
 		choosed_atk = Atk_Selected.PUNCH
-	elif rng >= 85:
+	elif rng >= 72:
 		choosed_atk = Atk_Selected.EARTHQUAKE
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
@@ -165,11 +165,11 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(str, atk_str, sec):
 	if is_in_atk_range and !grabbed:
-		sprite.position = Vector2(0,0)
 		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
 		health -= dmg
 		set_health_bar()
 		if dmg >= 25:
+			sprite.position = Vector2(0,0)
 			attacking = false
 			moving = false
 			stun_timer.start(sec)
@@ -312,7 +312,7 @@ func _on_sprite_2d_animation_finished():
 		_on_inhale_time_timeout()
 
 func _on_sprite_2d_frame_changed():
-	if (sprite.animation == "earthquake" and sprite.frame == 2) or (sprite.animation == "earthquake" and sprite.frame == 4) or (sprite.animation == "earthquake" and sprite.frame == 8):
+	if (sprite.animation == "earthquake" and sprite.frame == 1) or (sprite.animation == "earthquake" and sprite.frame == 3) or (sprite.animation == "earthquake" and sprite.frame == 7):
 		if earthquake_effect.is_playing():
 			earthquake_effect.stop()
 			earthquake_effect.play("effect")
@@ -332,7 +332,7 @@ func punch():
 		moving = false
 		sprite.play("punch")
 		punch_effect.play("effect")
-		punch_area.process_mode = Node.PROCESS_MODE_ALWAYS
+		punch_area.process_mode = Node.PROCESS_MODE_INHERIT
 
 func _on_effect_animation_finished():
 	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
@@ -342,8 +342,8 @@ func _on_effect_animation_finished():
 		_on_inhale_time_timeout()
 
 func _on_effect_frame_changed():
-	if earthquake_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", str, 0.1, 0.3)
+	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
+		emit_signal("take_dmg", str, 2, 0.5)
 
 'FUNZIONE PER L\'ATTACCO TERREMOTO'
 
@@ -353,7 +353,7 @@ func earthquake():
 		attacking = true
 		moving = false
 		sprite.play("earthquake")
-		earthquake_area.process_mode = Node.PROCESS_MODE_ALWAYS
+		earthquake_area.process_mode = Node.PROCESS_MODE_INHERIT
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 

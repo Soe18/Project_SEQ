@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=36 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_ffk67"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="2_eh7wu"]
@@ -162,8 +162,14 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
 size = Vector2(59, 97)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00dig"]
+bg_color = Color(0.219608, 0.219608, 0.219608, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
+bg_color = Color(1, 0, 0.0352941, 1)
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 621.039
+radius = 1116.03
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kr4ka"]
 size = Vector2(63.5, 120)
@@ -235,7 +241,7 @@ autoplay = "idle"
 [node name="Collider" type="CollisionShape2D" parent="."]
 position = Vector2(-3.5, 15.5)
 shape = SubResource("RectangleShape2D_sb3xy")
-debug_color = Color(0.0196078, 0.611765, 0.611765, 0.419608)
+debug_color = Color(0.0196078, 0.611765, 0.611765, 0.105882)
 
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
@@ -246,6 +252,8 @@ offset_left = -50.0
 offset_top = -57.0
 offset_right = 48.0
 offset_bottom = -38.0
+theme_override_styles/background = SubResource("StyleBoxFlat_00dig")
+theme_override_styles/fill = SubResource("StyleBoxFlat_0rxx2")
 max_value = 150.0
 rounded = true
 show_percentage = false

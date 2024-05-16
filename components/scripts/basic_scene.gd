@@ -4,6 +4,13 @@ var player
 var paused = false
 var connected = false
 
+@onready var canvas_layer = find_child("CanvasLayer")
+@onready var gui = canvas_layer.find_child("GUI")
+@onready var game_over_container = gui.find_child("GameOver_container")
+@onready var chara_container = gui.find_child("Chara_selector_container")
+@onready var round_gui = canvas_layer.find_child("Round_GUI")
+var player_gui
+
 'func _ready():
 	for i in get_child_count():
 		if get_child(i) != player:
@@ -17,6 +24,7 @@ var connected = false
 @onready var enemy_container = $Enemy_container
 
 func _process(delta):
+	# Gestione del menu di pausa
 	if Input.is_action_just_pressed("pause") and not paused:
 		paused = true
 		pause_game(paused)
@@ -52,19 +60,25 @@ func _on_gui_select_character(char):
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1, 1)
+	
+	# creo la telecamera
 	var camera = Camera2D.new()
+	# impostazioni per la telecamera
 	camera.zoom = Vector2(1.5,1.5)
-	player.add_child(camera,true)
+	camera.position_smoothing_enabled = true
+	camera.position_smoothing_speed = 3
+	# condizione per collegare lo script della telecamera
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
 		player.scale = Vector2(1.2, 1.2)
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
+	# condizione per attivare la gui di Rufus
 	if char == "rufus":
-		find_child("CanvasLayer").add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
-		find_child("CanvasLayer").get_child(find_child("CanvasLayer").get_child_count()-1).player = player
-		find_child("CanvasLayer").get_child(find_child("CanvasLayer").get_child_count()-1).player_death.connect(self._on_player_death)
-	connect_enemies_with_player()
-	find_child("GUI").visible = false
+		activate_rufus()
+	player.add_child(camera,true) # aggiungo la camera al player
+	connect_enemies_with_player() # connetto i nemici e il player
+	gui.visible = false
+	canvas_layer.get_child(0).visible = true
 	
 'METODO CHE CONNETTE I SEGNALI AL PLAYER
 	cicla ogni nodo figlio della root nella scena,
@@ -77,23 +91,42 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 		var current_node = enemy_container.get_child(i)
 		if "Enemy" in current_node.name: #se il nome del nemico contiene "Enemy"
 			current_node.player = player
+			# segnale tra player e nemici per capire se si è in range
 			player.is_in_atk_range.connect(current_node._on_player_is_in_atk_range)
+			# segnale tra player e nemici per infliggere danno
 			player.take_dmg.connect(current_node._on_player_take_dmg)
+			# segnale tra nemici e player per infliggere danno
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
+			# se il player ha scelto nathan
 			if player.char_name == "Nathan":
+				# connetto il segnale della grab
 				player.grab.connect(current_node._on_player_grab)
 
 func pause_game(get_paused):
-	for i in get_child_count():
-		if get_paused:
+	for i in get_child_count(): # ciclo tutti i nodi
+		if get_paused: # se non sono in pausa
 			get_child(i).process_mode = Node.PROCESS_MODE_DISABLED
-		else:
-			get_child(i).process_mode = Node.PROCESS_MODE_ALWAYS
+		else: # se sono in pausa
+			get_child(i).process_mode = Node.PROCESS_MODE_INHERIT
 
 func calculate_dmg(str, atk_str, tem):
-	var dmg = round((str * atk_str) / tem + randi_range(0, 8))
+	var dmg = round((str * atk_str + randi_range(0, 16)) / tem)
 	print(dmg)
 	return dmg
 
 func _on_player_death():
-	find_child("GUI").visible = true
+	gui.visible = true # la GUI diventa visibile
+	game_over_container.visible = true # rendo visibile il game over
+	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
+	player_gui.visible = false # nascondo la gui del player
+	
+func activate_rufus():
+	canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
+	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
+	player_gui.player = player
+	player_gui.player_death.connect(self._on_player_death)
+	player_gui.max_health = player.vit
+	player_gui.healthbar.max_value = player.vit
+	player_gui.healthbar.value = player.vit
+	player_gui.healthbar_label.text = str(player.vit) + "/" + str(player.vit)
+	player.set_health_bar.connect(player_gui._on_player_set_health_bar)

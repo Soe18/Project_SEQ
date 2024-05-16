@@ -737,16 +737,6 @@ collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_kqagk")
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-offset_left = -76.0
-offset_top = -82.0
-offset_right = 86.0
-offset_bottom = -55.0
-step = 1.0
-rounded = true
-show_percentage = false
-metadata/_edit_use_anchors_ = true
-
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.156982, 0.156982)
 sprite_frames = SubResource("SpriteFrames_dte57")
@@ -838,11 +828,11 @@ wait_time = 0.4
 one_shot = true
 
 [node name="Skill1_cooldown" type="Timer" parent="."]
-wait_time = 3.623
+wait_time = 4.91
 one_shot = true
 
 [node name="Skill2_cooldown" type="Timer" parent="."]
-wait_time = 4.743
+wait_time = 6.113
 one_shot = true
 
 [node name="Eva_cooldown" type="Timer" parent="."]
@@ -850,7 +840,7 @@ wait_time = 3.955
 one_shot = true
 
 [node name="Ulti_cooldown" type="Timer" parent="."]
-wait_time = 8.412
+wait_time = 14.727
 one_shot = true
 
 [node name="Combo_time" type="Timer" parent="."]
@@ -862,6 +852,8 @@ one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)
+limit_smoothed = true
+position_smoothing_enabled = true
 
 [connection signal="set_idle" from="." to="." method="_on_set_idle" flags=18]
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished" flags=18]

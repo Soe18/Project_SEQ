@@ -7,6 +7,10 @@ var player
 @onready var eva_cooldown_time = $GridContainer/Control3/Eva_cooldown
 @onready var ulti_cooldown_time = $GridContainer/Control4/Ulti_cooldown
 
+@onready var healthbar = $MarginContainer/PanelContainer/Control/Health_bar
+@onready var healthbar_label = $MarginContainer/PanelContainer/Control/Health_bar/Health_label
+var max_health
+
 signal player_death()
 
 var temp = false
@@ -33,3 +37,9 @@ func _process(delta):
 	if player == null and temp:
 		temp = false
 		emit_signal("player_death")
+
+func _on_player_set_health_bar(vit):
+	if vit <= 0:
+		player.queue_free()
+	healthbar.value = vit
+	healthbar_label.text = str(vit) + "/" +  str(max_health)

@@ -110,11 +110,12 @@ func chase_player():
 		sprite.play("idle")
 
 func sprint_to_player():
-	player_position = player.position
-	target_position = (player_position - position).normalized()
-	flip()
-	sprite.play("running")
-	move_and_collide(target_position * 5)
+	if player != null:
+		player_position = player.position
+		target_position = (player_position - position).normalized()
+		flip()
+		sprite.play("running")
+		move_and_collide(target_position * 5)
 
 func choose_atk():
 	var rng = randi_range(0,100)
@@ -340,7 +341,7 @@ func sprint():
 func _on_charge_time_timeout():
 	if stun_timer.is_stopped():
 		sprinting = true
-		sprint_area.process_mode = Node.PROCESS_MODE_ALWAYS
+		sprint_area.process_mode = Node.PROCESS_MODE_INHERIT
 		$Inhale_time.start(6)
 
 func _on_update_atk_timeout():

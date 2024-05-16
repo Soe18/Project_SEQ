@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://d3fr55lfdcvjp"]
+[gd_scene load_steps=15 format=3 uid="uid://d3fr55lfdcvjp"]
 
 [ext_resource type="Script" path="res://components/scripts/basic_scene.gd" id="1_37lom"]
 [ext_resource type="Texture2D" uid="uid://cs5jopxmileup" path="res://components/sprites/mainlevbuild.png" id="2_cdl2a"]
 [ext_resource type="Texture2D" uid="uid://1myxeqojf4he" path="res://components/sprites/decorative.png" id="3_6y76a"]
 [ext_resource type="Script" path="res://components/scripts/GUI.gd" id="5_x0khl"]
+[ext_resource type="PackedScene" uid="uid://bm7culrlwfwta" path="res://scenes/GUI/basic_scene_GUI.tscn" id="6_jl7ps"]
 [ext_resource type="Script" path="res://components/scripts/enemy_spawn_position.gd" id="7_1cuyb"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x50h8"]
@@ -1175,6 +1176,11 @@ size = Vector2(1523, 2715)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ojwx3"]
 size = Vector2(5512.13, 1345.5)
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5w7gn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4wxl"]
+bg_color = Color(0.4, 0, 0, 1)
+
 [node name="Scene_manager" type="Node2D"]
 script = ExtResource("1_37lom")
 metadata/_edit_vertical_guides_ = []
@@ -1194,52 +1200,6 @@ scale = Vector2(9.397, 9.397)
 tile_set = SubResource("TileSet_yahxf")
 format = 2
 layer_0/tile_data = PackedInt32Array(-65537, 196617, 1, -1, 196617, 2, 65535, 196617, 3)
-
-[node name="GUI" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
-script = ExtResource("5_x0khl")
-
-[node name="MarginContainer" type="MarginContainer" parent="GUI"]
-layout_mode = 1
-offset_top = 120.0
-offset_right = 1919.0
-offset_bottom = 200.0
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
-
-[node name="GridContainer" type="GridContainer" parent="GUI/MarginContainer"]
-layout_mode = 2
-theme_override_constants/h_separation = 60
-columns = 3
-
-[node name="Select_stancil" type="Button" parent="GUI/MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 30
-text = "PLAYER STANCIL"
-metadata/_edit_use_anchors_ = true
-
-[node name="Select_rufus" type="Button" parent="GUI/MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 30
-text = "RUFUS"
-metadata/_edit_use_anchors_ = true
-
-[node name="Select_nathan" type="Button" parent="GUI/MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 30
-text = "NATHAN"
-metadata/_edit_use_anchors_ = true
 
 [node name="RigidBody2D" type="StaticBody2D" parent="."]
 position = Vector2(3384, 104)
@@ -1271,33 +1231,132 @@ one_shot = true
 position = Vector2(172, 856)
 
 [node name="Spawnpoint2" type="Marker2D" parent="Enemy_container"]
-position = Vector2(1830, 956)
+position = Vector2(1665, 716)
 
 [node name="Spawnpoint3" type="Marker2D" parent="Enemy_container"]
-position = Vector2(1668, -46)
+position = Vector2(1347, -112)
 
 [node name="Spawnpoint4" type="Marker2D" parent="Enemy_container"]
-position = Vector2(1132, -110)
+position = Vector2(356, -178)
 
 [node name="Spawnpoint5" type="Marker2D" parent="Enemy_container"]
-position = Vector2(564, 688)
+position = Vector2(519, 412)
 
 [node name="Spawnpoint6" type="Marker2D" parent="Enemy_container"]
-position = Vector2(485, -185)
+position = Vector2(850, 783)
 
 [node name="Spawnpoint7" type="Marker2D" parent="Enemy_container"]
-position = Vector2(925, 375)
+position = Vector2(1349, 460)
+
+[node name="Spawnpoint8" type="Marker2D" parent="Enemy_container"]
+position = Vector2(821, 38)
+
+[node name="Spawnpoint9" type="Marker2D" parent="Enemy_container"]
+position = Vector2(1216, 941)
+
+[node name="Spawnpoint10" type="Marker2D" parent="Enemy_container"]
+position = Vector2(349, 1125)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Control" type="Control" parent="CanvasLayer"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Round_GUI" parent="CanvasLayer" instance=ExtResource("6_jl7ps")]
+visible = false
 
-[connection signal="select_character" from="GUI" to="." method="_on_gui_select_character"]
-[connection signal="pressed" from="GUI/MarginContainer/GridContainer/Select_stancil" to="GUI" method="_on_select_stancil_pressed"]
-[connection signal="pressed" from="GUI/MarginContainer/GridContainer/Select_rufus" to="GUI" method="_on_select_rufus_pressed"]
-[connection signal="pressed" from="GUI/MarginContainer/GridContainer/Select_nathan" to="GUI" method="_on_select_nathan_pressed"]
+[node name="GUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_x0khl")
+
+[node name="Chara_selector_container" type="MarginContainer" parent="CanvasLayer/GUI"]
+layout_mode = 1
+offset_top = 120.0
+offset_right = 1919.0
+offset_bottom = 200.0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/GUI/Chara_selector_container"]
+layout_mode = 2
+theme_override_constants/h_separation = 60
+columns = 3
+
+[node name="Select_stancil" type="Button" parent="CanvasLayer/GUI/Chara_selector_container/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_neighbor_left = NodePath("../Select_nathan")
+focus_neighbor_right = NodePath("../Select_rufus")
+theme_override_font_sizes/font_size = 30
+text = "PLAYER STANCIL"
+metadata/_edit_use_anchors_ = true
+
+[node name="Select_rufus" type="Button" parent="CanvasLayer/GUI/Chara_selector_container/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_neighbor_left = NodePath("../Select_stancil")
+focus_neighbor_right = NodePath("../Select_nathan")
+theme_override_font_sizes/font_size = 30
+text = "RUFUS"
+metadata/_edit_use_anchors_ = true
+
+[node name="Select_nathan" type="Button" parent="CanvasLayer/GUI/Chara_selector_container/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_neighbor_left = NodePath("../Select_rufus")
+focus_neighbor_right = NodePath("../Select_stancil")
+theme_override_font_sizes/font_size = 30
+text = "NATHAN"
+metadata/_edit_use_anchors_ = true
+
+[node name="GameOver_container" type="MarginContainer" parent="CanvasLayer/GUI"]
+visible = false
+layout_mode = 2
+offset_left = 15.0
+offset_top = 135.0
+offset_right = 1904.0
+offset_bottom = 585.0
+theme_override_constants/margin_top = 196
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/GUI/GameOver_container"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5w7gn")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/GUI/GameOver_container/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 83
+theme_override_styles/normal = SubResource("StyleBoxFlat_f4wxl")
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 87
+theme_override_constants/margin_right = 0
+
+[node name="Retry" type="Button" parent="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Riprova"
+
+[connection signal="round_changed" from="Enemy_container" to="CanvasLayer/Round_GUI" method="_on_round_changed"]
 [connection signal="timeout" from="Enemy_container/Round_cooldown" to="Enemy_container" method="_on_round_cooldown_timeout"]
+[connection signal="select_character" from="CanvasLayer/GUI" to="." method="_on_gui_select_character"]
+[connection signal="pressed" from="CanvasLayer/GUI/Chara_selector_container/GridContainer/Select_stancil" to="CanvasLayer/GUI" method="_on_select_stancil_pressed"]
+[connection signal="pressed" from="CanvasLayer/GUI/Chara_selector_container/GridContainer/Select_rufus" to="CanvasLayer/GUI" method="_on_select_rufus_pressed"]
+[connection signal="pressed" from="CanvasLayer/GUI/Chara_selector_container/GridContainer/Select_nathan" to="CanvasLayer/GUI" method="_on_select_nathan_pressed"]
+[connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/Retry" to="CanvasLayer/GUI" method="_on_retry_pressed"]

@@ -15,7 +15,6 @@ var current_pbc = pbc
 @export var efc : float = 1.5
 var current_efc = efc
 
-
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 
@@ -24,6 +23,7 @@ enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 signal is_in_atk_range(is_in, body)
 signal take_dmg(str, atk_str, sec_stun)
 signal set_idle()
+signal set_health_bar(current_vit)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
@@ -85,8 +85,7 @@ var ult_moving_mod
 
 @warning_ignore("unused_parameter")
 func _ready():
-	$HealthBar.max_value = vit
-	set_health_bar()
+	emit_signal("set_health_bar", current_vit)
 
 func _physics_process(_delta):
 	if can_move:
@@ -287,7 +286,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 5, 2.1)
+		emit_signal("take_dmg", current_str, 10, 2.1)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -325,22 +324,22 @@ func _on_ult_area_body_exited(body):
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		emit_signal("take_dmg", current_str, 5, 0.4)
+		emit_signal("take_dmg", current_str, 10, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		emit_signal("take_dmg", current_str, 5, 0.4)
+		emit_signal("take_dmg", current_str, 10, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		emit_signal("take_dmg", current_str, 5, 0.4)
+		emit_signal("take_dmg", current_str, 10, 0.4)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		emit_signal("take_dmg", current_str, 6, 0.5)
+		emit_signal("take_dmg", current_str, 11, 0.5)
 		atk_anim_finished = true
 		$Combo_time.start()
 
@@ -358,7 +357,7 @@ func _on_sprite_2d_animation_finished():
 
 func _on_sprite_2d_frame_changed():
 	if sprite.frame == 4 and sprite.animation == "base atk5":
-		emit_signal("take_dmg", current_str, 8, 0.5)
+		emit_signal("take_dmg", current_str, 13, 0.5)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
 		sprite.pause()
@@ -467,18 +466,13 @@ func _on_ult_cooldown_timeout():
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(str, atk_str, sec):
 	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem)
-	set_health_bar()
+	emit_signal("set_health_bar", current_vit)
 	#print("take dmg: "+str(dmg))
 	emit_signal("set_idle")
 	sprite.play("damaged")
 	can_move = false
 	stun_timer.wait_time = sec
 	stun_timer.start()
-
-func set_health_bar():
-	$HealthBar.value = current_vit
-	if current_vit <= 0:
-		queue_free()
 
 func _on_stun_timeout():
 	emit_signal("set_idle")
