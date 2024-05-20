@@ -71,11 +71,11 @@ func _on_gui_select_character(char):
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
 		player.scale = Vector2(1.2, 1.2)
+		player.add_child(camera,true) # aggiungo la camera al player
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 	# condizione per attivare la gui di Rufus
 	if char == "rufus":
 		activate_rufus()
-	player.add_child(camera,true) # aggiungo la camera al player
 	connect_enemies_with_player() # connetto i nemici e il player
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
@@ -121,6 +121,7 @@ func _on_player_death():
 	player_gui.visible = false # nascondo la gui del player
 	
 func activate_rufus():
+	enemy_container.heal_between_rounds.connect(player._on_get_healed)
 	canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
 	player_gui.player = player

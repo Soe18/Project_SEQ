@@ -32,7 +32,9 @@ var sprinting = false
 @onready var basic_atk_effect = $Basic_atk_Area/Effect
 @onready var basic_atk_collider = $Basic_atk_Area/Skill_collider
 @onready var stun_timer = $Stun
-@onready var sprite_collider = $Collider
+
+@onready var body_collider = $Body_collider
+@onready var head_collider = $Head_collider
 
 @onready var sprint_area = $Sprint_Area
 @onready var sprint_collider = $Sprint_Area/Skill_collider
@@ -206,7 +208,8 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		sprinting = false
 		grabbed = true
 		sprite.visible = false
-		sprite_collider.disabled = true
+		body_collider.disabled = true
+		head_collider.disabled = true
 	if !is_been_grabbed and grabbed:
 		moving = true
 		grabbed = false
@@ -244,7 +247,8 @@ func set_health_bar():
 	setto le collisioni a true'
 
 func _on_timer_timeout():
-	sprite_collider.disabled = false
+	body_collider.disabled = false
+	head_collider.disabled = false
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
 {

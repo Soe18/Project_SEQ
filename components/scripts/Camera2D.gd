@@ -1,6 +1,7 @@
 extends Camera2D
 
-var shacking = false
+var shaking = false
+var shake_strenght = 15
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -8,19 +9,13 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if shacking:
+	if shaking:
 		shake()
 
-
 func _on_player_shake_camera(is_shacking):
-	shacking = is_shacking
-	if is_shacking == true:
-		position.y = 6
-	else:
-		position.y = 0
+	shaking = is_shacking
+	if not is_shacking:
+		offset = Vector2(0,0)
 
 func shake():
-	if position.y == 10:
-		position.y = -6
-	else:
-		position.y = 10
+	offset = Vector2(randf_range(-shake_strenght,shake_strenght),randf_range(-shake_strenght,shake_strenght))

@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://dbw1in01yk45v"]
+[gd_scene load_steps=56 format=3 uid="uid://dbw1in01yk45v"]
 
 [ext_resource type="Script" path="res://components/scripts/giant.gd" id="1_f8337"]
 [ext_resource type="Texture2D" uid="uid://bese26q4y7aob" path="res://components/sprites/enemies/giant/giant_damaged.png" id="2_3r8s3"]
@@ -248,8 +248,14 @@ animations = [{
 "speed": 2.5
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_u1m20"]
+radius = 23.0328
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(157, 152)
+size = Vector2(155.396, 78.4173)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_37387"]
+size = Vector2(60.3597, 37.3381)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f8pc5"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -262,7 +268,7 @@ radius = 879.151
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cwyod"]
 radius = 54.0
-height = 268.0
+height = 220.863
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ulpnw"]
 atlas = ExtResource("7_i3aa1")
@@ -413,10 +419,18 @@ sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Collider" type="CollisionShape2D" parent="."]
-position = Vector2(6.5, 26)
+[node name="Head_collider" type="CollisionShape2D" parent="."]
+position = Vector2(10.7914, -27.3381)
+shape = SubResource("CircleShape2D_u1m20")
+
+[node name="Body_collider" type="CollisionShape2D" parent="."]
+position = Vector2(7.19424, 26.9784)
 shape = SubResource("RectangleShape2D_sb3xy")
 debug_color = Color(0.0196078, 0.611765, 0.611765, 0.419608)
+
+[node name="Legs_collider" type="CollisionShape2D" parent="."]
+position = Vector2(-4.28058, 84.8561)
+shape = SubResource("RectangleShape2D_37387")
 
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
@@ -448,7 +462,7 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Punch_Area"]
-position = Vector2(50, 13)
+position = Vector2(62.9497, 13)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_cwyod")
 debug_color = Color(0.592157, 0.854902, 0.105882, 0.0352941)
@@ -457,7 +471,7 @@ debug_color = Color(0.592157, 0.854902, 0.105882, 0.0352941)
 position = Vector2(59, -5)
 scale = Vector2(0.279167, 0.279167)
 sprite_frames = SubResource("SpriteFrames_rxp4i")
-animation = &"idle"
+animation = &"effect"
 autoplay = "idle"
 
 [node name="Earthquake_Area" type="Area2D" parent="."]

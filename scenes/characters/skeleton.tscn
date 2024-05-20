@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://dc4r0c3q4h1vo"]
+[gd_scene load_steps=49 format=3 uid="uid://dc4r0c3q4h1vo"]
 
 [ext_resource type="Script" path="res://components/scripts/skeleton.gd" id="1_dah7i"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_apuag"]
@@ -241,8 +241,11 @@ animations = [{
 "speed": 6.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_wt77j"]
+radius = 16.0312
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(59, 97)
+size = Vector2(53, 67)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0p46"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -316,8 +319,12 @@ sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Collider" type="CollisionShape2D" parent="."]
-position = Vector2(-3.5, 15.5)
+[node name="Head_collider" type="CollisionShape2D" parent="."]
+position = Vector2(2, -19)
+shape = SubResource("CircleShape2D_wt77j")
+
+[node name="Body_collider" type="CollisionShape2D" parent="."]
+position = Vector2(-4.5, 30.5)
 shape = SubResource("RectangleShape2D_sb3xy")
 debug_color = Color(1, 1, 0, 0.0666667)
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=37 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_ffk67"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="2_eh7wu"]
@@ -159,8 +159,11 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_xuhbw"]
+radius = 17.0
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(59, 97)
+size = Vector2(49, 64)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00dig"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -238,8 +241,12 @@ sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Collider" type="CollisionShape2D" parent="."]
-position = Vector2(-3.5, 15.5)
+[node name="Head_collider" type="CollisionShape2D" parent="."]
+position = Vector2(8, -16)
+shape = SubResource("CircleShape2D_xuhbw")
+
+[node name="Body_collider" type="CollisionShape2D" parent="."]
+position = Vector2(-5.5, 32)
 shape = SubResource("RectangleShape2D_sb3xy")
 debug_color = Color(0.0196078, 0.611765, 0.611765, 0.105882)
 

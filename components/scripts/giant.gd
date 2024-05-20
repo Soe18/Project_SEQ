@@ -39,7 +39,10 @@ var choosed_atk
 @onready var earthquake_effect = $Earthquake_Area/Effect
 
 @onready var stun_timer = $Stun
-@onready var sprite_collider = $Collider
+
+@onready var head_collider = $Head_collider
+@onready var body_collider = $Body_collider
+@onready var legs_collider = $Legs_collider
 
 @onready var update_direction_timer = $UpdateDirection
 
@@ -169,6 +172,7 @@ func _on_player_take_dmg(str, atk_str, sec):
 		health -= dmg
 		set_health_bar()
 		if dmg >= 25:
+			punch_effect.play("idle")
 			sprite.position = Vector2(0,0)
 			attacking = false
 			moving = false
@@ -203,7 +207,9 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		moving = false
 		grabbed = true
 		sprite.visible = false
-		sprite_collider.disabled = true
+		head_collider.disabled = true
+		body_collider.disabled = true
+		legs_collider.disabled = true
 	if !is_been_grabbed and grabbed:
 		moving = true
 		grabbed = false
@@ -241,7 +247,9 @@ func set_health_bar():
 	setto le collisioni a true'
 
 func _on_timer_timeout():
-	sprite_collider.disabled = false
+	head_collider.disabled = false
+	body_collider.disabled = false
+	legs_collider.disabled = false
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
 {

@@ -3,9 +3,9 @@ extends Control
 var player
 
 @onready var skill1_cooldown_time = $GridContainer/Control/Skill1_cooldown
-@onready var skill2_cooldown_time = $GridContainer/Control2/Skill2_cooldown
-@onready var eva_cooldown_time = $GridContainer/Control3/Eva_cooldown
-@onready var ulti_cooldown_time = $GridContainer/Control4/Ulti_cooldown
+@onready var skill2_cooldown_time = $GridContainer/Control/Skill2_cooldown
+@onready var eva_cooldown_time = $GridContainer/Control/Eva_cooldown
+@onready var ulti_cooldown_time = $GridContainer/Control/Ulti_cooldown
 
 @onready var healthbar = $MarginContainer/PanelContainer/Control/Health_bar
 @onready var healthbar_label = $MarginContainer/PanelContainer/Control/Health_bar/Health_label
@@ -17,7 +17,6 @@ var temp = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -42,4 +41,4 @@ func _on_player_set_health_bar(vit):
 	if vit <= 0:
 		player.queue_free()
 	healthbar.value = vit
-	healthbar_label.text = str(vit) + "/" +  str(max_health)
+	healthbar_label.text = str(vit) + "/" + str(max_health)

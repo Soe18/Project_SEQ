@@ -1,4 +1,4 @@
-[gd_scene load_steps=110 format=3 uid="uid://cdj6vi8f58cl0"]
+[gd_scene load_steps=111 format=3 uid="uid://cdj6vi8f58cl0"]
 
 [ext_resource type="Script" path="res://components/scripts/rufus.gd" id="1_kqagk"]
 [ext_resource type="Texture2D" uid="uid://b2uag3j6vt8fm" path="res://components/sprites/rufus/Rufus_base_atk1.png" id="2_qcuyf"]
@@ -534,8 +534,11 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xdive"]
-radius = 27.0
-height = 134.0
+radius = 17.0
+height = 88.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wragi"]
+radius = 18.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lu0mv"]
 size = Vector2(39.5, 94)
@@ -744,8 +747,12 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Player_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-3, 11)
+position = Vector2(-5, 24)
 shape = SubResource("CapsuleShape2D_xdive")
+
+[node name="Head_collider" type="CollisionShape2D" parent="."]
+position = Vector2(10, -26)
+shape = SubResource("CircleShape2D_wragi")
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 process_mode = 4
@@ -812,7 +819,6 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Ult_collider" type="CollisionShape2D" parent="Ult_area"]
-visible = false
 position = Vector2(0, -57)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_6qh5c")
@@ -850,11 +856,7 @@ one_shot = true
 [node name="Stun" type="Timer" parent="."]
 one_shot = true
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.5, 1.5)
-limit_smoothed = true
-position_smoothing_enabled = true
-
+[connection signal="get_healed" from="." to="." method="_on_get_healed"]
 [connection signal="set_idle" from="." to="." method="_on_set_idle" flags=18]
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished" flags=18]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed" flags=18]

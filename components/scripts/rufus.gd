@@ -24,6 +24,7 @@ signal is_in_atk_range(is_in, body)
 signal take_dmg(str, atk_str, sec_stun)
 signal set_idle()
 signal set_health_bar(current_vit)
+signal get_healed(amount)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
@@ -404,6 +405,7 @@ func _on_set_idle():
 	ult_area.process_mode = Node.PROCESS_MODE_DISABLED
 	ult_collider.disabled = true
 	$Player_collider.disabled = false
+	$Head_collider.disabled = false
 	can_move = true
 	is_evading = false
 	is_moving_ult = false
@@ -436,6 +438,7 @@ func _on_comb_time_timeout():
 'METODO CHE GESTISCE L\'EVASIONE IN BASE ALLA DIREZIONE PREMUTA'
 func evade():
 	$Player_collider.disabled = true
+	$Head_collider.disabled = true
 	if move_vertical == Move_Keys.UP:
 		velocity.y += -50
 	elif move_vertical == Move_Keys.DOWN:
@@ -476,3 +479,9 @@ func _on_enemy_take_dmg(str, atk_str, sec):
 
 func _on_stun_timeout():
 	emit_signal("set_idle")
+
+func _on_get_healed(amount):
+	current_vit += amount
+	if current_vit > vit:
+		current_vit = vit
+	emit_signal("set_health_bar", current_vit)
