@@ -27,7 +27,7 @@ var player_position
 var target_position
 var player
 
-enum Atk_Selected {IDLE, BASIC_ATK, PARRY}
+enum Possible_Attacks {IDLE, BASIC_ATK, PARRY}
 var choosed_atk
 
 @onready var sprite = $Sprite2D
@@ -38,6 +38,8 @@ var choosed_atk
 @onready var body_collider = $Body_collider
 
 @onready var update_direction_timer = $UpdateDirection
+
+@onready var healthbar = $HealthBar
 
 var player_entered = false
 var player_in_atk_range = false
@@ -69,9 +71,9 @@ func _physics_process(_delta):
 		pass
 	elif player_entered and moving:
 		chase_player()
-		if choosed_atk == Atk_Selected.BASIC_ATK and $Basic_atk_Cooldown.is_stopped():
+		if choosed_atk == Possible_Attacks.BASIC_ATK and $Basic_atk_Cooldown.is_stopped():
 			basic_atk()
-		elif choosed_atk == Atk_Selected.PARRY and $Parry_Cooldown.is_stopped():
+		elif choosed_atk == Possible_Attacks.PARRY and $Parry_Cooldown.is_stopped():
 			parry()
 	elif not player_entered and moving:
 		wander()
@@ -111,11 +113,11 @@ func chase_player():
 func choose_atk():
 	var rng = randi_range(0,100)
 	if rng >= 0 and rng < 10:
-		choosed_atk = Atk_Selected.IDLE
+		choosed_atk = Possible_Attacks.IDLE
 	elif rng >= 10 and rng < 65:
-		choosed_atk = Atk_Selected.BASIC_ATK
+		choosed_atk = Possible_Attacks.BASIC_ATK
 	elif rng >= 65:
-		choosed_atk = Atk_Selected.PARRY
+		choosed_atk = Possible_Attacks.PARRY
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
 
@@ -203,20 +205,25 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
-		_on_player_take_dmg(current_str, 13, 0.1)
-		if current_vit > 0:
+		if not soul_out or dying:
+			_on_inhale_time_timeout()
+			choosed_atk = Possible_Attacks.IDLE
+			$Update_Atk.stop()
 			moving = false
 			grabbed = true
 			sprite.visible = false
 			head_collider.disabled = true
 			body_collider.disabled = true
+			healthbar.visible = false
 	if !is_been_grabbed and grabbed:
+		$Update_Atk.start()
 		moving = true
 		grabbed = false
 		if is_flipped:
 			position.x += -450
 		else:
 			position.x += 450
+		healthbar.visible = true
 		sprite.visible = true
 		move_and_slide()
 		$GrabTime.start()
@@ -232,6 +239,7 @@ func is_grabbed():
 
 func _on_stun_timeout():
 	if not dying:
+		choosed_atk = Possible_Attacks.IDLE
 		_on_inhale_time_timeout()
 
 'DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE

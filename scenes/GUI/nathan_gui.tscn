@@ -1,11 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://c8q6cs7u1xl10"]
+[gd_scene load_steps=9 format=3 uid="uid://xby8pewycng"]
 
-[ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_4qgcb"]
-[ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="2_rdasp"]
-[ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="3_2maji"]
-[ext_resource type="Texture2D" uid="uid://bciywb7l5cwth" path="res://components/sprites/GUI/player_GUI/rufus/Skill2_GUI_rufus.png" id="4_7cjmb"]
-[ext_resource type="Texture2D" uid="uid://bflcuuauxyxfi" path="res://components/sprites/GUI/player_GUI/rufus/Eva_GUI_rufus.png" id="5_lwiw5"]
-[ext_resource type="Texture2D" uid="uid://cega3rs3chnkn" path="res://components/sprites/GUI/player_GUI/rufus/Ulti_GUI_rufus.png" id="6_8rr55"]
+[ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_jsxnq"]
+[ext_resource type="Texture2D" uid="uid://cxajiheooqevw" path="res://components/sprites/GUI/player_GUI/nathan/Skill1_GUI_nathan.png" id="2_0f0eu"]
+[ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="3_0iqn6"]
+[ext_resource type="Texture2D" uid="uid://d0udebg6bc5jk" path="res://components/sprites/GUI/player_GUI/nathan/Eva_GUI_nathan.png" id="4_pqgsg"]
+[ext_resource type="Texture2D" uid="uid://4ui1eecu07vp" path="res://components/sprites/GUI/player_GUI/nathan/Skill2_GUI_nathan.png" id="5_bbco0"]
+[ext_resource type="Texture2D" uid="uid://bf18bigyr5ycl" path="res://components/sprites/GUI/player_GUI/nathan/Ulti_GUI_nathan.png" id="6_hpsbx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dcn56"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -20,7 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_4qgcb")
+script = ExtResource("1_jsxnq")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -98,8 +98,8 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("3_2maji")
-texture_progress = ExtResource("2_rdasp")
+texture_under = ExtResource("2_0f0eu")
+texture_progress = ExtResource("3_0iqn6")
 metadata/_edit_use_anchors_ = true
 
 [node name="Eva_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
@@ -114,8 +114,8 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("5_lwiw5")
-texture_progress = ExtResource("2_rdasp")
+texture_under = ExtResource("4_pqgsg")
+texture_progress = ExtResource("3_0iqn6")
 metadata/_edit_use_anchors_ = true
 
 [node name="Skill2_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
@@ -134,8 +134,8 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("4_7cjmb")
-texture_progress = ExtResource("2_rdasp")
+texture_under = ExtResource("5_bbco0")
+texture_progress = ExtResource("3_0iqn6")
 
 [node name="Ulti_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
 layout_mode = 2
@@ -151,6 +151,6 @@ scale = Vector2(0.465, 0.465)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("6_8rr55")
-texture_progress = ExtResource("2_rdasp")
+texture_under = ExtResource("6_hpsbx")
+texture_progress = ExtResource("3_0iqn6")
 metadata/_edit_use_anchors_ = true

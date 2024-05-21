@@ -24,7 +24,9 @@ signal is_in_atk_range(is_in, body)
 signal take_dmg(atk_state, dmg, sec_stun)
 signal set_idle()
 signal grab(has_grabbed, is_flipped)
+signal set_health_bar(current_vit)
 signal shake_camera(is_shacking)
+signal get_healed(amount)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
@@ -56,16 +58,20 @@ var atk_anim_finished = true
 @onready var skill1_area = $Skill_1_area
 @onready var skill1_collider = $Skill_1_area/Skill_collider
 @onready var skill1_effect = $Skill_1_area/Effect
+@onready var skill1_cooldown = $Skill1_cooldown
 
 @onready var eva_collider = $Eva_area/Eva_collider
+@onready var eva_cooldown = $Eva_cooldown
 
 @onready var skill2_area = $Skill2_area
 @onready var skill2_collider = $Skill2_area/Skill_collider
 @onready var skill2_effect = $Skill2_area/Effect
+@onready var skill2_cooldown = $Skill2_cooldown
 
 @onready var ult_area = $Ult_area
 @onready var ult_collider = $Ult_area/Ult_collider
 @onready var ult_effect = $Ult_area/Effect
+@onready var ulti_cooldown = $Ult_cooldown
 
 @onready var stun_timer = $Stun
 
@@ -81,8 +87,7 @@ var atk_anim_finished = true
 @warning_ignore("unused_parameter") # c'è sta cosa altrimenti mi da fastidio "l'errore"
 
 func _ready():
-	$HealthBar.max_value = vit
-	set_health_bar()
+	emit_signal("set_health_bar", current_vit)
 
 func _physics_process(_delta):
 	if can_move:
@@ -222,6 +227,7 @@ func base_atk():
 		sprite.play("base atk5")
 	
 	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk1"]:
+		skill1_cooldown.start()
 		can_move = false
 		sk1_activated = true
 		atk_state = Atk_States.SK1
@@ -234,7 +240,7 @@ func base_atk():
 		move_vertical = null
 	
 	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["eva"]:
-		$Eva_cooldown.start()
+		eva_cooldown.start()
 		cooldown_state["eva"] = true
 		can_move = false
 		velocity = Vector2(0, 0)
@@ -244,6 +250,7 @@ func base_atk():
 		is_evading = true
 	
 	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk2"]:
+		skill2_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
@@ -254,6 +261,7 @@ func base_atk():
 		move_vertical = null
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
+		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
 		sprite.play("charging_ult")
@@ -314,7 +322,7 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 150, 6)
+		emit_signal("take_dmg", current_str, 85, 6)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -357,7 +365,6 @@ func _on_sprite_2d_animation_finished():
 
 	elif atk_state == Atk_States.SK2:
 		emit_signal("grab", true, sprite.flip_h)
-		$Skill2_cooldown.start()
 		cooldown_state["sk2"] = true
 		emit_signal("set_idle")
 
@@ -403,7 +410,6 @@ func _on_set_idle():
 
 # --------------------- TIMER INIZIO --------------------- #
 func _on_ult_time_timeout():
-	$Ult_cooldown.start()
 	emit_signal("shake_camera", false)
 	cooldown_state["ult"] = true
 	$Ult_area/Ult_time.start()
@@ -421,7 +427,6 @@ func _on_grab_time_timeout():
 
 func _on_sk_1_time_timeout():
 	emit_signal("set_idle")
-	$Skill1_cooldown.start()
 	cooldown_state["sk1"] = true
 	emit_signal("set_idle")
 
@@ -476,18 +481,20 @@ func _on_enemy_is_in_atk_range(is_in, body):
 
 func _on_enemy_take_dmg(str, atk_str, sec):
 	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem)
-	set_health_bar()
+	emit_signal("set_health_bar", current_vit)
 	#print("take dmg: "+str(dmg))
+	emit_signal("shake_camera", false)
 	emit_signal("set_idle")
 	sprite.play("damaged")
 	can_move = false
 	stun_timer.wait_time = sec
 	stun_timer.start()
 
-func set_health_bar():
-	$HealthBar.value = current_vit
-	if current_vit <= 0:
-		queue_free()
-
 func _on_stun_timeout():
 	emit_signal("set_idle")
+
+func _on_get_healed(amount):
+	current_vit += amount
+	if current_vit > vit:
+		current_vit = vit
+	emit_signal("set_health_bar", current_vit)

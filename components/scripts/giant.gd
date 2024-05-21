@@ -25,7 +25,7 @@ var player
 
 var attacking = false
 
-enum Atk_Selected {IDLE, PUNCH, EARTHQUAKE, GIGAGRAB}
+enum Possible_Attacks {IDLE, PUNCH, EARTHQUAKE, GIGAGRAB}
 var choosed_atk
 
 @onready var sprite = $Sprite2D
@@ -46,6 +46,8 @@ var choosed_atk
 
 @onready var update_direction_timer = $UpdateDirection
 
+@onready var healthbar = $HealthBar
+
 var player_entered = false
 var player_in_atk_range = false
 
@@ -58,7 +60,7 @@ var health
 
 func _ready():
 	health = vit
-	$HealthBar.max_value = vit
+	healthbar.max_value = vit
 	set_health_bar()
 	_on_update_direction_timeout()
 	update_direction_timer.start()
@@ -75,9 +77,9 @@ func _ready():
 func _physics_process(delta):
 	if player_entered and moving:
 		chase_player()
-		if choosed_atk == Atk_Selected.PUNCH and $Punch_Cooldown.is_stopped():
+		if choosed_atk == Possible_Attacks.PUNCH and $Punch_Cooldown.is_stopped():
 			punch()
-		if choosed_atk == Atk_Selected.EARTHQUAKE and $Earthquake_Cooldown.is_stopped() and stun_timer.is_stopped():
+		if choosed_atk == Possible_Attacks.EARTHQUAKE and $Earthquake_Cooldown.is_stopped() and stun_timer.is_stopped():
 			earthquake()
 	elif not player_entered and moving:
 		wander()
@@ -119,11 +121,11 @@ func chase_player():
 func choose_atk():
 	var rng = randi_range(0,100)
 	if rng >= 0 and rng < 15:
-		choosed_atk = Atk_Selected.IDLE
+		choosed_atk = Possible_Attacks.IDLE
 	elif rng >= 15 and rng <= 72:
-		choosed_atk = Atk_Selected.PUNCH
+		choosed_atk = Possible_Attacks.PUNCH
 	elif rng >= 72:
-		choosed_atk = Atk_Selected.EARTHQUAKE
+		choosed_atk = Possible_Attacks.EARTHQUAKE
 
 'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
 
@@ -203,14 +205,18 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
-		_on_player_take_dmg(current_str, 13, 0.1)
+		_on_inhale_time_timeout()
+		choosed_atk = Possible_Attacks.IDLE
+		$Update_Atk.stop()
 		moving = false
 		grabbed = true
 		sprite.visible = false
 		head_collider.disabled = true
 		body_collider.disabled = true
 		legs_collider.disabled = true
+		healthbar.visible = false
 	if !is_been_grabbed and grabbed:
+		$Update_Atk.start()
 		moving = true
 		grabbed = false
 		if is_flipped:
@@ -218,6 +224,7 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		else:
 			position.x += 450
 		sprite.visible = true
+		healthbar.visible = true
 		move_and_slide()
 		$GrabTime.start()
 
@@ -231,6 +238,7 @@ func is_grabbed():
 	setto il movimento a true'
 
 func _on_stun_timeout():
+	choosed_atk = Possible_Attacks.IDLE
 	_on_inhale_time_timeout()
 
 'DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
@@ -239,7 +247,7 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	$HealthBar.value = health
+	healthbar.value = health
 	if health <= 0:
 		queue_free()
 

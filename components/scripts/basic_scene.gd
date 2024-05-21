@@ -70,12 +70,14 @@ func _on_gui_select_character(char):
 	# condizione per collegare lo script della telecamera
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
-		player.scale = Vector2(1.2, 1.2)
+		camera.zoom = Vector2(1.3,1.3)
+		player.scale = Vector2(1.6, 1.6)
 		player.add_child(camera,true) # aggiungo la camera al player
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
-	# condizione per attivare la gui di Rufus
-	if char == "rufus":
-		activate_rufus()
+	else:
+		player.add_child(camera,true) # aggiungo la camera al player
+	# funzione per attivare le GUI
+	activate_player_GUI()
 	connect_enemies_with_player() # connetto i nemici e il player
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
@@ -119,10 +121,13 @@ func _on_player_death():
 	game_over_container.visible = true # rendo visibile il game over
 	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
 	player_gui.visible = false # nascondo la gui del player
-	
-func activate_rufus():
+
+func activate_player_GUI():
+	if player.char_name == "Rufus":
+		canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
+	elif player.char_name == "Nathan":
+		canvas_layer.add_child(load("res://scenes/GUI/nathan_gui.tscn").instantiate(),true)
 	enemy_container.heal_between_rounds.connect(player._on_get_healed)
-	canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
 	player_gui.player = player
 	player_gui.player_death.connect(self._on_player_death)

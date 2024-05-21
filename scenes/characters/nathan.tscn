@@ -665,19 +665,10 @@ radius = 466.0
 motion_mode = 1
 script = ExtResource("1_arpgr")
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-offset_left = -65.0
-offset_top = -61.0
-offset_right = 75.0
-offset_bottom = -41.0
-step = 1.0
-rounded = true
-show_percentage = false
-
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.156982, 0.156982)
 sprite_frames = SubResource("SpriteFrames_ded5k")
-animation = &"idle"
+animation = &"charging_ult"
 autoplay = "idle"
 
 [node name="Player_collider" type="CollisionShape2D" parent="."]
@@ -769,7 +760,7 @@ wait_time = 0.639
 one_shot = true
 
 [node name="Skill1_cooldown" type="Timer" parent="."]
-wait_time = 4.5
+wait_time = 6.5
 one_shot = true
 
 [node name="Skill2_cooldown" type="Timer" parent="."]
@@ -777,11 +768,11 @@ wait_time = 4.0
 one_shot = true
 
 [node name="Eva_cooldown" type="Timer" parent="."]
-wait_time = 3.955
+wait_time = 4.0
 one_shot = true
 
 [node name="Ult_cooldown" type="Timer" parent="."]
-wait_time = 8.412
+wait_time = 11.0
 one_shot = true
 
 [node name="Combo_time" type="Timer" parent="."]
