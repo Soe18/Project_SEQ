@@ -21,7 +21,7 @@ var parring = false
 var dying = false
 var soul_out = false
 
-signal take_dmg(str, atk_str, sec_stun)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 
 var player_position
 var target_position
@@ -159,11 +159,11 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec):
+func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
 	if dying and not soul_out:
 		pass
 	elif is_in_atk_range and !grabbed and not parring:
-		current_vit -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
+		current_vit -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 		moving = false
 		if current_vit > 0:
 			stun_timer.wait_time = sec
@@ -326,7 +326,7 @@ func _on_basic_atk_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, 5, 1)
+		emit_signal("take_dmg", current_str, 5, 1, current_pbc, current_efc)
 	basic_atk_effect.play("idle")
 	sprite.play("idle")
 	

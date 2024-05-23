@@ -18,7 +18,7 @@ var is_in_atk_range = false
 var moving = true
 var grabbed = false
 
-signal take_dmg(str, atk_str, sec_stun)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 
 var player_position
 var target_position
@@ -170,11 +170,14 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec):
+func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
 	if is_in_atk_range and !grabbed:
-		health -= get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
+		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
+		health -= dmg
 		set_health_bar()
 		#print("take dmg: "+str(dmg))
+		if sprinting and dmg >= 25:
+			sprinting = false
 		moving = false
 		stun_timer.wait_time = sec
 		stun_timer.start()
@@ -322,7 +325,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_sprint_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
-		emit_signal("take_dmg",current_str, 15, 2)
+		emit_signal("take_dmg",current_str, 15, 2, current_pbc, current_efc)
 		$Inhale_time.start(0.5)
 		$Update_Atk.start(0.5)
 
@@ -332,7 +335,7 @@ func _on_sprint_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg",current_str, 5, 1)
+		emit_signal("take_dmg",current_str, 5, 1, current_pbc, current_efc)
 		$Basic_atk_Cooldown.start()
 	basic_atk_effect.play("idle")
 	sprite.play("idle")

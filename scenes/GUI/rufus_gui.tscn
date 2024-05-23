@@ -10,8 +10,8 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dcn56"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n23eg"]
-bg_color = Color(1, 0, 0.0352941, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3mhrk"]
+bg_color = Color(1, 0, 0, 1)
 
 [node name="Rufus_GUI" type="Control"]
 layout_mode = 3
@@ -49,7 +49,7 @@ offset_left = -542.0
 offset_bottom = 59.0
 grow_horizontal = 0
 theme_override_styles/background = SubResource("StyleBoxFlat_dcn56")
-theme_override_styles/fill = SubResource("StyleBoxFlat_n23eg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_3mhrk")
 step = 1.0
 rounded = true
 show_percentage = false
@@ -68,7 +68,7 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
-text = "444/444"
+text = "0/0"
 
 [node name="GridContainer" type="GridContainer" parent="."]
 layout_mode = 1

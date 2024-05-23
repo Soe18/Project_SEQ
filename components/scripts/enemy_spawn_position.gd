@@ -9,7 +9,7 @@ signal round_changed()
 signal heal_between_rounds(amount)
 
 var fighting
-# Called when the node enters the scene tree for the first time.
+
 func _ready():
 	for i in get_children():
 		if "Spawnpoint" in i.name:
@@ -80,7 +80,7 @@ func activate_markers():
 				out = true
 		
 		add_child(load(enemy_scene).instantiate(),true)
-		#add_child(load(possible_enemies[2]).instantiate(),true)
+		#add_child(load(possible_enemies[0]).instantiate(),true)
 		get_child(get_child_count()-1).position = i.position
 
 

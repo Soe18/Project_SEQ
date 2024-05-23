@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var vit : int = 500
+@export var vit : int = 400
 var current_vit = vit
 @export var str : int = 200
 var current_str = str
@@ -17,7 +17,7 @@ var is_in_atk_range = false
 var moving = true
 var grabbed = false
 
-signal take_dmg(str, atk_str, sec_stun)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 
 var player_position
 var target_position
@@ -168,9 +168,9 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec):
+func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
 	if is_in_atk_range and !grabbed:
-		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem)
+		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 		health -= dmg
 		set_health_bar()
 		if dmg >= 25:
@@ -352,14 +352,14 @@ func punch():
 
 func _on_effect_animation_finished():
 	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", str, 25, 2.4)
+		emit_signal("take_dmg", str, 25, 2.4, current_pbc, current_efc)
 		_on_inhale_time_timeout()
 	if earthquake_effect.animation == "effect":
 		_on_inhale_time_timeout()
 
 func _on_effect_frame_changed():
 	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", str, 2, 0.5)
+		emit_signal("take_dmg", str, 2, 0.5, 0, 0)
 
 'FUNZIONE PER L\'ATTACCO TERREMOTO'
 

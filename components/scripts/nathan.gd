@@ -21,7 +21,7 @@ enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(atk_state, dmg, sec_stun)
+signal take_dmg(atk_state, dmg, sec_stun, pbc, efc)
 signal set_idle()
 signal grab(has_grabbed, is_flipped)
 signal set_health_bar(current_vit)
@@ -158,23 +158,13 @@ func move():
 		velocity.y = +OK_MULTIPLYER
 		sprite.play("Running")
 		
-	if move_horizontal == Move_Keys.LEFT:
+	if move_horizontal == Move_Keys.LEFT: # valori da flippare il player
 		velocity.x = -OK_MULTIPLYER
-		sprite.flip_h = true
-		bs_atk_collider.position.x = -121
-		skill1_area.rotation_degrees = 180
-		skill1_effect.flip_h = true
-		skill1_effect.rotation_degrees = 180
-		skill2_collider.position.x = -90
+		flip_sprite(true)
 		sprite.play("Running")
 	elif move_horizontal == Move_Keys.RIGHT:
 		velocity.x = +OK_MULTIPLYER
-		sprite.flip_h = false
-		bs_atk_collider.position.x = 43.5
-		skill1_area.rotation_degrees = 0
-		skill1_effect.flip_h = false
-		skill1_effect.rotation_degrees = 0
-		skill2_collider.position.x = 90
+		flip_sprite(false)
 		sprite.play("Running")
 	
 	if move_vertical != null and move_horizontal != null:
@@ -275,6 +265,7 @@ func base_atk():
 
 
 # ----------------- AREA2D INIZIO ----------------- #
+
 'DIGEST DELLE AREE2D PER GESTIRE QUANDO UN NEMICO ENTRA O ESCE DALL\'AREA
 	ogni metodo controlla sempre come prima cosa se il body è diverso da se stesso, altrimenti
 	manderebbe dei segnali inutili'
@@ -290,7 +281,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 12, 2.1)
+		emit_signal("take_dmg", current_str, 12, 2.1, current_pbc, current_efc)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -301,7 +292,7 @@ func _on_eva_area_body_exited(body):
 func _on_skill_1_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 30, 2)
+		emit_signal("take_dmg", current_str, 30, 2, current_pbc, current_efc)
 		skill1_area.find_child("Sk1_time").wait_time = 0.4
 		skill1_area.find_child("Sk1_time").start()
 		emit_signal("is_in_atk_range", false, body)
@@ -322,7 +313,7 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 85, 6)
+		emit_signal("take_dmg", current_str, 85, 6, current_pbc, current_efc)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -333,24 +324,40 @@ func _on_ult_area_body_exited(body):
 
 
 
+func flip_sprite(flip):
+	if flip:
+		sprite.flip_h = true
+		bs_atk_collider.position.x = -121
+		skill1_area.rotation_degrees = 180
+		skill1_effect.flip_h = true
+		skill1_effect.rotation_degrees = 180
+		skill2_collider.position.x = -90
+	else:
+		sprite.flip_h = false
+		bs_atk_collider.position.x = 43.5
+		skill1_area.rotation_degrees = 0
+		skill1_effect.flip_h = false
+		skill1_effect.rotation_degrees = 0
+		skill2_collider.position.x = 90
+
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		emit_signal("take_dmg", current_str, 9, 0.5)
+		emit_signal("take_dmg", current_str, 9, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		emit_signal("take_dmg", current_str, 10, 0.5)
+		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		emit_signal("take_dmg", current_str, 10, 0.5)
+		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		emit_signal("take_dmg", current_str, 11, 0.5)
+		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
@@ -409,6 +416,7 @@ func _on_set_idle():
 
 
 # --------------------- TIMER INIZIO --------------------- #
+
 func _on_ult_time_timeout():
 	emit_signal("shake_camera", false)
 	cooldown_state["ult"] = true
@@ -479,10 +487,12 @@ func _on_enemy_is_in_atk_range(is_in, body):
 	else:
 		is_self_in_atk_range = false
 
-func _on_enemy_take_dmg(str, atk_str, sec):
-	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem)
+
+' - DIGEST DEL SEGNALE take_dmg DEI NEMICI - '
+
+func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
+	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 	emit_signal("set_health_bar", current_vit)
-	#print("take dmg: "+str(dmg))
 	emit_signal("shake_camera", false)
 	emit_signal("set_idle")
 	sprite.play("damaged")

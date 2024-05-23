@@ -70,7 +70,6 @@ func _on_gui_select_character(char):
 	# condizione per collegare lo script della telecamera
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
-		camera.zoom = Vector2(1.3,1.3)
 		player.scale = Vector2(1.6, 1.6)
 		player.add_child(camera,true) # aggiungo la camera al player
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
@@ -111,8 +110,11 @@ func pause_game(get_paused):
 		else: # se sono in pausa
 			get_child(i).process_mode = Node.PROCESS_MODE_INHERIT
 
-func calculate_dmg(str, atk_str, tem):
-	var dmg = round((str * atk_str + randi_range(0, 16)) / tem)
+func calculate_dmg(str, atk_str, tem, pbc, efc):
+	var dmg = round((str * atk_str) / tem)
+	var rng = randi_range(0, 100)
+	if pbc > rng:
+		dmg = round(dmg * efc)
 	print(dmg)
 	return dmg
 
