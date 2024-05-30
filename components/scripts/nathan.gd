@@ -52,23 +52,18 @@ var atk_anim_finished = true
 
 @onready var sprite = $Sprite2D
 
-@onready var bs_atk_area = $Basic_atk_Area
 @onready var bs_atk_collider = $Basic_atk_Area/Atk_collider
 
-@onready var skill1_area = $Skill_1_area
 @onready var skill1_collider = $Skill_1_area/Skill_collider
-@onready var skill1_effect = $Skill_1_area/Effect
+@onready var skill1_duration_time = $Skill_1_area/Sk1_time
 @onready var skill1_cooldown = $Skill1_cooldown
 
 @onready var eva_collider = $Eva_area/Eva_collider
 @onready var eva_cooldown = $Eva_cooldown
 
-@onready var skill2_area = $Skill2_area
 @onready var skill2_collider = $Skill2_area/Skill_collider
-@onready var skill2_effect = $Skill2_area/Effect
 @onready var skill2_cooldown = $Skill2_cooldown
 
-@onready var ult_area = $Ult_area
 @onready var ult_collider = $Ult_area/Ult_collider
 @onready var ult_effect = $Ult_area/Effect
 @onready var ulti_cooldown = $Ult_cooldown
@@ -92,11 +87,11 @@ func _ready():
 func _physics_process(_delta):
 	if can_move:
 		move()
-	base_atk()
-	if is_evading:
-		evade()
-	if sk1_activated:
+	elif sk1_activated:
 		skill1_moving(sprite.flip_h)
+	elif is_evading:
+		evade()
+	base_atk()
 
 'METODO CHE GESTISCE IL MOVIMENTO DEL PLAYER
 	pulisce il vettore della velocità
@@ -184,7 +179,6 @@ func move():
 func base_atk():
 	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "Running") and atk_anim_finished:
 		can_move = false
-		bs_atk_area.process_mode = Node.PROCESS_MODE_INHERIT
 		bs_atk_collider.disabled = false
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
@@ -221,11 +215,10 @@ func base_atk():
 		can_move = false
 		sk1_activated = true
 		atk_state = Atk_States.SK1
-		skill1_area.process_mode = Node.PROCESS_MODE_INHERIT
 		skill1_collider.disabled = false
 		sprite.play("skill1")
-		skill1_area.find_child("Sk1_time").wait_time = 1.696
-		skill1_area.find_child("Sk1_time").start()
+		skill1_duration_time.wait_time = 1.696
+		skill1_duration_time.start()
 		move_horizontal = null
 		move_vertical = null
 	
@@ -244,7 +237,6 @@ func base_atk():
 		can_move = false
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
-		skill2_area.process_mode = Node.PROCESS_MODE_INHERIT
 		skill2_collider.disabled = false
 		$Grab_time.start()
 		move_horizontal = null
@@ -293,8 +285,8 @@ func _on_skill_1_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, 30, 2, current_pbc, current_efc)
-		skill1_area.find_child("Sk1_time").wait_time = 0.4
-		skill1_area.find_child("Sk1_time").start()
+		skill1_duration_time.wait_time = 0.4
+		skill1_duration_time.start()
 		emit_signal("is_in_atk_range", false, body)
 
 func _on_skill_1_area_body_exited(body):
@@ -308,7 +300,6 @@ func _on_skill_2_area_body_entered(body):
 func _on_skill_2_area_body_exited(body):
 	if body != self:
 		emit_signal("is_in_atk_range", false, body)
-	pass
 
 func _on_ult_area_body_entered(body):
 	if body != self:
@@ -328,49 +319,55 @@ func flip_sprite(flip):
 	if flip:
 		sprite.flip_h = true
 		bs_atk_collider.position.x = -121
-		skill1_area.rotation_degrees = 180
-		skill1_effect.flip_h = true
-		skill1_effect.rotation_degrees = 180
 		skill2_collider.position.x = -90
 	else:
 		sprite.flip_h = false
 		bs_atk_collider.position.x = 43.5
-		skill1_area.rotation_degrees = 0
-		skill1_effect.flip_h = false
-		skill1_effect.rotation_degrees = 0
 		skill2_collider.position.x = 90
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
+		bs_atk_collider.disabled = true
+		bs_atk_collider.disabled = false
 		emit_signal("take_dmg", current_str, 9, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
+		bs_atk_collider.disabled = true
+		bs_atk_collider.disabled = false
 		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
+		bs_atk_collider.disabled = false
 		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
+		bs_atk_collider.disabled = true
+		bs_atk_collider.disabled = false
 		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk5":
+		bs_atk_collider.disabled = true
+		bs_atk_collider.disabled = false
+		emit_signal("take_dmg", current_str, 12, 0.5, current_pbc, current_efc)
 		emit_signal("set_idle")
 	
 	elif atk_state == Atk_States.EVA:
+		eva_collider.disabled = false
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK1:
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK2:
+		emit_signal("take_dmg", current_str, 13, 0, current_pbc, current_efc)
 		emit_signal("grab", true, sprite.flip_h)
 		cooldown_state["sk2"] = true
 		emit_signal("set_idle")
@@ -379,7 +376,6 @@ func _on_sprite_2d_animation_finished():
 		sprite.pause()
 		emit_signal("shake_camera", true)
 		$Ult_area/Ult_time.start()
-		ult_area.process_mode = Node.PROCESS_MODE_INHERIT
 		ult_collider.disabled = false
 		ult_effect.play("effect")
 
@@ -393,18 +389,13 @@ func _on_set_idle():
 	move_vertical = null
 	atk_state = Atk_States.IDLE
 	sprite.play("idle")
-	bs_atk_area.process_mode = Node.PROCESS_MODE_DISABLED
+	skill1_duration_time.stop()
 	bs_atk_collider.disabled = true
 	eva_collider.disabled = true
-	skill1_effect.play("idle")
-	skill1_area.process_mode = Node.PROCESS_MODE_DISABLED
 	skill1_collider.disabled = true
-	skill2_effect.play("idle")
-	#skill2_area.process_mode = Node.PROCESS_MODE_DISABLED
 	skill2_collider.disabled = true
-	ult_effect.play("idle")
-	ult_area.process_mode = Node.PROCESS_MODE_DISABLED
 	ult_collider.disabled = true
+	ult_effect.play("idle")
 	$Player_collider.disabled = false
 	can_move = true
 	atk_anim_finished = true
@@ -420,7 +411,7 @@ func _on_set_idle():
 func _on_ult_time_timeout():
 	emit_signal("shake_camera", false)
 	cooldown_state["ult"] = true
-	$Ult_area/Ult_time.start()
+	$Ult_area/Ult_time.stop()
 	emit_signal("set_idle")
 
 func _on_combo_time_timeout():

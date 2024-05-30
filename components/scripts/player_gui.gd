@@ -13,19 +13,19 @@ var max_health
 
 signal player_death()
 
-var temp = false
+var alive = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if player != null and not temp:
+	if player != null and not alive:
 		skill1_cooldown_time.max_value = player.skill1_cooldown.wait_time
 		skill2_cooldown_time.max_value = player.skill2_cooldown.wait_time
 		eva_cooldown_time.max_value = player.eva_cooldown.wait_time
 		ulti_cooldown_time.max_value = player.ulti_cooldown.wait_time
-		temp = true
+		alive = true
 	
 	if player != null:
 		skill1_cooldown_time.value = player.skill1_cooldown.time_left
@@ -33,8 +33,8 @@ func _process(delta):
 		eva_cooldown_time.value = player.eva_cooldown.time_left
 		ulti_cooldown_time.value = player.ulti_cooldown.time_left
 		
-	if player == null and temp:
-		temp = false
+	if player == null and alive:
+		alive = false
 		emit_signal("player_death")
 
 func _on_player_set_health_bar(vit):
@@ -42,3 +42,11 @@ func _on_player_set_health_bar(vit):
 		player.queue_free()
 	healthbar.value = vit
 	healthbar_label.text = str(vit) + "/" + str(max_health)
+
+func _on_nathan_grab(is_grabbed):
+	if is_grabbed:
+		player.skill2_cooldown.stop()
+		skill2_cooldown_time.tint_under = Color(Color.RED,1)
+	else:
+		player.skill2_cooldown.start()
+		skill2_cooldown_time.tint_under = Color(Color.WHITE,1)

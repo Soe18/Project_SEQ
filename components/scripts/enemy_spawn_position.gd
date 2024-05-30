@@ -34,7 +34,7 @@ func _on_round_cooldown_timeout():
 func activate_markers():
 	active_markers.clear()
 	
-	var round_count = get_parent().round_gui.round_count
+	var round_count = get_parent().round_gui.round_count+1
 	
 	var min_count = ceil(round_count/2)
 	

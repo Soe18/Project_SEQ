@@ -249,13 +249,13 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_u1m20"]
-radius = 23.0328
+radius = 24.5027
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(155.396, 78.4173)
+size = Vector2(169.065, 87.0504)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_37387"]
-size = Vector2(60.3597, 37.3381)
+size = Vector2(63.9568, 40.2878)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f8pc5"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -424,12 +424,12 @@ position = Vector2(10.7914, -27.3381)
 shape = SubResource("CircleShape2D_u1m20")
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(7.19424, 26.9784)
+position = Vector2(7.55388, 29.1367)
 shape = SubResource("RectangleShape2D_sb3xy")
 debug_color = Color(0.0196078, 0.611765, 0.611765, 0.419608)
 
 [node name="Legs_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-4.28058, 84.8561)
+position = Vector2(-4.64029, 85.6115)
 shape = SubResource("RectangleShape2D_37387")
 
 [node name="Stun" type="Timer" parent="."]

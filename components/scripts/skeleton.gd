@@ -22,6 +22,7 @@ var dying = false
 var soul_out = false
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal got_grabbed(is_grabbed)
 
 var player_position
 var target_position
@@ -206,6 +207,8 @@ se il segnale è di uscita dalla grab e il nodo è grabbato
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
 		if not soul_out or dying:
+			if player.char_name == "Nathan":
+				emit_signal("got_grabbed", true)
 			_on_inhale_time_timeout()
 			choosed_atk = Possible_Attacks.IDLE
 			$Update_Atk.stop()
@@ -216,6 +219,8 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 			body_collider.disabled = true
 			healthbar.visible = false
 	if !is_been_grabbed and grabbed:
+		if player.char_name == "Nathan":
+			emit_signal("got_grabbed", false)
 		$Update_Atk.start()
 		moving = true
 		grabbed = false

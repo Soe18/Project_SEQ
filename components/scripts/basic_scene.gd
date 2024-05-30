@@ -102,6 +102,7 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			if player.char_name == "Nathan":
 				# connetto il segnale della grab
 				player.grab.connect(current_node._on_player_grab)
+				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
 
 func pause_game(get_paused):
 	for i in get_child_count(): # ciclo tutti i nodi

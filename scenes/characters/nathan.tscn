@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=3 uid="uid://e6lbvx4r5aqc"]
+[gd_scene load_steps=76 format=3 uid="uid://e6lbvx4r5aqc"]
 
 [ext_resource type="Script" path="res://components/scripts/nathan.gd" id="1_arpgr"]
 [ext_resource type="Texture2D" uid="uid://cmb3fpdibbfxt" path="res://components/sprites/nathan/nathan_eva.png" id="2_vy16t"]
@@ -11,9 +11,6 @@
 [ext_resource type="Texture2D" uid="uid://j5wvaxionfxf" path="res://components/sprites/nathan/nathan_damaged.png" id="9_akbuy"]
 [ext_resource type="Texture2D" uid="uid://catk52bjnup21" path="res://components/sprites/nathan/nathan_idle.png" id="10_mbgx6"]
 [ext_resource type="Texture2D" uid="uid://k50b4xhn2gp5" path="res://components/sprites/nathan/nathan_sk1.png" id="11_47s6q"]
-[ext_resource type="Texture2D" uid="uid://c5qat6y7dko25" path="res://components/sprites/rufus/Rufus_skill1_eff.png" id="12_nmmiu"]
-[ext_resource type="Texture2D" uid="uid://u0s32lgru8y" path="res://components/sprites/rufus/Rufus_skill1.png" id="13_b3pp7"]
-[ext_resource type="Texture2D" uid="uid://cd38kiddcqh6c" path="res://components/sprites/rufus/Rufus_skill2_eff.png" id="14_onwby"]
 [ext_resource type="Texture2D" uid="uid://okdo8asqtw4c" path="res://components/sprites/nathan/nathan_ult_eff.png" id="15_rpd8r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_iaryq"]
@@ -449,167 +446,16 @@ animations = [{
 "speed": 8.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8jnk4"]
-size = Vector2(86, 123)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8jryo"]
+radius = 39.3941
+height = 167.545
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jw0fn"]
-size = Vector2(55, 120)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fpam1"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(0, 0, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_443e6"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(800, 0, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7sjlt"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(1600, 0, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_p1njx"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(0, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xw233"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(800, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_yhjaw"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(1600, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_5g3og"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(1600, 0, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_iogua"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(0, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gvs1g"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(800, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a1m7f"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(1600, 800, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1bppb"]
-atlas = ExtResource("12_nmmiu")
-region = Rect2(0, 1600, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_iydjr"]
-atlas = ExtResource("13_b3pp7")
-region = Rect2(1200, 1800, 600, 600)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_557fw"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fpam1")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_443e6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7sjlt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_p1njx")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_xw233")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yhjaw")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5g3og")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_iogua")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gvs1g")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a1m7f")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1bppb")
-}],
-"loop": false,
-"name": &"effect",
-"speed": 7.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_iydjr")
-}],
-"loop": true,
-"name": &"idle",
-"speed": 8.0
-}]
+size = Vector2(56, 120)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7qi7k"]
-radius = 59.0
-height = 192.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_o6h04"]
-atlas = ExtResource("14_onwby")
-region = Rect2(0, 0, 1200, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3vafl"]
-atlas = ExtResource("14_onwby")
-region = Rect2(1200, 0, 1200, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_npt55"]
-atlas = ExtResource("14_onwby")
-region = Rect2(0, 800, 1200, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_om7no"]
-atlas = ExtResource("14_onwby")
-region = Rect2(1200, 800, 1200, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_l2e2g"]
-atlas = ExtResource("14_onwby")
-region = Rect2(0, 1600, 1200, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lenx2"]
-atlas = ExtResource("14_onwby")
-region = Rect2(1800, 1800, 600, 600)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_roxdw"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_o6h04")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_3vafl")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_npt55")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_om7no")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_l2e2g")
-}],
-"loop": false,
-"name": &"effect",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_lenx2")
-}],
-"loop": true,
-"name": &"idle",
-"speed": 5.0
-}]
+radius = 70.0
+height = 226.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ay25m"]
 size = Vector2(120, 52)
@@ -629,10 +475,6 @@ region = Rect2(3024, 0, 3024, 3600)
 atlas = ExtResource("15_rpd8r")
 region = Rect2(0, 3600, 3024, 3600)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1qf8v"]
-atlas = ExtResource("15_rpd8r")
-region = Rect2(3024, 3600, 3024, 3600)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_2j1od"]
 animations = [{
 "frames": [{
@@ -651,11 +493,11 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1qf8v")
+"texture": null
 }],
 "loop": true,
 "name": &"idle",
-"speed": 5.0
+"speed": 0.0
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ig6ww"]
@@ -668,37 +510,29 @@ script = ExtResource("1_arpgr")
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.156982, 0.156982)
 sprite_frames = SubResource("SpriteFrames_ded5k")
-animation = &"charging_ult"
+animation = &"idle"
 autoplay = "idle"
 
 [node name="Player_collider" type="CollisionShape2D" parent="."]
-position = Vector2(1.5, 10)
-rotation = -1.5708
-shape = SubResource("RectangleShape2D_8jnk4")
+position = Vector2(6, 22)
+rotation = -1.98095
+shape = SubResource("CapsuleShape2D_8jryo")
+debug_color = Color(0, 0.6, 0.701961, 0.419608)
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
-process_mode = 4
 position = Vector2(40, 1)
 
 [node name="Atk_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
-position = Vector2(43.5, 11)
+position = Vector2(50, 11)
 shape = SubResource("RectangleShape2D_jw0fn")
 disabled = true
 debug_color = Color(0.666667, 0.458824, 0.611765, 0.419608)
 
 [node name="Skill_1_area" type="Area2D" parent="."]
-process_mode = 4
 position = Vector2(0, 2)
 
-[node name="Effect" type="AnimatedSprite2D" parent="Skill_1_area"]
-position = Vector2(0, 6.10352e-05)
-scale = Vector2(0.285, 0.198826)
-sprite_frames = SubResource("SpriteFrames_557fw")
-animation = &"idle"
-autoplay = "idle"
-
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill_1_area"]
-position = Vector2(-1, 11)
+position = Vector2(0, 19)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_7qi7k")
 disabled = true
@@ -709,14 +543,6 @@ wait_time = 1.696
 one_shot = true
 
 [node name="Skill2_area" type="Area2D" parent="."]
-process_mode = 4
-
-[node name="Effect" type="AnimatedSprite2D" parent="Skill2_area"]
-position = Vector2(-1, 10)
-scale = Vector2(0.1325, 0.1325)
-sprite_frames = SubResource("SpriteFrames_roxdw")
-animation = &"idle"
-autoplay = "idle"
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill2_area"]
 position = Vector2(90, 12)
@@ -733,7 +559,6 @@ disabled = true
 debug_color = Color(0.796078, 1, 0.635294, 0.419608)
 
 [node name="Ult_area" type="Area2D" parent="."]
-process_mode = 4
 
 [node name="Effect" type="AnimatedSprite2D" parent="Ult_area"]
 scale = Vector2(0.246015, 0.246015)
@@ -760,15 +585,15 @@ wait_time = 0.639
 one_shot = true
 
 [node name="Skill1_cooldown" type="Timer" parent="."]
-wait_time = 6.5
+wait_time = 5.5
 one_shot = true
 
 [node name="Skill2_cooldown" type="Timer" parent="."]
-wait_time = 4.0
+wait_time = 7.0
 one_shot = true
 
 [node name="Eva_cooldown" type="Timer" parent="."]
-wait_time = 4.0
+wait_time = 3.5
 one_shot = true
 
 [node name="Ult_cooldown" type="Timer" parent="."]
@@ -789,11 +614,9 @@ one_shot = true
 [connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited"]
 [connection signal="body_entered" from="Skill_1_area" to="." method="_on_skill_1_area_body_entered"]
 [connection signal="body_exited" from="Skill_1_area" to="." method="_on_skill_1_area_body_exited"]
-[connection signal="animation_finished" from="Skill_1_area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="timeout" from="Skill_1_area/Sk1_time" to="." method="_on_sk_1_time_timeout"]
 [connection signal="body_entered" from="Skill2_area" to="." method="_on_skill_2_area_body_entered"]
 [connection signal="body_exited" from="Skill2_area" to="." method="_on_skill_2_area_body_exited"]
-[connection signal="animation_finished" from="Skill2_area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="body_entered" from="Eva_area" to="." method="_on_eva_area_body_entered"]
 [connection signal="body_exited" from="Eva_area" to="." method="_on_eva_area_body_exited"]
 [connection signal="body_entered" from="Ult_area" to="." method="_on_ult_area_body_entered"]

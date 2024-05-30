@@ -1,4 +1,4 @@
-[gd_scene load_steps=111 format=3 uid="uid://cdj6vi8f58cl0"]
+[gd_scene load_steps=108 format=3 uid="uid://cdj6vi8f58cl0"]
 
 [ext_resource type="Script" path="res://components/scripts/rufus.gd" id="1_kqagk"]
 [ext_resource type="Texture2D" uid="uid://b2uag3j6vt8fm" path="res://components/sprites/rufus/Rufus_base_atk1.png" id="2_qcuyf"]
@@ -587,10 +587,6 @@ region = Rect2(1600, 800, 800, 800)
 atlas = ExtResource("14_5masp")
 region = Rect2(0, 1600, 800, 800)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_iydjr"]
-atlas = ExtResource("11_h0yje")
-region = Rect2(1200, 1800, 600, 600)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_xt8wu"]
 animations = [{
 "frames": [{
@@ -633,11 +629,11 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_iydjr")
+"texture": null
 }],
 "loop": true,
 "name": &"idle",
-"speed": 8.0
+"speed": 0.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3sm70"]
@@ -664,10 +660,6 @@ region = Rect2(1200, 800, 1200, 800)
 atlas = ExtResource("15_2wlen")
 region = Rect2(0, 1600, 1200, 800)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_lenx2"]
-atlas = ExtResource("15_2wlen")
-region = Rect2(1800, 1800, 600, 600)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_6ujbr"]
 animations = [{
 "frames": [{
@@ -692,11 +684,11 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lenx2")
+"texture": null
 }],
 "loop": true,
 "name": &"idle",
-"speed": 5.0
+"speed": 0.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_e35s4"]
@@ -706,10 +698,6 @@ height = 198.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cdtx2"]
 radius = 16.0
 height = 114.233
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_murx3"]
-atlas = ExtResource("13_xg5lg")
-region = Rect2(800, 2400, 800, 800)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ggw6e"]
 animations = [{
@@ -723,11 +711,11 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_murx3")
+"texture": null
 }],
 "loop": true,
 "name": &"idle",
-"speed": 5.0
+"speed": 0.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6qh5c"]
@@ -748,13 +736,13 @@ autoplay = "idle"
 [node name="Body_collider" type="CollisionShape2D" parent="."]
 position = Vector2(-5, 24)
 shape = SubResource("CapsuleShape2D_xdive")
+debug_color = Color(0, 0.6, 0.701961, 0.419608)
 
 [node name="Head_collider" type="CollisionShape2D" parent="."]
 position = Vector2(10, -26)
 shape = SubResource("CircleShape2D_wragi")
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
-process_mode = 4
 position = Vector2(40, 1)
 
 [node name="Atk_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
@@ -764,7 +752,6 @@ disabled = true
 debug_color = Color(0.666667, 0.458824, 0.611765, 0.419608)
 
 [node name="Skill_1_area" type="Area2D" parent="."]
-process_mode = 4
 position = Vector2(0, 2)
 
 [node name="Effect" type="AnimatedSprite2D" parent="Skill_1_area"]
@@ -782,7 +769,6 @@ disabled = true
 debug_color = Color(0.823529, 0.172549, 0.878431, 0.419608)
 
 [node name="Skill2_area" type="Area2D" parent="."]
-process_mode = 4
 
 [node name="Effect" type="AnimatedSprite2D" parent="Skill2_area"]
 position = Vector2(-1, 10)
@@ -807,7 +793,6 @@ disabled = true
 debug_color = Color(0.796078, 1, 0.635294, 0.419608)
 
 [node name="Ult_area" type="Area2D" parent="."]
-process_mode = 4
 position = Vector2(0, 57)
 
 [node name="Effect" type="AnimatedSprite2D" parent="Ult_area"]
@@ -818,6 +803,7 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Ult_collider" type="CollisionShape2D" parent="Ult_area"]
+visible = false
 position = Vector2(0, -57)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_6qh5c")
