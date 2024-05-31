@@ -1,4 +1,4 @@
-[gd_scene load_steps=108 format=3 uid="uid://cdj6vi8f58cl0"]
+[gd_scene load_steps=107 format=3 uid="uid://cdj6vi8f58cl0"]
 
 [ext_resource type="Script" path="res://components/scripts/rufus.gd" id="1_kqagk"]
 [ext_resource type="Texture2D" uid="uid://b2uag3j6vt8fm" path="res://components/sprites/rufus/Rufus_base_atk1.png" id="2_qcuyf"]
@@ -537,9 +537,6 @@ animations = [{
 radius = 17.0
 height = 88.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_wragi"]
-radius = 18.0
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lu0mv"]
 size = Vector2(39.5, 94)
 
@@ -723,7 +720,8 @@ radius = 151.0
 height = 550.0
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
-collision_mask = 7
+texture_filter = 1
+scale = Vector2(0.9, 0.9)
 motion_mode = 1
 script = ExtResource("1_kqagk")
 
@@ -734,18 +732,15 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-5, 24)
+position = Vector2(-1.11111, 13.3333)
 shape = SubResource("CapsuleShape2D_xdive")
 debug_color = Color(0, 0.6, 0.701961, 0.419608)
-
-[node name="Head_collider" type="CollisionShape2D" parent="."]
-position = Vector2(10, -26)
-shape = SubResource("CircleShape2D_wragi")
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 position = Vector2(40, 1)
 
 [node name="Atk_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
+visible = false
 position = Vector2(4.25, 12)
 shape = SubResource("RectangleShape2D_lu0mv")
 disabled = true
@@ -762,6 +757,7 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill_1_area"]
+visible = false
 position = Vector2(36, 2)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_3sm70")
@@ -778,6 +774,7 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill2_area"]
+visible = false
 position = Vector2(-3, 18)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_e35s4")
@@ -786,6 +783,7 @@ disabled = true
 [node name="Eva_area" type="Area2D" parent="."]
 
 [node name="Eva_collider" type="CollisionShape2D" parent="Eva_area"]
+visible = false
 position = Vector2(17, 19)
 rotation = 0.544543
 shape = SubResource("CapsuleShape2D_cdtx2")

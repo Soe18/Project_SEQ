@@ -387,20 +387,32 @@ func _on_sprite_2d_frame_changed():
 func _on_set_idle():
 	move_horizontal = null
 	move_vertical = null
+	
 	atk_state = Atk_States.IDLE
+	
 	sprite.play("idle")
+	ult_effect.play("idle")
+	
 	skill1_duration_time.stop()
+	
 	bs_atk_collider.disabled = true
 	eva_collider.disabled = true
 	skill1_collider.disabled = true
 	skill2_collider.disabled = true
 	ult_collider.disabled = true
-	ult_effect.play("idle")
 	$Player_collider.disabled = false
+	
+	self.set_collision_layer_value(1, true)
+	self.set_collision_layer_value(2, false)
+	
+	self.set_collision_mask_value(1, true)
+	self.set_collision_mask_value(2, false)
+	
 	can_move = true
 	atk_anim_finished = true
 	is_evading = false
 	sk1_activated = false
+	
 	sprite.position = Vector2(0,0)
 
 
@@ -436,7 +448,11 @@ func _on_sk_1_time_timeout():
 
 'METODO DELL\'EVASIONE DEL PLAYER'
 func evade():
-	$Player_collider.disabled = true
+	self.set_collision_layer_value(1, false)
+	self.set_collision_layer_value(2, true)
+	
+	self.set_collision_mask_value(1, false)
+	self.set_collision_mask_value(2, true)
 	if move_vertical == Move_Keys.UP:
 		velocity.y += -15
 	elif move_vertical == Move_Keys.DOWN:

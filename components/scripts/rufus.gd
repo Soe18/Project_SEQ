@@ -69,7 +69,6 @@ var ult_moving_mod
 @onready var ulti_cooldown = $Ulti_cooldown
 
 @onready var body_collider = $Body_collider
-@onready var head_collider = $Head_collider
 
 @onready var stun_timer = $Stun
 
@@ -290,7 +289,6 @@ func _on_skill_1_area_body_exited(body):
 
 func _on_skill_2_area_body_entered(body):
 	if body != self:
-		print("entrato sk2")
 		emit_signal("is_in_atk_range", true, body)
 
 func _on_skill_2_area_body_exited(body):
@@ -382,7 +380,6 @@ func _on_effect_frame_changed():
 		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
 
 func ult_moving():
-	head_collider.disabled = true
 	body_collider.disabled = true
 	sprite.position.y += ult_moving_mod
 	if sprite.flip_h:
@@ -414,8 +411,13 @@ func _on_set_idle():
 	eva_collider.disabled = true
 	ult_collider.disabled = true
 	
-	head_collider.disabled = false
 	body_collider.disabled = false
+	
+	self.set_collision_layer_value(1, true)
+	self.set_collision_layer_value(2, false)
+	
+	self.set_collision_mask_value(1, true)
+	self.set_collision_mask_value(2, false)
 	
 	can_move = true
 	is_evading = false
@@ -448,8 +450,10 @@ func _on_comb_time_timeout():
 
 'METODO CHE GESTISCE L\'EVASIONE IN BASE ALLA DIREZIONE PREMUTA'
 func evade():
-	head_collider.disabled = true
-	body_collider.disabled = true
+	self.set_collision_layer_value(1, false)
+	self.set_collision_layer_value(2,true)
+	self.set_collision_mask_value(1, false)
+	self.set_collision_mask_value(2, true)
 	if move_vertical == Move_Keys.UP:
 		velocity.y += -50
 	elif move_vertical == Move_Keys.DOWN:

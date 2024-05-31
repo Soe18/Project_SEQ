@@ -59,7 +59,7 @@ func _on_gui_select_character(char):
 	add_child(player_scene.instantiate())
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
-	player.scale = Vector2(1, 1)
+	player.scale = Vector2(0.9, 0.9)
 	
 	# creo la telecamera
 	var camera = Camera2D.new()
@@ -116,7 +116,6 @@ func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var rng = randi_range(0, 100)
 	if pbc > rng:
 		dmg = round(dmg * efc)
-	print(dmg)
 	return dmg
 
 func _on_player_death():
