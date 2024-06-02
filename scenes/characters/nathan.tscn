@@ -447,8 +447,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8jryo"]
-radius = 39.3941
-height = 167.545
+radius = 35.0
+height = 120.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jw0fn"]
 size = Vector2(52, 120)
@@ -504,18 +504,21 @@ animations = [{
 radius = 466.0
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+y_sort_enabled = true
 motion_mode = 1
 script = ExtResource("1_arpgr")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-12, -12)
 scale = Vector2(0.156982, 0.156982)
 sprite_frames = SubResource("SpriteFrames_ded5k")
 animation = &"idle"
 autoplay = "idle"
 
 [node name="Player_collider" type="CollisionShape2D" parent="."]
-position = Vector2(6, 22)
-rotation = -1.98095
+visible = false
+position = Vector2(-3, 15)
+rotation = -1.5708
 shape = SubResource("CapsuleShape2D_8jryo")
 debug_color = Color(0, 0.6, 0.701961, 0.419608)
 
@@ -523,6 +526,7 @@ debug_color = Color(0, 0.6, 0.701961, 0.419608)
 position = Vector2(40, 1)
 
 [node name="Atk_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
+visible = false
 position = Vector2(50, 11)
 shape = SubResource("RectangleShape2D_jw0fn")
 disabled = true
@@ -532,6 +536,7 @@ debug_color = Color(0.666667, 0.458824, 0.611765, 0.419608)
 position = Vector2(0, 2)
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill_1_area"]
+visible = false
 position = Vector2(0, 19)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_7qi7k")
@@ -545,6 +550,7 @@ one_shot = true
 [node name="Skill2_area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Skill2_area"]
+visible = false
 position = Vector2(90, 12)
 rotation = -1.5708
 shape = SubResource("RectangleShape2D_ay25m")
@@ -553,6 +559,7 @@ disabled = true
 [node name="Eva_area" type="Area2D" parent="."]
 
 [node name="Eva_collider" type="CollisionShape2D" parent="Eva_area"]
+visible = false
 position = Vector2(5, 12)
 shape = SubResource("CircleShape2D_ykv8p")
 disabled = true

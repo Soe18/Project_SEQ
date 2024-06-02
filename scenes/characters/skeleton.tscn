@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://dc4r0c3q4h1vo"]
+[gd_scene load_steps=48 format=3 uid="uid://dc4r0c3q4h1vo"]
 
 [ext_resource type="Script" path="res://components/scripts/skeleton.gd" id="1_dah7i"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_apuag"]
@@ -241,11 +241,9 @@ animations = [{
 "speed": 6.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_wt77j"]
-radius = 17.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(61, 73)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uwkny"]
+radius = 23.0
+height = 98.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0p46"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -309,6 +307,8 @@ animations = [{
 }]
 
 [node name="SkeletonEnemy" type="CharacterBody2D"]
+motion_mode = 1
+wall_min_slide_angle = 0.0
 script = ExtResource("1_dah7i")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
@@ -318,14 +318,11 @@ sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Head_collider" type="CollisionShape2D" parent="."]
-position = Vector2(2, -19)
-shape = SubResource("CircleShape2D_wt77j")
-debug_color = Color(1, 1, 0, 0.0666667)
-
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-3.5, 29.5)
-shape = SubResource("RectangleShape2D_sb3xy")
+visible = false
+position = Vector2(-1, 16)
+rotation = 0.279253
+shape = SubResource("CapsuleShape2D_uwkny")
 debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Stun" type="Timer" parent="."]
@@ -348,6 +345,7 @@ wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
+visible = false
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false
@@ -357,6 +355,7 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
+visible = false
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0, 0, 0.0784314)
@@ -368,9 +367,6 @@ sprite_frames = SubResource("SpriteFrames_g7j7j")
 animation = &"idle"
 autoplay = "idle"
 flip_h = true
-
-[node name="UpdateDirection" type="Timer" parent="."]
-wait_time = 1.518
 
 [node name="Inhale_time" type="Timer" parent="."]
 wait_time = 0.8
@@ -397,16 +393,27 @@ one_shot = true
 wait_time = 4.0
 one_shot = true
 
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 125.4
+target_desired_distance = 100.0
+path_max_distance = 1000.0
+navigation_layers = 3
+path_postprocessing = 1
+avoidance_enabled = true
+radius = 43.0
+max_neighbors = 20
+max_speed = 1703.04
+
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
-[connection signal="timeout" from="Stun" to="." method="_on_stun_timeout" flags=18]
-[connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout" flags=18]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered" flags=18]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited" flags=18]
-[connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered" flags=18]
-[connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited" flags=18]
-[connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished" flags=18]
-[connection signal="timeout" from="UpdateDirection" to="." method="_on_update_direction_timeout" flags=18]
-[connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout" flags=18]
+[connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
+[connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
+[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
+[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
+[connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered"]
+[connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited"]
+[connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished"]
+[connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
 [connection signal="timeout" from="Soul_delay_time" to="." method="_on_soul_delay_time_timeout"]
 [connection signal="timeout" from="Soul_respawn_time" to="." method="_on_soul_respawn_time_timeout"]
+[connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]

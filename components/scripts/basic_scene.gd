@@ -59,18 +59,18 @@ func _on_gui_select_character(char):
 	add_child(player_scene.instantiate())
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
-	player.scale = Vector2(0.9, 0.9)
+	player.scale = Vector2(0.95, 0.95)
 	
 	# creo la telecamera
 	var camera = Camera2D.new()
 	# impostazioni per la telecamera
-	camera.zoom = Vector2(1.5,1.5)
+	camera.zoom = Vector2(1.6,1.6)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 3
 	# condizione per collegare lo script della telecamera
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
-		player.scale = Vector2(1.6, 1.6)
+		player.scale = Vector2(1.4, 1.4)
 		player.add_child(camera,true) # aggiungo la camera al player
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 	else:

@@ -534,8 +534,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xdive"]
-radius = 17.0
-height = 88.0
+radius = 18.6236
+height = 104.718
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lu0mv"]
 size = Vector2(39.5, 94)
@@ -720,7 +720,7 @@ radius = 151.0
 height = 550.0
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
-texture_filter = 1
+y_sort_enabled = true
 scale = Vector2(0.9, 0.9)
 motion_mode = 1
 script = ExtResource("1_kqagk")
@@ -732,9 +732,10 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-1.11111, 13.3333)
+visible = false
+position = Vector2(1.19209e-06, 9.99997)
 shape = SubResource("CapsuleShape2D_xdive")
-debug_color = Color(0, 0.6, 0.701961, 0.419608)
+debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 position = Vector2(40, 1)
@@ -840,29 +841,29 @@ one_shot = true
 one_shot = true
 
 [connection signal="get_healed" from="." to="." method="_on_get_healed"]
-[connection signal="set_idle" from="." to="." method="_on_set_idle" flags=18]
-[connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished" flags=18]
-[connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed" flags=18]
-[connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered" flags=18]
-[connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited" flags=18]
-[connection signal="body_entered" from="Skill_1_area" to="." method="_on_skill_1_area_body_entered" flags=18]
-[connection signal="body_exited" from="Skill_1_area" to="." method="_on_skill_1_area_body_exited" flags=18]
-[connection signal="animation_finished" from="Skill_1_area/Effect" to="." method="_on_effect_animation_finished" flags=18]
-[connection signal="frame_changed" from="Skill_1_area/Effect" to="." method="_on_effect_frame_changed" flags=18]
-[connection signal="body_entered" from="Skill2_area" to="." method="_on_skill_2_area_body_entered" flags=18]
-[connection signal="body_exited" from="Skill2_area" to="." method="_on_skill_2_area_body_exited" flags=18]
-[connection signal="animation_finished" from="Skill2_area/Effect" to="." method="_on_effect_animation_finished" flags=18]
-[connection signal="frame_changed" from="Skill2_area/Effect" to="." method="_on_effect_frame_changed" flags=18]
-[connection signal="body_entered" from="Eva_area" to="." method="_on_eva_area_body_entered" flags=18]
-[connection signal="body_exited" from="Eva_area" to="." method="_on_eva_area_body_exited" flags=18]
-[connection signal="body_entered" from="Ult_area" to="." method="_on_ult_area_body_entered" flags=18]
-[connection signal="body_exited" from="Ult_area" to="." method="_on_ult_area_body_exited" flags=18]
-[connection signal="animation_finished" from="Ult_area/Effect" to="." method="_on_effect_animation_finished" flags=18]
-[connection signal="timeout" from="Ult_area/Ult_time" to="." method="_on_ult_time_timeout" flags=18]
-[connection signal="timeout" from="Eva_time" to="." method="_on_eva_time_timeout" flags=18]
-[connection signal="timeout" from="Skill1_cooldown" to="." method="_on_skill_1_cooldown_timeout" flags=18]
-[connection signal="timeout" from="Skill2_cooldown" to="." method="_on_skill_2_cooldown_timeout" flags=18]
-[connection signal="timeout" from="Eva_cooldown" to="." method="_on_eva_cooldown_timeout" flags=18]
-[connection signal="timeout" from="Ulti_cooldown" to="." method="_on_ult_cooldown_timeout" flags=18]
-[connection signal="timeout" from="Combo_time" to="." method="_on_comb_time_timeout" flags=18]
+[connection signal="set_idle" from="." to="." method="_on_set_idle"]
+[connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
+[connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]
+[connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered"]
+[connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited"]
+[connection signal="body_entered" from="Skill_1_area" to="." method="_on_skill_1_area_body_entered"]
+[connection signal="body_exited" from="Skill_1_area" to="." method="_on_skill_1_area_body_exited"]
+[connection signal="animation_finished" from="Skill_1_area/Effect" to="." method="_on_effect_animation_finished"]
+[connection signal="frame_changed" from="Skill_1_area/Effect" to="." method="_on_effect_frame_changed"]
+[connection signal="body_entered" from="Skill2_area" to="." method="_on_skill_2_area_body_entered"]
+[connection signal="body_exited" from="Skill2_area" to="." method="_on_skill_2_area_body_exited"]
+[connection signal="animation_finished" from="Skill2_area/Effect" to="." method="_on_effect_animation_finished"]
+[connection signal="frame_changed" from="Skill2_area/Effect" to="." method="_on_effect_frame_changed"]
+[connection signal="body_entered" from="Eva_area" to="." method="_on_eva_area_body_entered"]
+[connection signal="body_exited" from="Eva_area" to="." method="_on_eva_area_body_exited"]
+[connection signal="body_entered" from="Ult_area" to="." method="_on_ult_area_body_entered"]
+[connection signal="body_exited" from="Ult_area" to="." method="_on_ult_area_body_exited"]
+[connection signal="animation_finished" from="Ult_area/Effect" to="." method="_on_effect_animation_finished"]
+[connection signal="timeout" from="Ult_area/Ult_time" to="." method="_on_ult_time_timeout"]
+[connection signal="timeout" from="Eva_time" to="." method="_on_eva_time_timeout"]
+[connection signal="timeout" from="Skill1_cooldown" to="." method="_on_skill_1_cooldown_timeout"]
+[connection signal="timeout" from="Skill2_cooldown" to="." method="_on_skill_2_cooldown_timeout"]
+[connection signal="timeout" from="Eva_cooldown" to="." method="_on_eva_cooldown_timeout"]
+[connection signal="timeout" from="Ulti_cooldown" to="." method="_on_ult_cooldown_timeout"]
+[connection signal="timeout" from="Combo_time" to="." method="_on_comb_time_timeout"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]

@@ -52,6 +52,8 @@ var atk_anim_finished = true
 
 @onready var sprite = $Sprite2D
 
+@onready var player_collider = $Player_collider
+
 @onready var bs_atk_collider = $Basic_atk_Area/Atk_collider
 
 @onready var skill1_collider = $Skill_1_area/Skill_collider
@@ -412,8 +414,6 @@ func _on_set_idle():
 	atk_anim_finished = true
 	is_evading = false
 	sk1_activated = false
-	
-	sprite.position = Vector2(0,0)
 
 
 

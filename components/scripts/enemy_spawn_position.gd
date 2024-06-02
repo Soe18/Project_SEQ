@@ -53,6 +53,7 @@ func activate_markers():
 		max_count = markers.size()
 	
 	var enemy_count = randi_range(min_count, max_count)
+	enemy_count = markers.size()
 	print("round_count = " + str(round_count))
 	print("min_count = " + str(min_count))
 	print("max_count = " + str(max_count))
@@ -80,7 +81,7 @@ func activate_markers():
 				out = true
 		
 		add_child(load(enemy_scene).instantiate(),true)
-		#add_child(load(possible_enemies[2]).instantiate(),true)
+		#add_child(load(possible_enemies[0]).instantiate(),true)
 		get_child(get_child_count()-1).position = i.position
 
 

@@ -21,7 +21,6 @@ var grabbed = false
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal got_grabbed(is_grabbed)
 
-var player_position
 var target_position
 var player
 
@@ -29,21 +28,23 @@ enum Possible_Attacks {IDLE, BASIC_ATK, SPRINT}
 var choosed_atk
 var sprinting = false
 
+@onready var navigation_agent = $NavigationAgent2D
+
 @onready var sprite = $Sprite2D
 @onready var basic_atk_effect = $Basic_atk_Area/Effect
 @onready var basic_atk_collider = $Basic_atk_Area/Skill_collider
 @onready var stun_timer = $Stun
 
 @onready var body_collider = $Body_collider
-@onready var head_collider = $Head_collider
 
 @onready var sprint_area = $Sprint_Area
 @onready var sprint_collider = $Sprint_Area/Skill_collider
 
-@onready var update_direction_timer = $UpdateDirection
 @onready var healthbar = $HealthBar
 
-var player_entered = false
+@onready var area_of_detection = $Area_of_detection
+
+var player_entered = true
 var player_in_atk_range = false
 
 var health
@@ -57,8 +58,6 @@ func _ready():
 	health = vit
 	healthbar.max_value = vit
 	set_health_bar()
-	_on_update_direction_timeout()
-	update_direction_timer.start()
 	sprite.play("idle")
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -79,7 +78,14 @@ func _physics_process(delta):
 		if choosed_atk == Possible_Attacks.SPRINT and $Sprint_Cooldown.is_stopped() and not sprinting and $Stun.is_stopped():
 			sprint()
 	elif not player_entered and moving:
-		wander()
+		if player:
+			if not navigation_agent.is_navigation_finished():
+				sprite.play("running")
+				target_position = navigation_agent.target_position
+				velocity = global_position.direction_to(target_position) * 150
+				move_and_slide()
+			else:
+				sprite.play("idle")
 	elif not player_entered and not moving:
 		sprite.play("idle")
 	elif grabbed:
@@ -91,33 +97,53 @@ func _physics_process(delta):
 	se il nodo è distante dal player di almeno 12 unità
 		muovo il nodo verso il player con la velocità di 3'
 
-func flip():
-	if target_position.x < 0:
+func flip(distance_to_player):
+	if distance_to_player.x < 0:
 		basic_atk_effect.position = Vector2(-49, 12)
 		basic_atk_effect.flip_h = false
+		body_collider.position = Vector2(19, 16)
 		sprite.flip_h = true
-		basic_atk_collider.position = Vector2(-73.5, 5.5)
-	elif target_position.x > 0:
+		basic_atk_collider.position = Vector2(-42, 16)
+		body_collider.rotation_degrees = -11
+		body_collider.position.x = 7
+	elif distance_to_player.x > 0:
 		basic_atk_effect.position = Vector2(49, 12)
 		basic_atk_effect.flip_h = true
+		body_collider.position = Vector2(-6, 16)
 		sprite.flip_h = false
-		basic_atk_collider.position = Vector2(73.5, 5.5)
+		basic_atk_collider.position = Vector2(42, 16)
+		body_collider.rotation_degrees = 11
+		body_collider.position.x = -7
 
 func chase_player():
-	player_position = player.position
-	target_position = (player_position - position).normalized()
-	flip()
-	if position.distance_to(player_position) > 100:
-		sprite.play("running")
-		move_and_collide(target_position * 3)
-	elif position.distance_to(player_position) <= 100 and sprite.animation == "running":
-		sprite.play("idle")
+	if player:
+		navigation_agent.target_position = player.global_position
+		
+		if navigation_agent.is_navigation_finished():
+			if sprite.animation == "running":
+				sprite.play("idle")
+		else:
+			var current_agent_position = global_position
+			target_position = navigation_agent.get_next_path_position()
+			
+			var new_velocity = global_position.direction_to(target_position) * 200
+			
+			if navigation_agent.avoidance_enabled:
+				navigation_agent.set_velocity(new_velocity)
+			else:
+				_on_navigation_agent_2d_velocity_computed(new_velocity)
+			
+			sprite.play("running")
+			move_and_slide()
+		var player_position = (player.position - position).normalized()
+		flip(player_position)
 
 func sprint_to_player():
 	if player != null:
-		player_position = player.position
+		var player_position = player.position
 		target_position = (player_position - position).normalized()
-		flip()
+		flip(target_position)
+		
 		sprite.play("running")
 		move_and_collide(target_position * 5)
 
@@ -127,15 +153,9 @@ func choose_atk():
 		choosed_atk = Possible_Attacks.IDLE
 	elif rng >= 10 and rng < 85:
 		choosed_atk = Possible_Attacks.BASIC_ATK
-	elif rng >= 85:
+	else:
 		choosed_atk = Possible_Attacks.SPRINT
 
-'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
-
-func wander():
-	sprite.play("running")
-	flip()
-	move_and_collide(target_position * 2)
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -176,7 +196,6 @@ func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
 		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 		health -= dmg
 		set_health_bar()
-		#print("take dmg: "+str(dmg))
 		if sprinting and dmg >= 25:
 			sprinting = false
 		moving = false
@@ -218,7 +237,6 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		grabbed = true
 		sprite.visible = false
 		body_collider.disabled = true
-		head_collider.disabled = true
 		healthbar.visible = false
 	if !is_been_grabbed and grabbed:
 		if player.char_name == "Nathan":
@@ -227,9 +245,9 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		moving = true
 		grabbed = false
 		if is_flipped:
-			position.x += -450
+			position.x = player.position.x + -450
 		else:
-			position.x += 450
+			position.x = player.position.x + 450
 		healthbar.visible = true
 		sprite.visible = true
 		move_and_slide()
@@ -263,52 +281,7 @@ func set_health_bar():
 
 func _on_timer_timeout():
 	body_collider.disabled = false
-	head_collider.disabled = false
 
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è entrato'
-
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		update_direction_timer.stop()
-		player_entered = true
-
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è uscito'
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		update_direction_timer.start()
-		player_entered = false
-
-'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
-	ferma il movimento
-	fa partire il tempo di fermo
-	aspetta il segnale
-	crea un vettore con direzione casuale
-	aggiorna il target con il vettore appena creato
-	crea una variabile randomica che determina quanto durerà lo spostamento
-	aggiorna il wait_time del timer'
-
-func _on_update_direction_timeout():
-	moving = false
-	sprite.play("idle")
-	$Inhale_time.start()
-	await _on_inhale_time_timeout
-	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
-	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
-	var new_update_time = randf_range(3,6)
-	update_direction_timer.wait_time = new_update_time
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
@@ -316,8 +289,17 @@ func _on_update_direction_timeout():
 func _on_inhale_time_timeout():
 	moving = true
 	sprinting = false
+	choosed_atk = Possible_Attacks.IDLE
 	sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
 	sprite.play("idle")
+
+func _on_area_of_detection_body_entered(body):
+	if body == player:
+		player_entered = true
+
+func _on_area_of_detection_body_exited(body):
+	if body == player:
+		player_entered = false
 
 func _on_basic_atk_area_body_entered(body):
 	if body == player:
@@ -367,3 +349,6 @@ func _on_update_atk_timeout():
 	if not sprinting:
 		choose_atk()
 	$Update_Atk.start()
+
+func _on_navigation_agent_2d_velocity_computed(safe_velocity):
+	velocity = safe_velocity

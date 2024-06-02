@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=36 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_ffk67"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="2_eh7wu"]
@@ -159,11 +159,9 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_xuhbw"]
-radius = 19.0263
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(49, 64)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7foa3"]
+radius = 26.0
+height = 104.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00dig"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -230,6 +228,9 @@ animations = [{
 size = Vector2(96, 137.5)
 
 [node name="ZombieEnemy" type="CharacterBody2D"]
+y_sort_enabled = true
+motion_mode = 1
+wall_min_slide_angle = 0.0
 script = ExtResource("1_ffk67")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
@@ -239,45 +240,44 @@ sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Head_collider" type="CollisionShape2D" parent="."]
-position = Vector2(7, -16)
-shape = SubResource("CircleShape2D_xuhbw")
-debug_color = Color(0, 0.6, 0.701961, 0.0705882)
-
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-5.5, 32)
-shape = SubResource("RectangleShape2D_sb3xy")
-debug_color = Color(0.0196078, 0.611765, 0.611765, 0.105882)
-
-[node name="Stun" type="Timer" parent="."]
-wait_time = 3.0
-one_shot = true
+visible = false
+position = Vector2(-7, 16)
+rotation = 0.191986
+shape = SubResource("CapsuleShape2D_7foa3")
+debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 offset_left = -50.0
-offset_top = -57.0
+offset_top = -60.0
 offset_right = 48.0
-offset_bottom = -38.0
+offset_bottom = -41.0
 theme_override_styles/background = SubResource("StyleBoxFlat_00dig")
 theme_override_styles/fill = SubResource("StyleBoxFlat_0rxx2")
 max_value = 150.0
 rounded = true
 show_percentage = false
 
+[node name="Stun" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
 [node name="GrabTime" type="Timer" parent="."]
 wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
+visible = false
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false
 shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0, 0.6, 0.701961, 0.0352941)
+debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
+visible = false
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0.00392157, 0.0666667, 0.109804)
@@ -286,6 +286,7 @@ debug_color = Color(1, 0.00392157, 0.0666667, 0.109804)
 position = Vector2(49, 12)
 scale = Vector2(0.0875, 0.133333)
 sprite_frames = SubResource("SpriteFrames_g7j7j")
+animation = &"idle"
 autoplay = "idle"
 flip_h = true
 
@@ -297,9 +298,6 @@ visible = false
 position = Vector2(-5, 17.25)
 shape = SubResource("RectangleShape2D_fhhjd")
 debug_color = Color(1, 1, 0, 0.054902)
-
-[node name="UpdateDirection" type="Timer" parent="."]
-wait_time = 1.518
 
 [node name="Inhale_time" type="Timer" parent="."]
 wait_time = 0.8
@@ -322,6 +320,17 @@ autostart = true
 wait_time = 2.0
 one_shot = true
 
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 120.4
+target_desired_distance = 100.0
+path_max_distance = 1000.0
+navigation_layers = 3
+path_postprocessing = 1
+avoidance_enabled = true
+radius = 43.0
+max_neighbors = 20
+max_speed = 1703.04
+
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
 [connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
 [connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
@@ -331,7 +340,7 @@ one_shot = true
 [connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="body_entered" from="Sprint_Area" to="." method="_on_sprint_area_body_entered"]
 [connection signal="body_exited" from="Sprint_Area" to="." method="_on_sprint_area_body_exited"]
-[connection signal="timeout" from="UpdateDirection" to="." method="_on_update_direction_timeout"]
 [connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
 [connection signal="timeout" from="Charge_Time" to="." method="_on_charge_time_timeout"]
+[connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]

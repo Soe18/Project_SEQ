@@ -41,15 +41,13 @@ var choosed_atk
 
 @onready var stun_timer = $Stun
 
-@onready var head_collider = $Head_collider
 @onready var body_collider = $Body_collider
-@onready var legs_collider = $Legs_collider
 
-@onready var update_direction_timer = $UpdateDirection
+@onready var navigation_agent = $NavigationAgent2D
 
 @onready var healthbar = $HealthBar
 
-var player_entered = false
+var player_entered = true
 var player_in_atk_range = false
 
 var health
@@ -63,8 +61,6 @@ func _ready():
 	health = vit
 	healthbar.max_value = vit
 	set_health_bar()
-	_on_update_direction_timeout()
-	update_direction_timer.start()
 	sprite.play("idle")
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -76,14 +72,21 @@ func _ready():
 		allora fa partire il metodo grab()'
 
 func _physics_process(delta):
-	if player_entered and moving:
+	if player_entered and moving and not attacking:
 		chase_player()
 		if choosed_atk == Possible_Attacks.PUNCH and $Punch_Cooldown.is_stopped():
 			punch()
 		if choosed_atk == Possible_Attacks.EARTHQUAKE and $Earthquake_Cooldown.is_stopped() and stun_timer.is_stopped():
 			earthquake()
 	elif not player_entered and moving:
-		wander()
+		if player:
+			if not navigation_agent.is_navigation_finished():
+				sprite.play("running")
+				target_position = navigation_agent.target_position
+				velocity = global_position.direction_to(target_position) * 150
+				move_and_slide()
+			else:
+				sprite.play("idle")
 	elif not player_entered and not moving and not attacking:
 		sprite.play("idle")
 		punch_effect.play("idle")
@@ -97,27 +100,44 @@ func _physics_process(delta):
 	se il nodo è distante dal player di almeno 12 unità
 		muovo il nodo verso il player con la velocità di 3'
 
-func flip():
-	if target_position.x < 0:
+func flip(distance_to_player):
+	if distance_to_player.x < 0:
 		punch_collider.position = Vector2(-50, 13)
 		punch_effect.position = Vector2(-59,-5)
 		punch_effect.flip_h = true
 		sprite.flip_h = true
-	elif target_position.x > 0:
+		body_collider.rotation_degrees = -16.5
+		body_collider.position.x = -6.835
+	elif distance_to_player.x > 0:
 		punch_collider.position = Vector2(50, 13)
 		punch_effect.position = Vector2(59,-5)
 		punch_effect.flip_h = false
 		sprite.flip_h = false
+		body_collider.rotation_degrees = 16.5
+		body_collider.position.x = 11.151
 
 func chase_player():
-	player_position = player.position
-	target_position = (player_position - position).normalized()
-	flip()
-	if position.distance_to(player_position) > 200:
-		sprite.play("running")
-		move_and_collide(target_position * 1.5)
-	elif position.distance_to(player_position) <= 200 and sprite.animation == "running":
-		sprite.play("idle")
+	if player:
+		navigation_agent.target_position = player.global_position
+		
+		if navigation_agent.is_navigation_finished():
+			if sprite.animation == "running":
+				sprite.play("idle")
+		else:
+			var current_agent_position = global_position
+			target_position = navigation_agent.get_next_path_position()
+			
+			var new_velocity = global_position.direction_to(target_position) * 125
+			
+			if navigation_agent.avoidance_enabled:
+				navigation_agent.set_velocity(new_velocity)
+			else:
+				_on_navigation_agent_2d_velocity_computed(new_velocity)
+			
+			sprite.play("running")
+			move_and_slide()
+		var player_position = (player.position - position).normalized()
+		flip(player_position)
 
 func choose_atk():
 	var rng = randi_range(0,100)
@@ -127,14 +147,6 @@ func choose_atk():
 		choosed_atk = Possible_Attacks.PUNCH
 	elif rng >= 72:
 		choosed_atk = Possible_Attacks.EARTHQUAKE
-
-'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
-
-func wander():
-	sprite.play("running")
-	flip()
-	move_and_collide(target_position * 1)
-
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST DEL SEGNALE DEL PLAYER "is_in_atk_range"
@@ -214,9 +226,7 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		moving = false
 		grabbed = true
 		sprite.visible = false
-		head_collider.disabled = true
 		body_collider.disabled = true
-		legs_collider.disabled = true
 		healthbar.visible = false
 	if !is_been_grabbed and grabbed:
 		if player.char_name == "Nathan":
@@ -225,9 +235,9 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		moving = true
 		grabbed = false
 		if is_flipped:
-			position.x += -450
+			position.x = player.position.x + -450
 		else:
-			position.x += 450
+			position.x = player.position.x + 450
 		sprite.visible = true
 		healthbar.visible = true
 		move_and_slide()
@@ -260,9 +270,7 @@ func set_health_bar():
 	setto le collisioni a true'
 
 func _on_timer_timeout():
-	head_collider.disabled = false
 	body_collider.disabled = false
-	legs_collider.disabled = false
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
 {
@@ -274,7 +282,6 @@ func _on_timer_timeout():
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
-		update_direction_timer.stop()
 		player_entered = true
 
 'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
@@ -287,7 +294,6 @@ func _on_area_of_detection_body_entered(body):
 
 func _on_area_of_detection_body_exited(body):
 	if body == player:
-		update_direction_timer.start()
 		player_entered = false
 
 func _on_punch_area_body_entered(body):
@@ -307,25 +313,6 @@ func _on_earthquake_area_body_entered(body):
 func _on_earthquake_area_body_exited(body):
 	if body == player:
 		player_in_atk_range = false
-
-'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
-	ferma il movimento
-	fa partire il tempo di fermo
-	aspetta il segnale
-	crea un vettore con direzione casuale
-	aggiorna il target con il vettore appena creato
-	crea una variabile randomica che determina quanto durerà lo spostamento
-	aggiorna il wait_time del timer'
-
-func _on_update_direction_timeout():
-	moving = false
-	sprite.play("idle")
-	$Inhale_time.start()
-	await _on_inhale_time_timeout
-	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
-	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
-	var new_update_time = randf_range(3,6)
-	update_direction_timer.wait_time = new_update_time
 # -------- SIGNAL DIGEST -------- #
 
 func _on_sprite_2d_animation_finished():
@@ -391,3 +378,6 @@ func _on_inhale_time_timeout():
 func _on_update_atk_timeout():
 	choose_atk()
 	$Update_Atk.start()
+
+func _on_navigation_agent_2d_velocity_computed(safe_velocity):
+	velocity = safe_velocity

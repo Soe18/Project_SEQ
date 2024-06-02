@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3 uid="uid://dbw1in01yk45v"]
+[gd_scene load_steps=54 format=3 uid="uid://dbw1in01yk45v"]
 
 [ext_resource type="Script" path="res://components/scripts/giant.gd" id="1_f8337"]
 [ext_resource type="Texture2D" uid="uid://bese26q4y7aob" path="res://components/sprites/enemies/giant/giant_damaged.png" id="2_3r8s3"]
@@ -248,14 +248,9 @@ animations = [{
 "speed": 2.5
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_u1m20"]
-radius = 24.5027
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sb3xy"]
-size = Vector2(169.065, 87.0504)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_37387"]
-size = Vector2(63.9568, 40.2878)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_wmmft"]
+radius = 64.3886
+height = 164.748
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f8pc5"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -408,27 +403,23 @@ animations = [{
 
 [node name="GiantEnemy" type="CharacterBody2D"]
 scale = Vector2(1.39, 1.39)
+motion_mode = 1
+wall_min_slide_angle = 0.0
 script = ExtResource("1_f8337")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "sposta di 40 px lo sprite"
 scale = Vector2(0.287, 0.287)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"earthquake"
+animation = &"idle"
 autoplay = "idle"
 
-[node name="Head_collider" type="CollisionShape2D" parent="."]
-position = Vector2(10.7914, -27.3381)
-shape = SubResource("CircleShape2D_u1m20")
-
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(7.55388, 29.1367)
-shape = SubResource("RectangleShape2D_sb3xy")
-debug_color = Color(0.0196078, 0.611765, 0.611765, 0.419608)
-
-[node name="Legs_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-4.64029, 85.6115)
-shape = SubResource("RectangleShape2D_37387")
+visible = false
+position = Vector2(11.151, 25.5396)
+rotation = 0.287979
+shape = SubResource("CapsuleShape2D_wmmft")
+debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
@@ -460,6 +451,7 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Punch_Area"]
+visible = false
 position = Vector2(62.9497, 13)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_cwyod")
@@ -476,6 +468,7 @@ autoplay = "idle"
 process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Earthquake_Area"]
+visible = false
 position = Vector2(0.719425, -6.47482)
 shape = SubResource("CircleShape2D_cc5nt")
 debug_color = Color(0.996078, 0, 0.227451, 0.0235294)
@@ -486,9 +479,6 @@ scale = Vector2(0.464931, 0.464931)
 sprite_frames = SubResource("SpriteFrames_0nggx")
 animation = &"idle"
 autoplay = "idle"
-
-[node name="UpdateDirection" type="Timer" parent="."]
-wait_time = 1.518
 
 [node name="Inhale_time" type="Timer" parent="."]
 wait_time = 0.8
@@ -507,6 +497,17 @@ wait_time = 5.9
 one_shot = true
 autostart = true
 
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 192.0
+target_desired_distance = 100.0
+path_max_distance = 1000.0
+navigation_layers = 3
+path_postprocessing = 1
+avoidance_enabled = true
+radius = 37.15
+max_neighbors = 20
+max_speed = 1703.04
+
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
@@ -520,6 +521,6 @@ autostart = true
 [connection signal="body_exited" from="Earthquake_Area" to="." method="_on_earthquake_area_body_exited"]
 [connection signal="animation_finished" from="Earthquake_Area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="frame_changed" from="Earthquake_Area/Effect" to="." method="_on_effect_frame_changed"]
-[connection signal="timeout" from="UpdateDirection" to="." method="_on_update_direction_timeout"]
 [connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
+[connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]
