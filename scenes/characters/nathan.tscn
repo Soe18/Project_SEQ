@@ -504,6 +504,7 @@ animations = [{
 radius = 466.0
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+process_mode = 1
 y_sort_enabled = true
 motion_mode = 1
 script = ExtResource("1_arpgr")

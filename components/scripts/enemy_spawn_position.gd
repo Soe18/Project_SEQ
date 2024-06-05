@@ -53,7 +53,7 @@ func activate_markers():
 		max_count = markers.size()
 	
 	var enemy_count = randi_range(min_count, max_count)
-	enemy_count = markers.size()
+	#enemy_count = markers.size()
 	print("round_count = " + str(round_count))
 	print("min_count = " + str(min_count))
 	print("max_count = " + str(max_count))

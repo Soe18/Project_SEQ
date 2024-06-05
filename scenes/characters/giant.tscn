@@ -402,6 +402,7 @@ animations = [{
 }]
 
 [node name="GiantEnemy" type="CharacterBody2D"]
+process_mode = 1
 scale = Vector2(1.39, 1.39)
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -502,9 +503,7 @@ path_desired_distance = 192.0
 target_desired_distance = 100.0
 path_max_distance = 1000.0
 navigation_layers = 3
-path_postprocessing = 1
 avoidance_enabled = true
-radius = 37.15
 max_neighbors = 20
 max_speed = 1703.04
 

@@ -720,6 +720,7 @@ radius = 151.0
 height = 550.0
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+process_mode = 1
 y_sort_enabled = true
 scale = Vector2(0.9, 0.9)
 motion_mode = 1

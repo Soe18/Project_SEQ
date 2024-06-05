@@ -105,11 +105,12 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
 
 func pause_game(get_paused):
-	for i in get_child_count(): # ciclo tutti i nodi
-		if get_paused: # se non sono in pausa
-			get_child(i).process_mode = Node.PROCESS_MODE_DISABLED
-		else: # se sono in pausa
-			get_child(i).process_mode = Node.PROCESS_MODE_INHERIT
+	if get_paused: # se non sono in pausa
+		get_tree().paused = true
+	else: # se sono in pausa
+		get_tree().paused = false
+		if player:
+			player.velocity = Vector2(0, 0)
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var dmg = round((str * atk_str) / tem)

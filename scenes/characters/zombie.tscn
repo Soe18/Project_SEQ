@@ -228,6 +228,7 @@ animations = [{
 size = Vector2(96, 137.5)
 
 [node name="ZombieEnemy" type="CharacterBody2D"]
+process_mode = 1
 y_sort_enabled = true
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -325,9 +326,7 @@ path_desired_distance = 120.4
 target_desired_distance = 100.0
 path_max_distance = 1000.0
 navigation_layers = 3
-path_postprocessing = 1
 avoidance_enabled = true
-radius = 43.0
 max_neighbors = 20
 max_speed = 1703.04
 
