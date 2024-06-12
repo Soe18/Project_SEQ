@@ -403,6 +403,7 @@ animations = [{
 
 [node name="GiantEnemy" type="CharacterBody2D"]
 process_mode = 1
+y_sort_enabled = true
 scale = Vector2(1.39, 1.39)
 motion_mode = 1
 wall_min_slide_angle = 0.0

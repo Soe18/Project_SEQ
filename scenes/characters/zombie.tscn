@@ -242,7 +242,6 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(-7, 16)
 rotation = 0.191986
 shape = SubResource("CapsuleShape2D_7foa3")
@@ -278,7 +277,6 @@ debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
-visible = false
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0.00392157, 0.0666667, 0.109804)
@@ -322,7 +320,7 @@ wait_time = 2.0
 one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 120.4
+path_desired_distance = 62.6
 target_desired_distance = 100.0
 path_max_distance = 1000.0
 navigation_layers = 3

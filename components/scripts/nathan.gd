@@ -34,8 +34,6 @@ const OK_MULTIPLYER = 450.0
 const ACCELERATION_INCREASE = 10.0
 const MAX_ACCELERATION = 10000.0
 
-var is_self_in_atk_range = false
-
 var atk_state = Atk_States.IDLE
 
 var acceleration_value = 0.0
@@ -488,24 +486,18 @@ func _on_eva_cooldown_timeout():
 func _on_ult_cooldown_timeout():
 	cooldown_state["ult"] = false
 
-func _on_enemy_is_in_atk_range(is_in, body):
-	if is_in and body == self:
-		is_self_in_atk_range = is_in
-	else:
-		is_self_in_atk_range = false
-
-
 ' - DIGEST DEL SEGNALE take_dmg DEI NEMICI - '
 
 func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
 	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 	emit_signal("set_health_bar", current_vit)
 	emit_signal("shake_camera", false)
-	emit_signal("set_idle")
-	sprite.play("damaged")
-	can_move = false
-	stun_timer.wait_time = sec
-	stun_timer.start()
+	if sec > 0:
+		emit_signal("set_idle")
+		sprite.play("damaged")
+		can_move = false
+		stun_timer.wait_time = sec
+		stun_timer.start()
 
 func _on_stun_timeout():
 	emit_signal("set_idle")
@@ -515,3 +507,23 @@ func _on_get_healed(amount):
 	if current_vit > vit:
 		current_vit = vit
 	emit_signal("set_health_bar", current_vit)
+
+func _on_change_stats(stat, amount, time_duration):
+		if "str" in stat:
+			current_str += amount
+		elif "tem" in stat:
+			current_tem += amount
+		elif "des" in stat:
+			current_des += amount
+		elif "pbc" in stat:
+			current_pbc += amount
+		elif "efc" in stat:
+			current_efc += amount
+		
+		if time_duration != 0:
+			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
+			var new_timer = get_child(get_child_count()-1)
+			new_timer.stat = stat
+			new_timer.amount = -amount
+			new_timer.wait_time = time_duration
+			new_timer.start()

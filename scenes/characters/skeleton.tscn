@@ -308,6 +308,7 @@ animations = [{
 
 [node name="SkeletonEnemy" type="CharacterBody2D"]
 process_mode = 1
+y_sort_enabled = true
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_dah7i")
@@ -320,7 +321,6 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(-1, 16)
 rotation = 0.279253
 shape = SubResource("CapsuleShape2D_uwkny")
@@ -356,7 +356,6 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
-visible = false
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0, 0, 0.0784314)
@@ -395,7 +394,7 @@ wait_time = 4.0
 one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 125.4
+path_desired_distance = 71.3
 target_desired_distance = 100.0
 path_max_distance = 1000.0
 navigation_layers = 3

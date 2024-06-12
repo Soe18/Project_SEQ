@@ -183,7 +183,7 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
 	if is_in_atk_range and !grabbed:
-		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
+		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
 		health -= dmg
 		set_health_bar()
 		if dmg >= 25:
@@ -313,6 +313,7 @@ func _on_earthquake_area_body_entered(body):
 func _on_earthquake_area_body_exited(body):
 	if body == player:
 		player_in_atk_range = false
+		player.current_multiplyer = player.OK_MULTIPLYER
 # -------- SIGNAL DIGEST -------- #
 
 func _on_sprite_2d_animation_finished():
@@ -344,14 +345,16 @@ func punch():
 
 func _on_effect_animation_finished():
 	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", str, 25, 2.4, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, 25, 2.4, current_pbc, current_efc)
 		_on_inhale_time_timeout()
 	if earthquake_effect.animation == "effect":
 		_on_inhale_time_timeout()
 
 func _on_effect_frame_changed():
 	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", str, 2, 0.5, 0, 0)
+		emit_signal("take_dmg", current_str, 3.5, 0, 0, 0)
+		if player.current_multiplyer == player.OK_MULTIPLYER:
+			player.current_multiplyer -= 200
 
 'FUNZIONE PER L\'ATTACCO TERREMOTO'
 
@@ -381,3 +384,24 @@ func _on_update_atk_timeout():
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
+
+func _on_change_stats(stat, amount, time_duration):
+	if (is_in_atk_range and !grabbed) or time_duration == 0:
+		if "str" in stat:
+			current_str += amount
+		elif "tem" in stat:
+			current_tem += amount
+		elif "des" in stat:
+			current_des += amount
+		elif "pbc" in stat:
+			current_pbc += amount
+		elif "efc" in stat:
+			current_efc += amount
+		
+		if time_duration != 0:
+			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
+			var new_timer = get_child(get_child_count()-1)
+			new_timer.stat = stat
+			new_timer.amount = -amount
+			new_timer.wait_time = time_duration
+			new_timer.start()

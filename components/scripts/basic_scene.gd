@@ -75,8 +75,7 @@ func _on_gui_select_character(char):
 		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 	else:
 		player.add_child(camera,true) # aggiungo la camera al player
-	# funzione per attivare le GUI
-	activate_player_GUI()
+	activate_player_GUI() # funzione per attivare le GUI
 	connect_enemies_with_player() # connetto i nemici e il player
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
@@ -103,20 +102,21 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				# connetto il segnale della grab
 				player.grab.connect(current_node._on_player_grab)
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
+			else:
+				player.change_stats.connect(current_node._on_change_stats)
 
 func pause_game(get_paused):
 	if get_paused: # se non sono in pausa
 		get_tree().paused = true
 	else: # se sono in pausa
 		get_tree().paused = false
-		if player:
-			player.velocity = Vector2(0, 0)
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var dmg = round((str * atk_str) / tem)
 	var rng = randi_range(0, 100)
 	if pbc > rng:
 		dmg = round(dmg * efc)
+	print(str(dmg))
 	return dmg
 
 func _on_player_death():

@@ -25,10 +25,12 @@ signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
+signal change_stats(stat, amount, time_duration)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
 const OK_MULTIPLYER = 350.0
+var current_multiplyer = OK_MULTIPLYER
 const ACCELERATION_INCREASE = 10.0
 const MAX_ACCELERATION = 10000.0
 
@@ -148,19 +150,19 @@ func move():
 	
 	" Muovo giocatore "
 	if move_vertical == Move_Keys.UP:
-		velocity.y = -OK_MULTIPLYER
+		velocity.y = -current_multiplyer
 		sprite.play("Running")
 		
 	elif move_vertical == Move_Keys.DOWN:
-		velocity.y = +OK_MULTIPLYER
+		velocity.y = +current_multiplyer
 		sprite.play("Running")
 		
 	if move_horizontal == Move_Keys.LEFT:
-		velocity.x = -OK_MULTIPLYER
+		velocity.x = -current_multiplyer
 		flip_sprite(true)
 		sprite.play("Running")
 	elif move_horizontal == Move_Keys.RIGHT:
-		velocity.x = +OK_MULTIPLYER
+		velocity.x = +current_multiplyer
 		flip_sprite(false)
 		sprite.play("Running")
 	
@@ -378,6 +380,7 @@ func _on_effect_frame_changed():
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
 		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
+		emit_signal("change_stats", "tem", -25, 10)
 
 func ult_moving():
 	body_collider.disabled = true
@@ -486,11 +489,12 @@ func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
 	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
 	emit_signal("set_health_bar", current_vit)
 	#print("take dmg: "+str(dmg))
-	emit_signal("set_idle")
-	sprite.play("damaged")
-	can_move = false
-	stun_timer.wait_time = sec
-	stun_timer.start()
+	if sec > 0:
+		emit_signal("set_idle")
+		sprite.play("damaged")
+		can_move = false
+		stun_timer.wait_time = sec
+		stun_timer.start()
 
 func _on_stun_timeout():
 	emit_signal("set_idle")
@@ -500,3 +504,23 @@ func _on_get_healed(amount):
 	if current_vit > vit:
 		current_vit = vit
 	emit_signal("set_health_bar", current_vit)
+
+func _on_change_stats(stat, amount, time_duration):
+		if "str" in stat:
+			current_str += amount
+		elif "tem" in stat:
+			current_tem += amount
+		elif "des" in stat:
+			current_des += amount
+		elif "pbc" in stat:
+			current_pbc += amount
+		elif "efc" in stat:
+			current_efc += amount
+		
+		if time_duration != 0:
+			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
+			var new_timer = get_child(get_child_count()-1)
+			new_timer.stat = stat
+			new_timer.amount = -amount
+			new_timer.wait_time = time_duration
+			new_timer.start()
