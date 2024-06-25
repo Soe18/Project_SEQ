@@ -1,17 +1,17 @@
 extends CharacterBody2D
 
-@export var vit : int = 200
-var current_vit = vit
-@export var str : int = 110
-var current_str = str
-@export var tem : int = 100
-var current_tem = tem
-@export var des : int = 145
-var current_des = des
-@export var pbc : int = 30
-var current_pbc = pbc
-@export var efc : float = 1.5
-var current_efc = efc
+@export var default_vit : int = 200
+var current_vit = default_vit
+@export var default_str : int = 110
+var current_str = default_str
+@export var default_tem : int = 100
+var current_tem = default_tem
+@export var default_des : int = 145
+var current_des = default_des
+@export var default_pbc : int = 30
+var current_pbc = default_pbc
+@export var default_efc : float = 1.5
+var current_efc = default_efc
 
 var var_velocity = 2
 var is_in_atk_range = false
@@ -40,6 +40,8 @@ var choosed_atk
 @onready var navigation_agent = $NavigationAgent2D
 
 @onready var healthbar = $HealthBar
+
+@onready var status_sprite = $Status_alert_sprite
 
 var player_entered = true
 var player_in_atk_range = false
@@ -380,7 +382,7 @@ func _on_sprite_2d_animation_finished():
 	
 	if sprite.animation == "dying" and sprite.speed_scale == 0.5 and dying:
 		sprite.speed_scale = 1
-		current_vit = vit
+		current_vit = default_vit
 		set_health_bar()
 		_on_inhale_time_timeout()
 
@@ -402,9 +404,16 @@ func _on_change_stats(stat, amount, time_duration):
 			current_efc += amount
 		
 		if time_duration != 0:
+			if amount > 0:
+				status_sprite.play("buff")
+			else:
+				status_sprite.play("debuff")
 			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
 			var new_timer = get_child(get_child_count()-1)
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
 			new_timer.start()
+
+func _on_status_alert_sprite_animation_finished():
+	status_sprite.play("idle")

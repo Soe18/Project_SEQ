@@ -16,7 +16,7 @@ func _ready():
 			markers.append(i)
 
 'METODO CHE VIENE EVOCATO AD OGNI FRAME, CONTROLLA SE I NEMICI SONO ANCORA PRESENTI IN GAME'
-func _process(delta):
+func _process(_delta):
 	fighting = false
 	for i in get_children():
 		if "Enemy" in i.name:
@@ -80,8 +80,8 @@ func activate_markers():
 			else:
 				out = true
 		
-		#add_child(load(enemy_scene).instantiate(),true)
-		add_child(load(possible_enemies[2]).instantiate(),true)
+		add_child(load(enemy_scene).instantiate(),true)
+		#add_child(load(possible_enemies[0]).instantiate(),true)
 		get_child(get_child_count()-1).position = i.position
 
 

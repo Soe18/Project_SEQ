@@ -1,17 +1,17 @@
 extends CharacterBody2D
 
-@export var vit : int = 400
-var current_vit = vit
-@export var str : int = 200
-var current_str = str
-@export var tem : int = 148
-var current_tem = tem
-@export var des : int = 145
-var current_des = des
-@export var pbc : int = 30
-var current_pbc = pbc
-@export var efc : float = 1.5
-var current_efc = efc
+@export var default_vit : int = 400
+var current_vit = default_vit
+@export var default_str : int = 200
+var current_str = default_str
+@export var default_tem : int = 148
+var current_tem = default_tem
+@export var default_des : int = 145
+var current_des = default_des
+@export var default_pbc : int = 30
+var current_pbc = default_pbc
+@export var default_efc : float = 1.5
+var current_efc = default_efc
 
 var is_in_atk_range = false
 var moving = true
@@ -47,6 +47,8 @@ var choosed_atk
 
 @onready var healthbar = $HealthBar
 
+@onready var status_sprite = $Status_alert_sprite
+
 var player_entered = true
 var player_in_atk_range = false
 
@@ -58,8 +60,8 @@ var health
 	setta la barra della salute'
 
 func _ready():
-	health = vit
-	healthbar.max_value = vit
+	health = default_vit
+	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
 
@@ -102,14 +104,14 @@ func _physics_process(delta):
 
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		punch_collider.position = Vector2(-50, 13)
+		punch_collider.position = Vector2(-62.95, 13)
 		punch_effect.position = Vector2(-59,-5)
 		punch_effect.flip_h = true
 		sprite.flip_h = true
 		body_collider.rotation_degrees = -16.5
 		body_collider.position.x = -6.835
 	elif distance_to_player.x > 0:
-		punch_collider.position = Vector2(50, 13)
+		punch_collider.position = Vector2(62.95, 13)
 		punch_effect.position = Vector2(59,-5)
 		punch_effect.flip_h = false
 		sprite.flip_h = false
@@ -141,11 +143,11 @@ func chase_player():
 
 func choose_atk():
 	var rng = randi_range(0,100)
-	if rng >= 0 and rng < 15:
+	if rng >= 0 and rng < 20:
 		choosed_atk = Possible_Attacks.IDLE
-	elif rng >= 15 and rng <= 72:
+	elif rng >= 20 and rng <= 80:
 		choosed_atk = Possible_Attacks.PUNCH
-	elif rng >= 72:
+	elif rng >= 80:
 		choosed_atk = Possible_Attacks.EARTHQUAKE
 # -------- SIGNAL DIGEST -------- #
 
@@ -355,6 +357,7 @@ func _on_effect_frame_changed():
 		emit_signal("take_dmg", current_str, 3.5, 0, 0, 0)
 		if player.current_multiplyer == player.OK_MULTIPLYER:
 			player.current_multiplyer -= 200
+			player.status_sprite.play("debuff")
 
 'FUNZIONE PER L\'ATTACCO TERREMOTO'
 
@@ -399,9 +402,16 @@ func _on_change_stats(stat, amount, time_duration):
 			current_efc += amount
 		
 		if time_duration != 0:
+			if amount > 0:
+				status_sprite.play("buff")
+			else:
+				status_sprite.play("debuff")
 			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
 			var new_timer = get_child(get_child_count()-1)
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
 			new_timer.start()
+
+func _on_status_alert_sprite_animation_finished():
+	status_sprite.play("idle")

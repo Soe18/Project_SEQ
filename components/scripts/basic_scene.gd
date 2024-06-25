@@ -9,6 +9,8 @@ var connected = false
 @onready var game_over_container = gui.find_child("GameOver_container")
 @onready var chara_container = gui.find_child("Chara_selector_container")
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
+@onready var ost_player = $AudioStreamPlayer
+@onready var game_over_ost = $CanvasLayer/GUI/GameOver_container/GameOver_song
 var player_gui
 
 'func _ready():
@@ -23,7 +25,7 @@ var player_gui
 
 @onready var enemy_container = $Enemy_container
 
-func _process(delta):
+func _process(_delta):
 	# Gestione del menu di pausa
 	if Input.is_action_just_pressed("pause") and not paused:
 		paused = true
@@ -120,6 +122,8 @@ func calculate_dmg(str, atk_str, tem, pbc, efc):
 	return dmg
 
 func _on_player_death():
+	ost_player.stop()
+	game_over_ost.play()
 	gui.visible = true # la GUI diventa visibile
 	game_over_container.visible = true # rendo visibile il game over
 	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
@@ -134,8 +138,8 @@ func activate_player_GUI():
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
 	player_gui.player = player
 	player_gui.player_death.connect(self._on_player_death)
-	player_gui.max_health = player.vit
-	player_gui.healthbar.max_value = player.vit
-	player_gui.healthbar.value = player.vit
-	player_gui.healthbar_label.text = str(player.vit) + "/" + str(player.vit)
+	player_gui.max_health = player.default_vit
+	player_gui.healthbar.max_value = player.default_vit
+	player_gui.healthbar.value = player.default_vit
+	player_gui.healthbar_label.text = str(player.default_vit) + "/" + str(player.default_vit)
 	player.set_health_bar.connect(player_gui._on_player_set_health_bar)

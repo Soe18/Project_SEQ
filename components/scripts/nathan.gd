@@ -2,18 +2,18 @@ extends CharacterBody2D
 
 var char_name = "Nathan"
 
-@export var vit : int = 270
-var current_vit = vit
-@export var str : int = 138
-var current_str = str
-@export var tem : int = 162
-var current_tem = tem
-@export var des : int = 145
-var current_des = des
-@export var pbc : int = 30
-var current_pbc = pbc
-@export var efc : float = 1.5
-var current_efc = efc
+@export var default_vit : int = 270
+var current_vit = default_vit
+@export var default_str : int = 138
+var current_str = default_str
+@export var default_tem : int = 162
+var current_tem = default_tem
+@export var default_des : int = 145
+var current_des = default_des
+@export var default_pbc : int = 30
+var current_pbc = default_pbc
+@export var default_efc : float = 1.5
+var current_efc = default_efc
 
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
@@ -30,7 +30,8 @@ signal get_healed(amount)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
-const OK_MULTIPLYER = 450.0
+const OK_MULTIPLYER = 390.0
+var current_multiplyer = OK_MULTIPLYER
 const ACCELERATION_INCREASE = 10.0
 const MAX_ACCELERATION = 10000.0
 
@@ -69,6 +70,8 @@ var atk_anim_finished = true
 @onready var ulti_cooldown = $Ult_cooldown
 
 @onready var stun_timer = $Stun
+
+@onready var status_sprite = $Status_alert_sprite
 
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
@@ -367,7 +370,6 @@ func _on_sprite_2d_animation_finished():
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK2:
-		emit_signal("take_dmg", current_str, 13, 0, current_pbc, current_efc)
 		emit_signal("grab", true, sprite.flip_h)
 		cooldown_state["sk2"] = true
 		emit_signal("set_idle")
@@ -489,7 +491,7 @@ func _on_ult_cooldown_timeout():
 ' - DIGEST DEL SEGNALE take_dmg DEI NEMICI - '
 
 func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
-	current_vit -= get_parent().calculate_dmg(str, atk_str, self.tem, pbc, efc)
+	current_vit -= get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
 	emit_signal("set_health_bar", current_vit)
 	emit_signal("shake_camera", false)
 	if sec > 0:
@@ -504,8 +506,8 @@ func _on_stun_timeout():
 
 func _on_get_healed(amount):
 	current_vit += amount
-	if current_vit > vit:
-		current_vit = vit
+	if current_vit > default_vit:
+		current_vit = default_vit
 	emit_signal("set_health_bar", current_vit)
 
 func _on_change_stats(stat, amount, time_duration):
@@ -521,9 +523,16 @@ func _on_change_stats(stat, amount, time_duration):
 			current_efc += amount
 		
 		if time_duration != 0:
+			if amount > 0:
+				status_sprite.play("buff")
+			else:
+				status_sprite.play("debuff")
 			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
 			var new_timer = get_child(get_child_count()-1)
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
 			new_timer.start()
+
+func _on_status_alert_sprite_animation_finished():
+	status_sprite.play("idle")
