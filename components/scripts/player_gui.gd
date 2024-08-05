@@ -19,7 +19,7 @@ func _ready():
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if player != null and not alive:
 		skill1_cooldown_time.max_value = player.skill1_cooldown.wait_time
 		skill2_cooldown_time.max_value = player.skill2_cooldown.wait_time

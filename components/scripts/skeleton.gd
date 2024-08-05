@@ -123,7 +123,6 @@ func chase_player():
 			if sprite.animation == "running":
 				sprite.play("idle")
 		else:
-			var current_agent_position = global_position
 			target_position = navigation_agent.get_next_path_position()
 			
 			var new_velocity = global_position.direction_to(target_position) * 200
@@ -328,6 +327,9 @@ func _on_update_direction_timeout():
 	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
 	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
 	var new_update_time = randf_range(3,6)
+	$Update_Atk.wait_time = new_update_time
+
+
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'

@@ -9,8 +9,11 @@ var connected = false
 @onready var game_over_container = gui.find_child("GameOver_container")
 @onready var chara_container = gui.find_child("Chara_selector_container")
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
-@onready var ost_player = $AudioStreamPlayer
+@onready var ost_player = $Ost_player
+@onready var pause_ost_player = $Pause_ost_player
 @onready var game_over_ost = $CanvasLayer/GUI/GameOver_container/GameOver_song
+@onready var pause_gui = $CanvasLayer/Pause_GUI
+@onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
 var player_gui
 
 'func _ready():
@@ -27,12 +30,19 @@ var player_gui
 
 func _process(_delta):
 	# Gestione del menu di pausa
-	if Input.is_action_just_pressed("pause") and not paused:
-		paused = true
-		pause_game(paused)
-	elif Input.is_action_just_pressed("pause") and paused:
-		paused = false
-		pause_game(paused)
+	if Input.is_action_just_pressed("pause"):
+		if not paused:
+			paused = true
+			pause_game(paused)
+		else:
+			paused = false
+			pause_game(paused)
+	
+	if Input.is_action_just_pressed("fullscreen_toggle"):
+		if DisplayServer.window_get_mode(0) != DisplayServer.WINDOW_MODE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	
 	if player != null:
 		if not enemy_container.fighting:
@@ -110,8 +120,14 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 func pause_game(get_paused):
 	if get_paused: # se non sono in pausa
 		get_tree().paused = true
+		ost_player.stream_paused = true
+		pause_ost_player.play(0)
+		pause_gui.visible = true
 	else: # se sono in pausa
 		get_tree().paused = false
+		pause_ost_player.stop()
+		ost_player.stream_paused = false
+		pause_gui.visible = false
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var dmg = round((str * atk_str) / tem)
@@ -127,6 +143,7 @@ func _on_player_death():
 	game_over_container.visible = true # rendo visibile il game over
 	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
 	player_gui.visible = false # nascondo la gui del player
+	$CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry.grab_focus()
 
 func activate_player_GUI():
 	if player.char_name == "Rufus":

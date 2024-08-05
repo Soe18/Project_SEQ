@@ -32,15 +32,16 @@ var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
 const OK_MULTIPLYER = 390.0
 var current_multiplyer = OK_MULTIPLYER
-const ACCELERATION_INCREASE = 10.0
-const MAX_ACCELERATION = 10000.0
+const ACCELERATION = 10000.0
+const FRICTION = 7000.0
+
+@onready var axis = Vector2.ZERO
 
 var atk_state = Atk_States.IDLE
 
 var acceleration_value = 0.0
 var move_state = Moving_States.IDLE
-var move_horizontal = null
-var move_vertical = null
+
 var can_move = true
 
 var is_evading = false
@@ -87,9 +88,9 @@ var atk_anim_finished = true
 func _ready():
 	emit_signal("set_health_bar", current_vit)
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	if can_move:
-		move()
+		move(delta)
 	elif sk1_activated:
 		skill1_moving(sprite.flip_h)
 	elif is_evading:
@@ -103,7 +104,7 @@ func _physics_process(_delta):
 	altrimenti ci sarebbe il personaggio flippato ma l\'area rimane dall\'altra
 	parte'
 
-func move():
+'func move():
 	# Reset velocity
 	velocity = Vector2(0, 0)
 	#acceleration_manager()
@@ -171,7 +172,37 @@ func move():
 		velocity.y = velocity.y/sqrt(2)
 	
 	# Finalmente, muoviamo il player
+	move_and_slide()'
+
+func move(delta):
+	axis = get_input_axis()
+	if axis == Vector2.ZERO:
+		apply_friction(FRICTION * delta)
+	else:
+		sprite.play("Running")
+		apply_movement(axis * ACCELERATION * delta)
+		if axis.x < 0:
+			flip_sprite(true)
+		else:
+			flip_sprite(false)
+		
 	move_and_slide()
+
+func get_input_axis():
+	axis.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	axis.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+	return axis
+
+func apply_friction(amount):
+	if velocity.length() > amount:
+		velocity -= velocity.normalized() * amount
+	else:
+		velocity = Vector2.ZERO
+		sprite.play("idle")
+
+func apply_movement(accel):
+	velocity += accel
+	velocity = velocity.limit_length(current_multiplyer)
 
 'METODO CHE GESTISCE TUTTE LE ABILITA\' DEL PLAYER
 	ad ogni if si controlla l\'azione possibile, per l\'attacco di base si trovano
@@ -182,12 +213,11 @@ func move():
 func base_atk():
 	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "Running") and atk_anim_finished:
 		can_move = false
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", false)
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
 		sprite.play("base atk1")
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
@@ -218,12 +248,11 @@ func base_atk():
 		can_move = false
 		sk1_activated = true
 		atk_state = Atk_States.SK1
-		skill1_collider.disabled = false
+		skill1_collider.set_deferred("disabled", false)
 		sprite.play("skill1")
 		skill1_duration_time.wait_time = 1.696
 		skill1_duration_time.start()
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 	
 	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["eva"]:
 		eva_cooldown.start()
@@ -240,18 +269,16 @@ func base_atk():
 		can_move = false
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
-		skill2_collider.disabled = false
+		skill2_collider.set_deferred("disabled", false)
 		$Grab_time.start()
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
 		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
 		sprite.play("charging_ult")
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 
 	elif sprite.animation != "idle" or sprite.animation != "Running":
 		pass
@@ -330,40 +357,40 @@ func flip_sprite(flip):
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 9, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk5":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 12, 0.5, current_pbc, current_efc)
 		emit_signal("set_idle")
 	
 	elif atk_state == Atk_States.EVA:
-		eva_collider.disabled = false
+		eva_collider.set_deferred("disabled", false)
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK1:
@@ -378,7 +405,7 @@ func _on_sprite_2d_animation_finished():
 		sprite.pause()
 		emit_signal("shake_camera", true)
 		$Ult_area/Ult_time.start()
-		ult_collider.disabled = false
+		ult_collider.set_deferred("disabled", false)
 		ult_effect.play("effect")
 
 func _on_sprite_2d_frame_changed():
@@ -387,8 +414,7 @@ func _on_sprite_2d_frame_changed():
 
 '  -- set_idle mi permette di resettare il player allo stato di idle --  '
 func _on_set_idle():
-	move_horizontal = null
-	move_vertical = null
+	axis = Vector2.ZERO
 	
 	atk_state = Atk_States.IDLE
 	
@@ -397,12 +423,12 @@ func _on_set_idle():
 	
 	skill1_duration_time.stop()
 	
-	bs_atk_collider.disabled = true
-	eva_collider.disabled = true
-	skill1_collider.disabled = true
-	skill2_collider.disabled = true
-	ult_collider.disabled = true
-	$Player_collider.disabled = false
+	bs_atk_collider.set_deferred("disabled", true)
+	eva_collider.set_deferred("disabled", true)
+	skill1_collider.set_deferred("disabled", true)
+	skill2_collider.set_deferred("disabled", true)
+	ult_collider.set_deferred("disabled", true)
+	$Player_collider.set_deferred("disabled", false)
 	
 	self.set_collision_layer_value(1, true)
 	self.set_collision_layer_value(2, false)
@@ -431,7 +457,7 @@ func _on_combo_time_timeout():
 
 func _on_eva_time_timeout():
 	sprite.play()
-	eva_collider.disabled = false
+	eva_collider.set_deferred("disabled", false)
 
 func _on_grab_time_timeout():
 	emit_signal("grab", false, sprite.flip_h)
@@ -453,18 +479,26 @@ func evade():
 	
 	self.set_collision_mask_value(1, false)
 	self.set_collision_mask_value(2, true)
-	if move_vertical == Move_Keys.UP:
+	if axis.x == 0 and axis.y < 0:
 		velocity.y += -15
-	elif move_vertical == Move_Keys.DOWN:
+	elif axis.x == 0 and axis.y > 0:
 		velocity.y += 15
-	if move_horizontal == Move_Keys.LEFT:
+	if axis.x < 0 and axis.y == 0:
 		velocity.x += -15
-	elif move_horizontal == Move_Keys.RIGHT:
+	elif axis.x > 0 and axis.y == 0:
 		velocity.x += 15
-	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == false:
+	if axis.x > 0 and axis.y < 0:
 		velocity.x += 15
-	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == true:
+		velocity.y += -15
+	elif axis.x > 0 and axis.y > 0:
+		velocity.x += 15
+		velocity.y += 15
+	elif axis.x < 0 and axis.y > 0:
 		velocity.x += -15
+		velocity.y += 15
+	elif axis.x < 0 and axis.y < 0:
+		velocity.x += -15
+		velocity.y += -15
 	move_and_slide()
 
 'METODO CHE SPOSTA IL PLAYER DURANTE LA SKILL1'

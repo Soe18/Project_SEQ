@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d2sm6ac0hf26v"
+path="res://.godot/imported/Duck Game OST - Pause.mp3-3415c30227bd0573547ca26892d46244.mp3str"
+
+[deps]
+
+source_file="res://components/ost/Duck Game OST - Pause.mp3"
+dest_files=["res://.godot/imported/Duck Game OST - Pause.mp3-3415c30227bd0573547ca26892d46244.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

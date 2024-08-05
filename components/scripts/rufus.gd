@@ -31,16 +31,18 @@ var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
 const OK_MULTIPLYER = 350.0
 var current_multiplyer = OK_MULTIPLYER
-const ACCELERATION_INCREASE = 10.0
-const MAX_ACCELERATION = 10000.0
+const ACCELERATION = 10000.0
+const FRICTION = 7000.0
+
+@onready var axis = Vector2.ZERO
 
 var initial_y_position = 0
 
 var atk_state = Atk_States.IDLE
 
 var move_state = Moving_States.IDLE
-var move_horizontal = null
-var move_vertical = null
+'var move_horizontal = null
+var move_vertical = null'
 var can_move = true
 
 var is_evading = false
@@ -89,9 +91,10 @@ var ult_moving_mod
 func _ready():
 	emit_signal("set_health_bar", current_vit)
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	if can_move:
-		move()
+		move(delta)
+		#move(delta)
 	if stun_timer.is_stopped():
 		base_atk()
 	if is_evading:
@@ -106,7 +109,7 @@ func _physics_process(_delta):
 	altrimenti ci sarebbe il personaggio flippato ma l\'area rimane dall\'altra
 	parte'
 
-func move():
+'func move():
 	# Reset velocity
 	velocity = Vector2(0, 0)
 	
@@ -173,7 +176,37 @@ func move():
 		velocity.y = velocity.y/sqrt(2)
 	
 	# Finalmente, muoviamo il player
+	move_and_slide()'
+
+func move(delta):
+	axis = get_input_axis()
+	if axis == Vector2.ZERO:
+		apply_friction(FRICTION * delta)
+	else:
+		sprite.play("Running")
+		apply_movement(axis * ACCELERATION * delta)
+		if axis.x < 0:
+			flip_sprite(true)
+		else:
+			flip_sprite(false)
+		
 	move_and_slide()
+
+func get_input_axis():
+	axis.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	axis.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+	return axis
+
+func apply_friction(amount):
+	if velocity.length() > amount:
+		velocity -= velocity.normalized() * amount
+	else:
+		velocity = Vector2.ZERO
+		sprite.play("idle")
+
+func apply_movement(accel):
+	velocity += accel
+	velocity = velocity.limit_length(current_multiplyer)
 
 'METODO CHE GESTISCE TUTTE LE ABILITA\' DEL PLAYER
 	ad ogni if si controlla l\'azione possibile, per l\'attacco di base si trovano
@@ -188,8 +221,7 @@ func base_atk():
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
 		sprite.play("base atk1")
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
@@ -222,8 +254,7 @@ func base_atk():
 		skill1_collider.disabled = false
 		sprite.play("skill1")
 		skill1_effect.play("effect")
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 	
 	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["eva"]:
 		eva_cooldown.start()
@@ -242,17 +273,15 @@ func base_atk():
 		sprite.play("skill2")
 		skill2_effect.play("effect")
 		skill2_collider.disabled = false
-		move_horizontal = null
-		move_vertical = null
+		axis = Vector2.ZERO
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
 		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
 		sprite.play("charging_ult")
-		move_horizontal = null
-		move_vertical = null
 		ult_moving_mod = -9
+		axis = Vector2.ZERO
 
 	elif sprite.animation != "idle" or sprite.animation != "Running":
 		pass
@@ -400,8 +429,7 @@ func ult_moving():
 
 '  -- set_idle mi permette di resettare il player allo stato di idle --  '
 func _on_set_idle():
-	move_horizontal = null
-	move_vertical = null
+	axis = Vector2.ZERO
 	
 	atk_state = Atk_States.IDLE
 	
@@ -461,18 +489,26 @@ func evade():
 	self.set_collision_layer_value(2,true)
 	self.set_collision_mask_value(1, false)
 	self.set_collision_mask_value(2, true)
-	if move_vertical == Move_Keys.UP:
-		velocity.y += -50
-	elif move_vertical == Move_Keys.DOWN:
-		velocity.y += 50
-	if move_horizontal == Move_Keys.LEFT:
-		velocity.x += -50
-	elif move_horizontal == Move_Keys.RIGHT:
-		velocity.x += 50
-	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == false:
-		velocity.x += 50
-	elif (move_vertical == null and move_horizontal == null) and sprite.flip_h == true:
-		velocity.x += -50
+	if axis.x == 0 and axis.y < 0:
+		velocity.y += -35
+	elif axis.x == 0 and axis.y > 0:
+		velocity.y += 35
+	if axis.x < 0 and axis.y == 0:
+		velocity.x += -35
+	elif axis.x > 0 and axis.y == 0:
+		velocity.x += 35
+	if axis.x > 0 and axis.y < 0:
+		velocity.x += 35
+		velocity.y += -35
+	elif axis.x > 0 and axis.y > 0:
+		velocity.x += 35
+		velocity.y += 35
+	elif axis.x < 0 and axis.y > 0:
+		velocity.x += -35
+		velocity.y += 35
+	elif axis.x < 0 and axis.y < 0:
+		velocity.x += -35
+		velocity.y += -35
 	move_and_slide()
 
 '  -- GESTIONE COOLDOWN --  '
