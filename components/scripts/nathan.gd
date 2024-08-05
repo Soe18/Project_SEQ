@@ -30,10 +30,10 @@ signal get_healed(amount)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
-const OK_MULTIPLYER = 390.0
+@export var OK_MULTIPLYER : float = 390.0
 var current_multiplyer = OK_MULTIPLYER
-const ACCELERATION = 10000.0
-const FRICTION = 7000.0
+@export var ACCELERATION : float = 10000.0
+@export var FRICTION : float = 7000.0
 
 @onready var axis = Vector2.ZERO
 
