@@ -13,6 +13,8 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
+@export var damage_node : PackedScene
+
 var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
@@ -40,6 +42,8 @@ var choosed_atk
 @onready var navigation_agent = $NavigationAgent2D
 
 @onready var healthbar = $HealthBar
+
+@onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
 @onready var status_sprite = $Status_alert_sprite
 
@@ -131,7 +135,7 @@ func chase_player():
 			
 			sprite.play("running")
 			move_and_slide()
-		var player_position = (player.position - position).normalized()
+		player_position = (player.position - position).normalized()
 		flip(player_position)
 
 func choose_atk():
@@ -178,23 +182,26 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if dying and not soul_out:
 		pass
 	elif is_in_atk_range and !grabbed and not parring:
-		current_vit -= get_parent().get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
+		var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		show_hitmarker("-" + str(dmg))
+		current_vit -= dmg
 		moving = false
-		if current_vit > 0:
-			stun_timer.wait_time = sec
-			stun_timer.start()
-			sprite.play("damaged")
-		elif current_vit <= 0 and not dying:
-			dying = true
-			if not sprite.animation == "dying":
-				sprite.play("dying")
-			current_vit = 1
-			body_collider.process_mode = Node.PROCESS_MODE_DISABLED
-			$Soul_delay_time.start()
+		if stun_sec > 0:
+			if current_vit > 0:
+				stun_timer.wait_time = stun_sec
+				stun_timer.start()
+				sprite.play("damaged")
+			elif current_vit <= 0 and not dying:
+				dying = true
+				if not sprite.animation == "dying":
+					sprite.play("dying")
+				current_vit = 1
+				body_collider.process_mode = Node.PROCESS_MODE_DISABLED
+				$Soul_delay_time.start()
 		set_health_bar()
 	elif is_in_atk_range and !grabbed and parring:
 		$Inhale_time.start(0.8)
@@ -417,3 +424,16 @@ func _on_change_stats(stat, amount, time_duration):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
+
+func show_hitmarker(dmg):
+	var hitmarker = damage_node.instantiate()
+	hitmarker.position = hitmarker_spawnpoint.global_position
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(hitmarker, 
+						"position", 
+						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
+						0.75)
+	
+	hitmarker.get_child(0).text = dmg
+	get_tree().current_scene.add_child(hitmarker)

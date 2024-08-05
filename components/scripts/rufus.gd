@@ -412,13 +412,13 @@ func _on_set_idle():
 	skill2_effect.play("idle")
 	ult_effect.play("idle")
 	
-	bs_atk_collider.disabled = true
-	skill1_collider.disabled = true
-	skill2_collider.disabled = true
-	eva_collider.disabled = true
-	ult_collider.disabled = true
+	bs_atk_collider.set_deferred("disabled", true)
+	skill1_collider.set_deferred("disabled", true)
+	skill2_collider.set_deferred("disabled", true)
+	eva_collider.set_deferred("disabled", true)
+	ult_collider.set_deferred("disabled", true)
 	
-	body_collider.disabled = false
+	body_collider.set_deferred("disabled", false)
 	
 	self.set_collision_layer_value(1, true)
 	self.set_collision_layer_value(2, false)
@@ -489,15 +489,15 @@ func _on_ult_cooldown_timeout():
 	cooldown_state["ult"] = false
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
-	current_vit -= get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+	current_vit -= get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
 	emit_signal("set_health_bar", current_vit)
 	#print("take dmg: "+str(dmg))
-	if sec > 0:
+	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")
 		can_move = false
-		stun_timer.wait_time = sec
+		stun_timer.wait_time = stun_sec
 		stun_timer.start()
 
 func _on_stun_timeout():

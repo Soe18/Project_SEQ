@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://xby8pewycng"]
+[gd_scene load_steps=10 format=3 uid="uid://xby8pewycng"]
 
 [ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_jsxnq"]
 [ext_resource type="Texture2D" uid="uid://cxajiheooqevw" path="res://components/sprites/GUI/player_GUI/nathan/Skill1_GUI_nathan.png" id="2_0f0eu"]
+[ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_xqfar"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="3_0iqn6"]
 [ext_resource type="Texture2D" uid="uid://d0udebg6bc5jk" path="res://components/sprites/GUI/player_GUI/nathan/Eva_GUI_nathan.png" id="4_pqgsg"]
 [ext_resource type="Texture2D" uid="uid://4ui1eecu07vp" path="res://components/sprites/GUI/player_GUI/nathan/Skill2_GUI_nathan.png" id="5_bbco0"]
@@ -68,8 +69,11 @@ offset_right = 20.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 35
+theme_override_fonts/font = ExtResource("2_xqfar")
+theme_override_font_sizes/font_size = 61
 text = "0/0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GridContainer" type="GridContainer" parent="."]
 layout_mode = 1

@@ -2,7 +2,7 @@ extends Node2D
 
 var markers = []
 var active_markers = []
-var possible_enemies = ["res://scenes/characters/zombie.tscn","res://scenes/characters/skeleton.tscn", "res://scenes/characters/giant.tscn"]
+var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
 @onready var time_between_rounds = $Round_cooldown
 
 signal round_changed()

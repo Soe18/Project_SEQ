@@ -2,6 +2,9 @@ extends Control
 
 signal select_character(char)
 
+func _ready():
+	$Chara_selector_container/GridContainer/Select_rufus.grab_focus()
+	
 func _on_select_stancil_pressed():
 	emit_signal("select_character", "stencil")
 

@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://c8q6cs7u1xl10"]
+[gd_scene load_steps=10 format=3 uid="uid://c8q6cs7u1xl10"]
 
 [ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_4qgcb"]
+[ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_dq3dk"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="2_rdasp"]
 [ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="3_2maji"]
 [ext_resource type="Texture2D" uid="uid://bciywb7l5cwth" path="res://components/sprites/GUI/player_GUI/rufus/Skill2_GUI_rufus.png" id="4_7cjmb"]
@@ -68,7 +69,8 @@ offset_right = 20.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 35
+theme_override_fonts/font = ExtResource("2_dq3dk")
+theme_override_font_sizes/font_size = 61
 text = "0/0"
 
 [node name="GridContainer" type="GridContainer" parent="."]

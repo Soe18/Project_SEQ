@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bm7culrlwfwta"]
+[gd_scene load_steps=4 format=3 uid="uid://bm7culrlwfwta"]
 
 [ext_resource type="Script" path="res://components/scripts/basic_scene_GUI.gd" id="1_356s4"]
+[ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_j012h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_60f8n"]
 bg_color = Color(0.384314, 0.0470588, 0.243137, 1)
@@ -31,6 +32,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_60f8n")
 
 [node name="Round_displayer" type="Label" parent="MarginContainer/PanelContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 29
+theme_override_fonts/font = ExtResource("2_j012h")
+theme_override_font_sizes/font_size = 41
 text = "Ondata: 1"
 horizontal_alignment = 1

@@ -13,6 +13,8 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
+@export var damage_node : PackedScene
+
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
@@ -47,12 +49,12 @@ var choosed_atk
 
 @onready var healthbar = $HealthBar
 
+@onready var hitmarker_spawnpoint = $Hitmarker_spawn
+
 @onready var status_sprite = $Status_alert_sprite
 
 var player_entered = true
 var player_in_atk_range = false
-
-var health
 
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
 	setta la vita attuale a quella massima
@@ -60,7 +62,6 @@ var health
 	setta la barra della salute'
 
 func _ready():
-	health = default_vit
 	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
@@ -73,7 +74,7 @@ func _ready():
 	controlla se è grabbato
 		allora fa partire il metodo grab()'
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if player_entered and moving and not attacking:
 		chase_player()
 		if choosed_atk == Possible_Attacks.PUNCH and $Punch_Cooldown.is_stopped():
@@ -183,17 +184,18 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if is_in_atk_range and !grabbed:
-		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
-		health -= dmg
+		var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		show_hitmarker("-" + str(dmg))
+		current_vit -= dmg
 		set_health_bar()
-		if dmg >= 25:
+		if dmg >= 25 and stun_sec > 0:
 			punch_effect.play("idle")
 			sprite.position = Vector2(0,0)
 			attacking = false
 			moving = false
-			stun_timer.start(sec)
+			stun_timer.start(stun_sec)
 			sprite.play("damaged")
 
 'DIGEST DEL SENGALE DEL PLAYER "grab"
@@ -264,8 +266,8 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	healthbar.value = health
-	if health <= 0:
+	healthbar.value = current_vit
+	if current_vit <= 0:
 		queue_free()
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
@@ -415,3 +417,16 @@ func _on_change_stats(stat, amount, time_duration):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
+
+func show_hitmarker(dmg):
+	var hitmarker = damage_node.instantiate()
+	hitmarker.position = hitmarker_spawnpoint.global_position
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(hitmarker, 
+						"position", 
+						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
+						0.75)
+	
+	hitmarker.get_child(0).text = dmg
+	get_tree().current_scene.add_child(hitmarker)

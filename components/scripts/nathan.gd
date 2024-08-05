@@ -490,15 +490,15 @@ func _on_ult_cooldown_timeout():
 
 ' - DIGEST DEL SEGNALE take_dmg DEI NEMICI - '
 
-func _on_enemy_take_dmg(str, atk_str, sec, pbc, efc):
-	current_vit -= get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+	current_vit -= get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
 	emit_signal("set_health_bar", current_vit)
-	emit_signal("shake_camera", false)
-	if sec > 0:
+	#print("take dmg: "+str(dmg))
+	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")
 		can_move = false
-		stun_timer.wait_time = sec
+		stun_timer.wait_time = stun_sec
 		stun_timer.start()
 
 func _on_stun_timeout():

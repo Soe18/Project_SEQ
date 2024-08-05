@@ -118,7 +118,6 @@ func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var rng = randi_range(0, 100)
 	if pbc > rng:
 		dmg = round(dmg * efc)
-	print(str(dmg))
 	return dmg
 
 func _on_player_death():

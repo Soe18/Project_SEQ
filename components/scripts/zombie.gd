@@ -13,6 +13,8 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
+@export var damage_node : PackedScene
+
 var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
@@ -40,7 +42,9 @@ var sprinting = false
 @onready var sprint_area = $Sprint_Area
 @onready var sprint_collider = $Sprint_Area/Skill_collider
 
-@onready var healthbar = $HealthBar
+@onready var healthbar = $Control/HealthBar
+
+@onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
 @onready var area_of_detection = $Area_of_detection
 
@@ -193,18 +197,19 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(str, atk_str, sec, pbc, efc):
-	print("entrato")
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if is_in_atk_range and !grabbed:
-		var dmg = get_parent().get_parent().calculate_dmg(str, atk_str, self.current_tem, pbc, efc)
+		var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		show_hitmarker("-" + str(dmg))
 		health -= dmg
 		set_health_bar()
 		if sprinting and dmg >= 25:
 			sprinting = false
-		moving = false
-		stun_timer.wait_time = sec
-		stun_timer.start()
-		sprite.play("damaged")
+		if stun_sec > 0:
+			moving = false
+			stun_timer.wait_time = stun_sec
+			stun_timer.start()
+			sprite.play("damaged")
 
 'DIGEST DEL SENGALE DEL PLAYER "grab"
 {
@@ -275,7 +280,7 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	$HealthBar.value = health
+	healthbar.value = health
 	if health <= 0:
 		queue_free()
 
@@ -384,3 +389,16 @@ func _on_change_stats(stat, amount, time_duration):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
+
+func show_hitmarker(dmg):
+	var hitmarker = damage_node.instantiate()
+	hitmarker.position = hitmarker_spawnpoint.global_position
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(hitmarker, 
+						"position", 
+						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
+						0.75)
+	
+	hitmarker.get_child(0).text = dmg
+	get_tree().current_scene.add_child(hitmarker)
