@@ -408,7 +408,7 @@ func _on_change_stats(stat, amount, time_duration):
 				status_sprite.play("buff")
 			else:
 				status_sprite.play("debuff")
-			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
+			add_child(load("res://scenes/miscellaneous/time_of_change.tscn").instantiate(),true)
 			var new_timer = get_child(get_child_count()-1)
 			new_timer.stat = stat
 			new_timer.amount = -amount

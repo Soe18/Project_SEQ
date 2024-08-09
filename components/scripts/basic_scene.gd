@@ -3,6 +3,9 @@ extends Node2D
 var player
 var paused = false
 var connected = false
+var boss_defeted_count = 0
+var active_tileset : Node2D
+var active_enemy_container : Node2D
 
 @onready var canvas_layer = find_child("CanvasLayer")
 @onready var gui = canvas_layer.find_child("GUI")
@@ -16,28 +19,23 @@ var connected = false
 @onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
 var player_gui
 
-'func _ready():
-	for i in get_child_count():
-		if get_child(i) != player:
-			if "Enemy" in get_child(i).name:
-				player.is_in_atk_range.connect(get_child(i)._on_player_is_in_atk_range)
-				player.take_dmg.connect(get_child(i)._on_player_take_dmg)
-				if player.char_name == "Nathan":
-					player.grab.connect(get_child(i)._on_player_grab)
-					player.shake_camera(player.find_child("Camera2D")._on_player_shake_camera)'
+@export var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
+@export var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
 
-@onready var enemy_container = $Enemy_container
+var portal
+
+func _ready():
+	add_child(load(tilesets[0]).instantiate(),true)
+	active_tileset = get_child(get_child_count(true)-1)
+	
+	add_child(load(enemy_containers[0]).instantiate(),true)
+	active_enemy_container = get_child(get_child_count(true)-1)
+	
+	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
+	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
+
 
 func _process(_delta):
-	# Gestione del menu di pausa
-	if Input.is_action_just_pressed("pause"):
-		if not paused:
-			paused = true
-			pause_game(paused)
-		else:
-			paused = false
-			pause_game(paused)
-	
 	if Input.is_action_just_pressed("fullscreen_toggle"):
 		if DisplayServer.window_get_mode(0) != DisplayServer.WINDOW_MODE_FULLSCREEN:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
@@ -45,9 +43,18 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	
 	if player != null:
-		if not enemy_container.fighting:
+		# Gestione del menu di pausa
+		if Input.is_action_just_pressed("pause"):
+			if not paused:
+				paused = true
+				pause_game(paused)
+			else:
+				paused = false
+				pause_game(paused)
+	
+		if not active_enemy_container.fighting:
 			connected = false
-		if enemy_container.fighting and not connected:
+		if active_enemy_container.fighting and not connected:
 			connect_enemies_with_player()
 			connected = true
 
@@ -99,8 +106,8 @@ func _on_gui_select_character(char):
 		se il player ha dei segnali particolari (tipo Nathan con "grab")'
 
 func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
-	for i in enemy_container.get_child_count(): #cicla per ogni figlio della scena
-		var current_node = enemy_container.get_child(i)
+	for i in active_enemy_container.get_child_count(): #cicla per ogni figlio della scena
+		var current_node = active_enemy_container.get_child(i)
 		if "Enemy" in current_node.name: #se il nome del nemico contiene "Enemy"
 			current_node.player = player
 			# segnale tra player e nemici per capire se si è in range
@@ -150,7 +157,7 @@ func activate_player_GUI():
 		canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
 	elif player.char_name == "Nathan":
 		canvas_layer.add_child(load("res://scenes/GUI/nathan_gui.tscn").instantiate(),true)
-	enemy_container.heal_between_rounds.connect(player._on_get_healed)
+	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
 	player_gui.player = player
 	player_gui.player_death.connect(self._on_player_death)
@@ -159,3 +166,24 @@ func activate_player_GUI():
 	player_gui.healthbar.value = player.default_vit
 	player_gui.healthbar_label.text = str(player.default_vit) + "/" + str(player.default_vit)
 	player.set_health_bar.connect(player_gui._on_player_set_health_bar)
+
+func _on_boss_defeted():
+	add_child(load("res://scenes/miscellaneous/travel_portal.tscn").instantiate(),true)
+	portal = get_child(get_child_count()-1)
+	portal.player = player
+	portal.change_stage.connect(self._on_change_stage)
+
+func _on_change_stage():
+	boss_defeted_count += 1
+	
+	active_tileset.queue_free()
+	active_enemy_container.queue_free()
+	
+	add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
+	active_tileset = get_child(get_child_count(true)-1)
+	
+	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
+	active_enemy_container = get_child(get_child_count(true)-1)
+	
+	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
+	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)

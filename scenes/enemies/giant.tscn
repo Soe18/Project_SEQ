@@ -1,7 +1,7 @@
 [gd_scene load_steps=91 format=3 uid="uid://dbw1in01yk45v"]
 
 [ext_resource type="Script" path="res://components/scripts/giant.gd" id="1_t850f"]
-[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/hitmarker.tscn" id="2_w0xeh"]
+[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_w0xeh"]
 [ext_resource type="Texture2D" uid="uid://bese26q4y7aob" path="res://components/sprites/enemies/giant/giant_damaged.png" id="2_ywefj"]
 [ext_resource type="Texture2D" uid="uid://6geg8uhgs2nf" path="res://components/sprites/enemies/giant/giant_earthquake.png" id="3_7ybuo"]
 [ext_resource type="Texture2D" uid="uid://giovoho8320j" path="res://components/sprites/enemies/giant/giant_idle.png" id="4_sulq3"]
@@ -684,7 +684,6 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(11.151, 25.5396)
 rotation = -0.287979
 shape = SubResource("CapsuleShape2D_wmmft")
@@ -696,9 +695,9 @@ one_shot = true
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 y_sort_enabled = true
-offset_left = -56.0
+offset_left = -66.7914
 offset_top = -74.5755
-offset_right = 99.0
+offset_right = 88.2086
 offset_bottom = -53.5755
 theme_override_styles/background = SubResource("StyleBoxFlat_f8pc5")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fre0b")

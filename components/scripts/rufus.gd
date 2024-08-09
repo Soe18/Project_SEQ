@@ -43,6 +43,7 @@ var atk_state = Atk_States.IDLE
 var move_state = Moving_States.IDLE
 'var move_horizontal = null
 var move_vertical = null'
+
 var can_move = true
 
 var is_evading = false
@@ -89,7 +90,7 @@ var ult_moving_mod
 
 @warning_ignore("unused_parameter")
 func _ready():
-	emit_signal("set_health_bar", current_vit)
+	emit_signal("set_health_bar", default_vit)
 
 func _physics_process(delta):
 	if can_move:
@@ -187,7 +188,7 @@ func move(delta):
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)
-		else:
+		elif axis.x > 0:
 			flip_sprite(false)
 		
 	move_and_slide()
@@ -272,7 +273,6 @@ func base_atk():
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
 		skill2_effect.play("effect")
-		skill2_collider.disabled = false
 		axis = Vector2.ZERO
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
@@ -322,6 +322,8 @@ func _on_skill_1_area_body_exited(body):
 func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
+		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
+		emit_signal("change_stats", "tem", -25, 10)
 
 func _on_skill_2_area_body_exited(body):
 	if body != self:
@@ -409,8 +411,7 @@ func _on_effect_frame_changed():
 		emit_signal("take_dmg", current_str, 20, 0.6, current_pbc, current_efc)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
-		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
-		emit_signal("change_stats", "tem", -25, 10)
+		skill2_collider.disabled = false
 
 func ult_moving():
 	body_collider.disabled = true

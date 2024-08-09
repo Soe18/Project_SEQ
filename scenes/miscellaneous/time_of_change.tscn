@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://uutcjyrpx2ri"]
+
+[ext_resource type="Script" path="res://components/scripts/duration_of_changed_stats.gd" id="1_xhc8e"]
+
+[node name="Time_of_change" type="Timer"]
+wait_time = 10.0
+one_shot = true
+script = ExtResource("1_xhc8e")
+
+[connection signal="timeout" from="." to="." method="_on_timeout"]

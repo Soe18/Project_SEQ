@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dkvryp2tmx6uy" path="res://components/player_stencil/sprites/player_sk1_eff.png" id="7_3qoi4"]
 [ext_resource type="Texture2D" uid="uid://bb2m46v1f3j3m" path="res://components/player_stencil/sprites/player_sk2.png" id="7_tye3f"]
 [ext_resource type="Texture2D" uid="uid://db8vka32nra05" path="res://components/player_stencil/sprites/Ult_animation.png" id="9_d7htp"]
-[ext_resource type="PackedScene" uid="uid://2fkn4whglxhp" path="res://scenes/effect_sk_2.tscn" id="9_f2coy"]
+[ext_resource type="PackedScene" uid="uid://2fkn4whglxhp" path="res://scenes/miscellaneous/effect_sk_2.tscn" id="9_f2coy"]
 [ext_resource type="Texture2D" uid="uid://bauvsr4eln7he" path="res://components/player_stencil/sprites/ult_effect.png" id="11_e6ds7"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rq7j3"]

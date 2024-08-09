@@ -183,7 +183,7 @@ func move(delta):
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)
-		else:
+		elif axis.x < 0:
 			flip_sprite(false)
 		
 	move_and_slide()

@@ -74,7 +74,7 @@ func _ready():
 	controlla se è grabbato
 		allora fa partire il metodo grab()'
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if sprinting:
 		sprint_to_player()
 	elif player_entered and moving:
@@ -129,7 +129,6 @@ func chase_player():
 			if sprite.animation == "running":
 				sprite.play("idle")
 		else:
-			var current_agent_position = global_position
 			target_position = navigation_agent.get_next_path_position()
 			
 			var new_velocity = global_position.direction_to(target_position) * 200
@@ -380,7 +379,7 @@ func _on_change_stats(stat, amount, time_duration):
 				status_sprite.play("buff")
 			else:
 				status_sprite.play("debuff")
-			add_child(load("res://scenes/time_of_change.tscn").instantiate(),true)
+			add_child(load("res://scenes/miscellaneous/time_of_change.tscn").instantiate(),true)
 			var new_timer = get_child(get_child_count()-1)
 			new_timer.stat = stat
 			new_timer.amount = -amount
