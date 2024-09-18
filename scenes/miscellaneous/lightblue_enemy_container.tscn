@@ -21,7 +21,7 @@ position = Vector2(1617, -105)
 position = Vector2(729, 937)
 
 [node name="Spawnpoint4" type="Marker2D" parent="."]
-position = Vector2(40, 1051)
+position = Vector2(132, 990)
 
 [node name="Spawnpoint5" type="Marker2D" parent="."]
 position = Vector2(1794, 1008)
@@ -33,7 +33,7 @@ position = Vector2(629, 625)
 position = Vector2(148, 596)
 
 [node name="Spawnpoint8" type="Marker2D" parent="."]
-position = Vector2(1234, 1097)
+position = Vector2(1367, 738)
 
 [node name="Spawnpoint9" type="Marker2D" parent="."]
 position = Vector2(1149, 243)

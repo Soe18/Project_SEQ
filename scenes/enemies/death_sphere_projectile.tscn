@@ -172,7 +172,7 @@ animations = [{
 radius = 7.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bclj2"]
-radius = 38.0132
+radius = 25.2211
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yplq5"]
 radius = 105.262
@@ -189,7 +189,7 @@ script = ExtResource("1_fvn85")
 z_index = 1
 scale = Vector2(0.11, 0.11)
 sprite_frames = SubResource("SpriteFrames_auhc4")
-animation = &"impact"
+animation = &"spawn"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false

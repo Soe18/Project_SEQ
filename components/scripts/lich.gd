@@ -6,7 +6,7 @@ var boss_name = "Kreegakaleet lu Gosata'ahm"
 var current_vit = default_vit
 @export var default_str : int = 200
 var current_str = default_str
-@export var default_tem : int = 232
+@export var default_tem : int = 150
 var current_tem = default_tem
 @export var default_des : int = 145
 var current_des = default_des
@@ -115,16 +115,16 @@ func _physics_process(_delta):
 		dying_sequence()
 	elif not spawning:
 		if player_entered and moving:
-			if player:
+			if player and not grabbed:
 				if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
 					teleport()
-				if choosed_atk == Possible_Attacks.WITCHCRAFT and witchcraft_cooldown.is_stopped() and stun_timer.is_stopped() and not grabbed:
+				if choosed_atk == Possible_Attacks.WITCHCRAFT and witchcraft_cooldown.is_stopped() and stun_timer.is_stopped():
 					witchcraft()
-				if choosed_atk == Possible_Attacks.DEATH_SPHERE and death_sphere_cooldown.is_stopped() and stun_timer.is_stopped() and not grabbed:
+				if choosed_atk == Possible_Attacks.DEATH_SPHERE and death_sphere_cooldown.is_stopped() and stun_timer.is_stopped():
 					death_sphere()
-				if choosed_atk == Possible_Attacks.EXPLOSIONS and explosions_cooldown.is_stopped() and stun_timer.is_stopped() and not grabbed:
+				if choosed_atk == Possible_Attacks.EXPLOSIONS and explosions_cooldown.is_stopped() and stun_timer.is_stopped():
 					sprite.play("explosions")
-				if choosed_atk == Possible_Attacks.EVOCATION and evocation_cooldown.is_stopped() and stun_timer.is_stopped() and not grabbed:
+				if choosed_atk == Possible_Attacks.EVOCATION and evocation_cooldown.is_stopped() and stun_timer.is_stopped():
 					sprite.play("evocation")
 		elif not player_entered and moving:
 			if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():

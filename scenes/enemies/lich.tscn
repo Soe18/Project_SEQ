@@ -383,7 +383,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_g75d1")
 }, {
-"duration": 12.0,
+"duration": 11.0,
 "texture": SubResource("AtlasTexture_dwe4c")
 }, {
 "duration": 1.0,
@@ -435,13 +435,13 @@ animations = [{
 }],
 "loop": false,
 "name": &"evocation",
-"speed": 10.0
+"speed": 9.0
 }, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fqgic")
 }, {
-"duration": 1.0,
+"duration": 4.0,
 "texture": SubResource("AtlasTexture_k5et5")
 }, {
 "duration": 1.0,
@@ -551,7 +551,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5e2k8")
 }, {
-"duration": 1.0,
+"duration": 4.0,
 "texture": SubResource("AtlasTexture_nrra1")
 }, {
 "duration": 1.0,
@@ -853,7 +853,7 @@ position = Vector2(0, -64)
 z_index = 1
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"spawn"
+animation = &"witchcraft"
 autoplay = "spawn"
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
@@ -969,6 +969,7 @@ wait_time = 1.5
 one_shot = true
 
 [node name="Evocation_container" type="Node2D" parent="."]
+visible = false
 
 [node name="Evocation_location" type="Marker2D" parent="Evocation_container"]
 position = Vector2(150, 0)
@@ -1000,7 +1001,7 @@ wait_time = 2.0
 one_shot = true
 
 [node name="Teleport_Cooldown" type="Timer" parent="."]
-wait_time = 20.235
+wait_time = 10.0
 one_shot = true
 
 [node name="Witchcraft_Cooldown" type="Timer" parent="."]
@@ -1012,11 +1013,11 @@ wait_time = 10.0
 one_shot = true
 
 [node name="Explosions_Cooldown" type="Timer" parent="."]
-wait_time = 10.0
+wait_time = 20.0
 one_shot = true
 
 [node name="Evocation_Cooldown" type="Timer" parent="."]
-wait_time = 10.0
+wait_time = 40.0
 one_shot = true
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]

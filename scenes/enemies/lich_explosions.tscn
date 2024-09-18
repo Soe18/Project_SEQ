@@ -41,7 +41,7 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 5.0,
+"duration": 7.0,
 "texture": SubResource("AtlasTexture_haqbh")
 }, {
 "duration": 1.0,
@@ -71,8 +71,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_khq7l"]
-radius = 88.685
-height = 234.0
+radius = 74.3773
+height = 192.308
 
 [node name="Lich_explosion" type="CharacterBody2D"]
 scale = Vector2(1.3, 1.3)
@@ -87,8 +87,6 @@ process_mode = 1
 scale = Vector2(0.45, 0.45)
 sprite_frames = SubResource("SpriteFrames_35mb6")
 animation = &"effect"
-frame = 7
-frame_progress = 1.0
 offset = Vector2(0, -65)
 
 [node name="Area_of_effect" type="Area2D" parent="."]

@@ -33,7 +33,7 @@ func go_to_player():
 	if global_position.distance_to(origin) >= player_position.distance_to(origin):
 		direction = first_direction
 		
-	velocity = direction * 1000
+	velocity = direction * 900
 	move_and_slide()
 
 func _on_area_to_impact_body_entered(body):

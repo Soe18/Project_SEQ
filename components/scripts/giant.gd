@@ -302,12 +302,10 @@ func _on_area_of_detection_body_exited(body):
 
 func _on_punch_area_body_entered(body):
 	if body == player:
-		print("pugno entrato")
 		player_in_atk_range = true
 
 func _on_punch_area_body_exited(body):
 	if body == player:
-		print("pugno uscito")
 		player_in_atk_range = false
 
 func _on_earthquake_area_body_entered(body):

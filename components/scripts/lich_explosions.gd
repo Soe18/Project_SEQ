@@ -16,7 +16,7 @@ func _ready():
 
 func _on_area_of_effect_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",lich_str, 20, 3, lich_pbc, lich_efc)
+		emit_signal("take_dmg",lich_str, 17, 3, lich_pbc, lich_efc)
 
 func _on_sprite_2d_animation_finished():
 	queue_free()
