@@ -3,11 +3,12 @@ extends Node2D
 var markers = []
 var active_markers = []
 var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
-var boss_scene = "res://scenes/enemies/giant.tscn"
+var boss_scene = "res://scenes/enemies/lich.tscn"
 
 signal round_changed()
 signal heal_between_rounds(amount)
 signal boss_defeted()
+signal connect_boss_with_GUI(boss)
 
 var fighting
 var boss_is_defeted = false
@@ -108,11 +109,13 @@ func activate_markers():
 
 func spawn_boss():
 	add_child(load(boss_scene).instantiate(),true)
-	get_child(get_child_count()-1).position = boss_spawner.position
+	var active_boss = get_child(get_child_count()-1)
+	active_boss.position = boss_spawner.position
+	emit_signal("connect_boss_with_GUI", active_boss)
 
 func is_boss_round():
 	var round_count = get_parent().round_gui.round_count
-	if round_count > 0 and round_count % 2 == 0:
+	if round_count > 0 and round_count % 1 == 0:
 		return true
 	else:
 		return false

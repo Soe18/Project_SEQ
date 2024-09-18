@@ -39,7 +39,7 @@ position = Vector2(821, 38)
 position = Vector2(1216, 941)
 
 [node name="Spawnpoint10" type="Marker2D" parent="."]
-position = Vector2(349, 1125)
+position = Vector2(480, 987)
 
 [node name="Boss_Spawner" type="Marker2D" parent="."]
 position = Vector2(939, 518)

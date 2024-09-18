@@ -503,8 +503,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_wmmft"]
-radius = 64.3886
-height = 164.748
+radius = 58.9928
+height = 151.079
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f8pc5"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -684,8 +684,8 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(11.151, 25.5396)
-rotation = -0.287979
+position = Vector2(5.7554, 34.5324)
+rotation = 1.5708
 shape = SubResource("CapsuleShape2D_wmmft")
 debug_color = Color(1, 1, 0, 0.0666667)
 
@@ -694,6 +694,7 @@ wait_time = 3.0
 one_shot = true
 
 [node name="HealthBar" type="ProgressBar" parent="."]
+z_index = 2
 y_sort_enabled = true
 offset_left = -66.7914
 offset_top = -74.5755
@@ -734,7 +735,6 @@ animation = &"effect"
 autoplay = "idle"
 
 [node name="Earthquake_Area" type="Area2D" parent="."]
-process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Earthquake_Area"]
 visible = false

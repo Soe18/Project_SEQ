@@ -15,6 +15,8 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
+@export var damage_node : PackedScene
+
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 
@@ -73,6 +75,8 @@ var atk_anim_finished = true
 @onready var stun_timer = $Stun
 
 @onready var status_sprite = $Status_alert_sprite
+
+@onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
@@ -183,7 +187,7 @@ func move(delta):
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)
-		elif axis.x < 0:
+		elif axis.x > 0:
 			flip_sprite(false)
 		
 	move_and_slide()
@@ -483,11 +487,11 @@ func evade():
 		velocity.y += -15
 	elif axis.x == 0 and axis.y > 0:
 		velocity.y += 15
-	if axis.x < 0 and axis.y == 0:
+	elif axis.x < 0 and axis.y == 0:
 		velocity.x += -15
 	elif axis.x > 0 and axis.y == 0:
 		velocity.x += 15
-	if axis.x > 0 and axis.y < 0:
+	elif axis.x > 0 and axis.y < 0:
 		velocity.x += 15
 		velocity.y += -15
 	elif axis.x > 0 and axis.y > 0:
@@ -499,6 +503,10 @@ func evade():
 	elif axis.x < 0 and axis.y < 0:
 		velocity.x += -15
 		velocity.y += -15
+	elif sprite.flip_h:
+		velocity.x += -15
+	else:
+		velocity.x += 15
 	move_and_slide()
 
 'METODO CHE SPOSTA IL PLAYER DURANTE LA SKILL1'
@@ -525,9 +533,10 @@ func _on_ult_cooldown_timeout():
 ' - DIGEST DEL SEGNALE take_dmg DEI NEMICI - '
 
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	current_vit -= get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	var dmg = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	#print("take dmg: "+str(dmg))
+	#show_hitmarker("-" + str(dmg))
 	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")
@@ -570,3 +579,16 @@ func _on_change_stats(stat, amount, time_duration):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
+
+'func show_hitmarker(dmg):
+	var hitmarker = damage_node.instantiate()
+	hitmarker.position = hitmarker_spawnpoint.global_position
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(hitmarker, 
+						"position", 
+						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
+						0.75)
+	
+	hitmarker.get_child(0).text = dmg
+	get_tree().current_scene.add_child(hitmarker)'

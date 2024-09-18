@@ -33,7 +33,7 @@ func _ready():
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
-
+	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)
 
 func _process(_delta):
 	if Input.is_action_just_pressed("fullscreen_toggle"):
@@ -78,12 +78,13 @@ func _on_gui_select_character(char):
 	add_child(player_scene.instantiate())
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
-	player.scale = Vector2(0.95, 0.95)
+	player.scale = Vector2(0.9, 0.9)
 	
 	# creo la telecamera
 	var camera = Camera2D.new()
 	# impostazioni per la telecamera
 	camera.zoom = Vector2(1.6,1.6)
+	#camera.zoom = Vector2(0.5,0.5)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 3
 	# condizione per collegare lo script della telecamera
@@ -123,6 +124,10 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
 			else:
 				player.change_stats.connect(current_node._on_change_stats)
+			if "Lich" in current_node.name:
+				current_node.possible_teleport_locations = active_enemy_container.markers
+			if "Boss" in current_node.name:
+				current_node.set_health_bar.connect(round_gui._on_boss_set_healthbar)
 
 func pause_game(get_paused):
 	if get_paused: # se non sono in pausa
@@ -176,6 +181,9 @@ func _on_boss_defeted():
 func _on_change_stage():
 	boss_defeted_count += 1
 	
+	if boss_defeted_count == tilesets.size():
+		boss_defeted_count = 0
+	
 	active_tileset.queue_free()
 	active_enemy_container.queue_free()
 	
@@ -187,3 +195,5 @@ func _on_change_stage():
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
+	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)
+	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)

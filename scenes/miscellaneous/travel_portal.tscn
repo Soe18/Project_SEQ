@@ -87,6 +87,7 @@ _data = {
 }
 
 [node name="Portal" type="AnimatedSprite2D"]
+process_mode = 1
 z_index = -1
 position = Vector2(939, 518)
 scale = Vector2(0.274, 0.274)

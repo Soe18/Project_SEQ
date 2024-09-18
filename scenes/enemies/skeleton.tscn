@@ -496,8 +496,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uwkny"]
-radius = 23.0
-height = 98.0
+radius = 13.3233
+height = 74.1723
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0p46"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -598,6 +598,7 @@ wait_time = 3.0
 one_shot = true
 
 [node name="HealthBar" type="ProgressBar" parent="."]
+z_index = 2
 y_sort_enabled = true
 offset_left = -50.0
 offset_top = -57.0

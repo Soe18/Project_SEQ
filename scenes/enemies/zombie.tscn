@@ -414,8 +414,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7foa3"]
-radius = 26.0
-height = 104.0
+radius = 14.506
+height = 86.2729
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00dig"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -509,7 +509,7 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(-7, 16)
+position = Vector2(-5, 19)
 rotation = 0.191986
 shape = SubResource("CapsuleShape2D_7foa3")
 debug_color = Color(1, 1, 0, 0.0666667)
@@ -521,6 +521,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="HealthBar" type="ProgressBar" parent="Control"]
+z_index = 2
 y_sort_enabled = true
 layout_mode = 0
 offset_left = -50.0
@@ -542,7 +543,6 @@ wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
-visible = false
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false

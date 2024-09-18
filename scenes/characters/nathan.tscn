@@ -1,6 +1,7 @@
-[gd_scene load_steps=112 format=3 uid="uid://e6lbvx4r5aqc"]
+[gd_scene load_steps=113 format=3 uid="uid://e6lbvx4r5aqc"]
 
 [ext_resource type="Script" path="res://components/scripts/nathan.gd" id="1_arpgr"]
+[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_eetp7"]
 [ext_resource type="Texture2D" uid="uid://cmb3fpdibbfxt" path="res://components/sprites/nathan/nathan_eva.png" id="2_vy16t"]
 [ext_resource type="Texture2D" uid="uid://dce2go3tqkpm1" path="res://components/sprites/nathan/nathan_running.png" id="3_x7f85"]
 [ext_resource type="Texture2D" uid="uid://bwldyas685k83" path="res://components/sprites/nathan/nathan_bs_atk1.png" id="4_u3cg4"]
@@ -700,7 +701,7 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8jryo"]
-radius = 35.0
+radius = 43.0
 height = 120.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jw0fn"]
@@ -761,6 +762,7 @@ process_mode = 1
 y_sort_enabled = true
 motion_mode = 1
 script = ExtResource("1_arpgr")
+damage_node = ExtResource("2_eetp7")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-12, -12)
@@ -779,11 +781,10 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="Player_collider" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(-3, 15)
+position = Vector2(0, -1)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_8jryo")
-debug_color = Color(0, 0.6, 0.701961, 0.419608)
+debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 position = Vector2(40, 1)
