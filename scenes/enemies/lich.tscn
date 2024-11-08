@@ -3,10 +3,10 @@
 [ext_resource type="Script" path="res://components/scripts/lich.gd" id="1_ic8pi"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_ob30n"]
 [ext_resource type="Texture2D" uid="uid://bfnqigpq33feg" path="res://components/sprites/enemies/lich/lich_damaged.png" id="3_52rpl"]
-[ext_resource type="PackedScene" uid="uid://cymi8puqyx10m" path="res://scenes/enemies/witchcraft_Projectile.tscn" id="3_xbuw5"]
+[ext_resource type="PackedScene" uid="uid://cymi8puqyx10m" path="res://scenes/enemies/projectiles/witchcraft_Projectile.tscn" id="3_xbuw5"]
 [ext_resource type="Texture2D" uid="uid://bkue7qluevuds" path="res://components/sprites/enemies/lich/lich_death.png" id="4_c7rqb"]
-[ext_resource type="PackedScene" uid="uid://dvlviqq51kj4u" path="res://scenes/enemies/death_sphere_projectile.tscn" id="4_cepbk"]
-[ext_resource type="PackedScene" uid="uid://cumid71vq62yx" path="res://scenes/enemies/lich_explosions.tscn" id="5_jup8x"]
+[ext_resource type="PackedScene" uid="uid://dvlviqq51kj4u" path="res://scenes/enemies/projectiles/death_sphere_projectile.tscn" id="4_cepbk"]
+[ext_resource type="PackedScene" uid="uid://cumid71vq62yx" path="res://scenes/enemies/projectiles/lich_explosions.tscn" id="5_jup8x"]
 [ext_resource type="Texture2D" uid="uid://cwcate3hnggm2" path="res://components/sprites/enemies/lich/lich_death_sphere.png" id="5_yl4ui"]
 [ext_resource type="Texture2D" uid="uid://dk8p7lgwt0xxp" path="res://components/sprites/enemies/lich/lich_evocation.png" id="6_xfrwy"]
 [ext_resource type="Texture2D" uid="uid://dnrypqhdaeaxa" path="res://components/sprites/enemies/lich/lich_explosions.png" id="7_47psw"]
@@ -996,10 +996,6 @@ one_shot = true
 wait_time = 2.0
 one_shot = true
 
-[node name="Charge_Time" type="Timer" parent="."]
-wait_time = 2.0
-one_shot = true
-
 [node name="Teleport_Cooldown" type="Timer" parent="."]
 wait_time = 10.0
 one_shot = true
@@ -1009,11 +1005,11 @@ wait_time = 6.0
 one_shot = true
 
 [node name="Death_sphere_Cooldown" type="Timer" parent="."]
-wait_time = 10.0
+wait_time = 20.0
 one_shot = true
 
 [node name="Explosions_Cooldown" type="Timer" parent="."]
-wait_time = 20.0
+wait_time = 30.0
 one_shot = true
 
 [node name="Evocation_Cooldown" type="Timer" parent="."]
@@ -1032,4 +1028,3 @@ one_shot = true
 [connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
 [connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
-[connection signal="timeout" from="Charge_Time" to="." method="_on_charge_time_timeout"]

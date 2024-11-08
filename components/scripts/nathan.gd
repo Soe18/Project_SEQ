@@ -23,7 +23,7 @@ enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(atk_state, dmg, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal set_idle()
 signal grab(has_grabbed, is_flipped)
 signal set_health_bar(current_vit)

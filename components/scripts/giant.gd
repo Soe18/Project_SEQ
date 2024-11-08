@@ -268,6 +268,8 @@ func _on_stun_timeout():
 func set_health_bar():
 	healthbar.value = current_vit
 	if current_vit <= 0:
+		if player.char_name == "Nathan":
+			emit_signal("got_grabbed", false)
 		queue_free()
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB

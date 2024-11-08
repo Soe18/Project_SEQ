@@ -141,12 +141,10 @@ func choose_atk():
 	var rng = randi_range(0,100)
 	if rng >= 0 and rng < 10:
 		choosed_atk = Possible_Attacks.IDLE
-	elif rng >= 10 and rng < 65:
+	elif rng >= 10 and rng < 55:
 		choosed_atk = Possible_Attacks.BASIC_ATK
-	elif rng >= 65:
+	elif rng >= 55:
 		choosed_atk = Possible_Attacks.PARRY
-
-'METODO CHE FA VAGARE IL NODO, MA GESTISCE SOLO LO SPOSTAMENTO E NON LA DIREZIONE'
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -195,6 +193,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 				stun_timer.start()
 				sprite.play("damaged")
 			elif current_vit <= 0 and not dying:
+				if player.char_name == "Nathan":
+					emit_signal("got_grabbed", false)
 				dying = true
 				if not sprite.animation == "dying":
 					sprite.play("dying")

@@ -1,0 +1,105 @@
+[gd_scene load_steps=13 format=3 uid="uid://cumid71vq62yx"]
+
+[ext_resource type="Texture2D" uid="uid://bkcg36ttdeanw" path="res://components/sprites/enemies/lich/lich_explosions_effect.png" id="1_7m1ua"]
+[ext_resource type="Script" path="res://components/scripts/lich_explosions.gd" id="1_8njou"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6delb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_haqbh"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(0, 0, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rmory"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(600, 0, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bcalr"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(1200, 0, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uwhpu"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(0, 600, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8bfvw"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(600, 600, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g03kx"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(1200, 600, 600, 600)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y8neu"]
+atlas = ExtResource("1_7m1ua")
+region = Rect2(0, 1200, 600, 600)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_35mb6"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 7.0,
+"texture": SubResource("AtlasTexture_haqbh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rmory")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bcalr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uwhpu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8bfvw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g03kx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y8neu")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"effect",
+"speed": 11.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_khq7l"]
+radius = 74.3773
+height = 192.308
+
+[node name="Lich_explosion" type="CharacterBody2D"]
+z_index = 2
+scale = Vector2(1.3, 1.3)
+script = ExtResource("1_8njou")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_6delb")
+disabled = true
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+process_mode = 1
+scale = Vector2(0.45, 0.45)
+sprite_frames = SubResource("SpriteFrames_35mb6")
+animation = &"effect"
+offset = Vector2(0, -65)
+
+[node name="Area_of_effect" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area_of_effect"]
+position = Vector2(0, 6.685)
+rotation = -1.5708
+shape = SubResource("CapsuleShape2D_khq7l")
+disabled = true
+debug_color = Color(1, 0, 0, 0.00784314)
+
+[connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
+[connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]
+[connection signal="body_entered" from="Area_of_effect" to="." method="_on_area_of_effect_body_entered"]

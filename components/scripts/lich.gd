@@ -2,9 +2,9 @@ extends CharacterBody2D
 
 var boss_name = "Kreegakaleet lu Gosata'ahm"
 
-@export var default_vit : int = 2000
+@export var default_vit : int = 1000
 var current_vit = default_vit
-@export var default_str : int = 200
+@export var default_str : int = 190
 var current_str = default_str
 @export var default_tem : int = 150
 var current_tem = default_tem
@@ -17,26 +17,27 @@ var current_efc = default_efc
 
 @export var damage_node : PackedScene
 
+# attributo contenente le scene dei proiettili
 @export var witchcraft_scene : PackedScene
 @export var death_sphere_scene : PackedScene
 @export var explosion_scene : PackedScene
 
 var is_in_atk_range = false
-var moving = true
-var grabbed = false
-var spawning = true
-var dying = false
+var moving = true # variabile che gestisce lo stun
+var grabbed = false # variabile che gestisce il grab
+var spawning = true # variabile a true finché non finisce l'animazione di spawning, altrimenti false
+var dying = false # variabile a false finché il boss è in vita, poi a true per l'animazione di death
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal set_health_bar(vit)
 signal got_grabbed(is_grabbed)
 
-var target_position
 var player
 
 enum Possible_Attacks {IDLE, WITCHCRAFT, DEATH_SPHERE, EXPLOSIONS, EVOCATION, TELEPORT}
 var choosed_atk
 
+# riferimenti ai nodi
 @onready var sprite = $Sprite2D
 @onready var stun_timer = $Stun
 
@@ -71,13 +72,17 @@ var choosed_atk
 var player_entered = true
 var player_in_atk_range = false
 
+# array da popolare nel ready, in modo da essere scalabile
 var possible_teleport_locations = []
 var first_round_explosions = []
 var second_round_explosions = []
 var third_round_explosions = []
 var evocation_locations = []
+
+# array che contiene il percorso delle scene dei nemici evocabili, da rivedere
 var evocable_entities = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
 
+# contatore per evitare l'istanzia di due nodi con lo stesso nome, casini nei connect
 var evocation_count = 0
 
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -89,15 +94,19 @@ func _ready():
 	emit_signal("set_health_bar", current_vit)
 	sprite.play("spawn")
 	
+	# popolo l'array con i marker del primo round di esplosioni
 	for i in first_round_container.get_children():
 		first_round_explosions.append(i)
 	
+	# popolo l'array con i marker del secondo round di esplosioni
 	for i in second_round_container.get_children():
 		second_round_explosions.append(i)
 	
+	# popolo l'array con i marker del terzo round di esplosioni
 	for i in third_round_container.get_children():
 		third_round_explosions.append(i)
 	
+	# popolo l'array con i marker delle evocazioni
 	for i in evocation_container.get_children():
 		evocation_locations.append(i)
 	
@@ -111,55 +120,68 @@ func _ready():
 		allora fa partire il metodo grab()'
 
 func _physics_process(_delta):
-	if dying:
-		dying_sequence()
-	elif not spawning:
-		if player_entered and moving:
-			if player and not grabbed:
+	if dying: # se sta morendo ignoro qualsiasi altro processo
+		moving = false # non si deve muovere
+		sprite.play("death") # faccio partire l'animazione di morte
+	elif not spawning: # se non sta spawnando e non è morto allora sta combattendo
+		if player_entered and moving: # se vede il player (quindi è vivo) e può muoversi (non è stunnato)
+			if player and not grabbed: # se esiste il player e non è grabbato gestisco gli attacchi
+				
+				# se l'attacco è TELEPORT e il cooldown è finito
 				if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
-					teleport()
+					teleport() # faccio partire il metodo teleport()
+				
+				# se l'attacco è WITCHCRAFT e il cooldown è finito
 				if choosed_atk == Possible_Attacks.WITCHCRAFT and witchcraft_cooldown.is_stopped() and stun_timer.is_stopped():
-					witchcraft()
+					witchcraft() # faccio partire il metodo witchcraft()
+				
+				# se l'attacco è DEATH_SPHERE e il cooldown è finito
 				if choosed_atk == Possible_Attacks.DEATH_SPHERE and death_sphere_cooldown.is_stopped() and stun_timer.is_stopped():
-					death_sphere()
+					death_sphere() # faccio partire il metodo death_sphere()
+				
+				# se l'attacco è ESPLOSIONS e il cooldown è finito
 				if choosed_atk == Possible_Attacks.EXPLOSIONS and explosions_cooldown.is_stopped() and stun_timer.is_stopped():
-					sprite.play("explosions")
+					sprite.play("explosions") # faccio partire l'animazione del lich, vedi _on_sprite_animation_finished
+				
+				# se l'attacco è EVOCATION e il cooldown è finito
 				if choosed_atk == Possible_Attacks.EVOCATION and evocation_cooldown.is_stopped() and stun_timer.is_stopped():
-					sprite.play("evocation")
-		elif not player_entered and moving:
+					sprite.play("evocation") # faccio partire l'animazione del lich, vedi _on_sprite_animation_finished
+		elif not player_entered and moving: # se il player non è individuabile e può muoversi allora lo muovo e basta
 			if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
 					teleport()
 			else:
 				sprite.play("idle")
-		elif not player_entered and not moving:
-			sprite.play("idle")
-		elif grabbed:
+		elif not player_entered and not moving: # se il player non è dentro e non può muoversi
+			sprite.play("idle") # lo metto in idle, non ha niente da fare tanto
+		elif grabbed: # se è grabbato faccio partire il metodo apposito
 			is_grabbed()
 
-'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
-	salvo la posizione attuale del player
-	creo il vettore che punta al player, facendo la posizione del player - la posizione attuale e infine normalizzo il vettore
-	se il nodo è distante dal player di almeno 12 unità
-		muovo il nodo verso il player con la velocità di 3'
+# METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
+#	salvo la posizione attuale del player
+#	creo il vettore che punta al player, facendo la posizione del player - la posizione attuale e infine normalizzo il vettore
+#	se il nodo è distante dal player di almeno 12 unità
+#		muovo il nodo verso il player con la velocità di 3
 
+# -- INUTILE, LO TENGO PER PARCONDICIO -- #
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
 		pass
 	elif distance_to_player.x > 0:
 		pass
-	
+
+# METODO CHE GESTISCE LA SCELTA DELL'ATTACCO
 func choose_atk():
-	var rng = randi_range(0,200)
-	if rng >= 0 and rng < 50:
-		choosed_atk = Possible_Attacks.TELEPORT
-	elif rng >= 50 and rng < 75:
-		choosed_atk = Possible_Attacks.EVOCATION
-	elif rng >= 75 and rng < 120:
-		choosed_atk = Possible_Attacks.DEATH_SPHERE
-	elif rng >= 120 and rng < 150:
-		choosed_atk = Possible_Attacks.EXPLOSIONS
+	var rng = randi_range(0,100)
+	if rng >= 0 and rng < 25:
+		choosed_atk = Possible_Attacks.TELEPORT # 25%
+	elif rng >= 25 and rng < 35:
+		choosed_atk = Possible_Attacks.EVOCATION # 10%
+	elif rng >= 35 and rng < 60:
+		choosed_atk = Possible_Attacks.DEATH_SPHERE # 25%
+	elif rng >= 60 and rng < 75:
+		choosed_atk = Possible_Attacks.EXPLOSIONS # 15%
 	else:
-		choosed_atk = Possible_Attacks.WITCHCRAFT
+		choosed_atk = Possible_Attacks.WITCHCRAFT # 25%
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -202,36 +224,41 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 			current_vit -= dmg
 			emit_signal("set_health_bar", current_vit)
 			show_hitmarker("-" + str(dmg))
+			
+			# sto stronzo ha uno stun_reduction, cioè diminuisce i secondi di stun
 			stun_sec -= 0.5
+			# se ha culo di diminuire sotto lo 0 i secondi di stun
 			if stun_sec < 0:
-				stun_sec = 0
-			if stun_sec > 0:
+				stun_sec = 0 # semplicemente li riporta a 0
+			
+			# se ha secondi di stun e se il danno è maggiore uguale a 15 allora lo sente effettivamente
+			if stun_sec > 0 and dmg >= 15: # ha pure l'armor sta merda
 				moving = false
 				stun_timer.wait_time = stun_sec
 				stun_timer.start()
 				sprite.play("damaged")
 
-'DIGEST DEL SENGALE DEL PLAYER "grab"
-{
-	PARAMETRI
-	boolean is_been_grabbed: controlla se il segnale è di entrata o di uscita dalla grab
-	booelan is_flipped: indica se il player è flippato o meno
-}
-se il segnale è di grab, il nodo non è già grabbato e il nodo è in range
-	faccio ricevere un danno al nodo
-	tolgo la possibilità di muoversi del nodo
-	setto il grabbed a true
-	lo sprite diventa invisibile
-	disattivo le collisioni
-se il segnale è di uscita dalla grab e il nodo è grabbato
-	il nodo potrà di nuovo muoversi
-	setto il grabbed a false
-	se il nodo è flipped
-		spinge il nodo a sinistra di 450
-	altrimenti
-		spinge il nodo a destra di 450
-	lo sprite diventa visibile
-	faccio partire un timer per risettare le collisioni, se le riabilito insieme avviene un bug'
+# DIGEST DEL SENGALE DEL PLAYER "grab"
+# {
+# 	PARAMETRI
+# 	boolean is_been_grabbed: controlla se il segnale è di entrata o di uscita dalla grab
+# 	booelan is_flipped: indica se il player è flippato o meno
+# }
+# se il segnale è di grab, il nodo non è già grabbato e il nodo è in range
+# 	faccio ricevere un danno al nodo
+# 	tolgo la possibilità di muoversi del nodo
+# 	setto il grabbed a true
+# 	lo sprite diventa invisibile
+# 	disattivo le collisioni
+# se il segnale è di uscita dalla grab e il nodo è grabbato
+# 	il nodo potrà di nuovo muoversi
+# 	setto il grabbed a false
+# 	se il nodo è flipped
+# 		spinge il nodo a sinistra di 450
+# 	altrimenti
+# 		spinge il nodo a destra di 450
+# 	lo sprite diventa visibile
+# 	faccio partire un timer per risettare le collisioni, se le riabilito insieme avviene un bug
 
 func _on_player_grab(is_been_grabbed, is_flipped):
 	if not spawning:
@@ -282,16 +309,15 @@ func _on_timer_timeout():
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
+### TODO refactor di tutti questi metodi perché è deprecato
 func _on_inhale_time_timeout():
 	moving = true
 	choosed_atk = Possible_Attacks.IDLE
 	sprite.play("idle")
 
-func _on_charge_time_timeout():
-	if stun_timer.is_stopped():
-		$Inhale_time.start(6)
-
+# DIGEST DI QUANDO LO SPRITE CAMBIA IL FRAME DI ANIMAZIONE
 func _on_sprite_2d_frame_changed():
+	# NON ULTIMATO, DEVE AVERE LE ANIMAZIONI FINITE
 	if sprite.animation == "witchcraft" and sprite.frame == 5:
 		launch_witchcraft()
 	if sprite.animation == "death_sphere" and sprite.frame == 4:
@@ -315,19 +341,23 @@ func _on_sprite_2d_animation_finished():
 		evocation()
 		_on_inhale_time_timeout()
 
+# DIGEST DEL TIMER CHE SEGNALA DI SCEGLIERE UN ATTACCO
 func _on_update_atk_timeout():
 	choose_atk()
 	$Update_Atk.start()
 
+# METODO CHE FA TELETRASPORTARE IL LICH IN UNO DEI WAYPOINT
 func teleport():
 	var current_tp = possible_teleport_locations.pick_random()
 	self.global_position = current_tp.global_position
 	teleport_cooldown.start()
 
+# METODO CHE FA PARTIRE L'ANIMAZIONE DELL'ATTACCO WITCHCRAFT
 func witchcraft():
 	sprite.play("witchcraft")
 	witchcraft_cooldown.start()
 
+# METODO CHE INSTANZIA IL NODO WITCHCRAFT_PROJECTILE
 func launch_witchcraft():
 	self.add_child(witchcraft_scene.instantiate(),true)
 	var witchcraft_projectile = get_child(get_child_count()-1,true)
@@ -341,10 +371,12 @@ func launch_witchcraft():
 	witchcraft_projectile.look_at(player.global_position)
 	witchcraft_projectile.reparent(get_parent())
 
+# METODO CHE FA PARTIRE L'ANIMAZIONE DELL'ATTACCO DEATH_SPHERE
 func death_sphere():
 	sprite.play("death_sphere")
 	death_sphere_cooldown.start()
 
+# METODO CHE INSTANZIA IL NODO DEATH_SPHERE_PROJECTILE
 func launch_death_sphere():
 	add_child(death_sphere_scene.instantiate(),true)
 	var death_sphere_projectile = get_child(get_child_count()-1)
@@ -356,6 +388,7 @@ func launch_death_sphere():
 	death_sphere_projectile.lich_efc = current_efc
 	death_sphere_projectile.take_dmg.connect(player._on_enemy_take_dmg)
 
+# METODO CHE FA PARTIRE IL PRIMO ROUND DI ESPLOSIONI
 func explosions():
 	explosion_container.reparent(get_parent())
 	for i in first_round_explosions:
@@ -368,10 +401,11 @@ func explosions():
 			instantiate_explosion.lich_pbc = current_pbc
 			instantiate_explosion.lich_efc = current_efc
 			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
-	second_round_timer.start()
-	explosions_cooldown.start()
+	second_round_timer.start() # faccio partire il timer per il secondo round
+	explosions_cooldown.start() # faccio partire il cooldown
 	_on_inhale_time_timeout()
 
+# METODO CHE FA PARTIRE IL SECONDO ROUND DI ESPLOSIONI
 func _on_second_round_timer_timeout():
 	for i in second_round_explosions:
 		if player != null:
@@ -383,8 +417,9 @@ func _on_second_round_timer_timeout():
 			instantiate_explosion.lich_pbc = current_pbc
 			instantiate_explosion.lich_efc = current_efc
 			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
-	third_round_timer.start()
+	third_round_timer.start() # faccio partire il timer per il terzo round
 
+# METODO CHE FA PARTIRE IL TERZO ROUND DI ESPLOSIONI
 func _on_third_round_timer_timeout():
 	for i in third_round_explosions:
 		if player != null:
@@ -396,12 +431,15 @@ func _on_third_round_timer_timeout():
 			instantiate_explosion.lich_pbc = current_pbc
 			instantiate_explosion.lich_efc = current_efc
 			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
-	reset_explosions.start()
+	reset_explosions.start() # faccio partire il timer per resettare le esplosioni
 
+# DIGEST DEL SEGNALE DI RESET DELLE ESPLOSIONI
 func _on_reset_timeout():
-	explosion_container.reparent(self)
+	explosion_container.reparent(self) # faccio tornare come genitore del container il lich
 
+# METODO DELL'ATTACCO EVOCATION
 func evocation():
+	# calcolo la percentuale di vita in cui si trova
 	var _85_health = default_vit/100 * 85
 	var _70_health = default_vit/100 * 70
 	var _50_health = default_vit/100 * 50
@@ -504,14 +542,13 @@ func evocation():
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 	
+	# faccio partire il metodo dello scene manager per connettere i nemici spawnati con il player
 	get_parent().get_parent().connect_enemies_with_player()
-	evocation_cooldown.start()
+	evocation_cooldown.start() # faccio partire il cooldown
 
 
 
-func dying_sequence():
-	moving = false
-	sprite.play("death")
+# //////////// AREA COMUNE TRA NODI //////////// #
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
@@ -562,9 +599,3 @@ func show_hitmarker(dmg):
 	
 	hitmarker.get_child(0).text = dmg
 	get_tree().current_scene.add_child(hitmarker)
-
-
-
-
-
-

@@ -768,7 +768,7 @@ autostart = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 path_desired_distance = 192.0
-target_desired_distance = 100.0
+target_desired_distance = 140.0
 path_max_distance = 1000.0
 navigation_layers = 3
 avoidance_enabled = true

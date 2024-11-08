@@ -176,11 +176,11 @@ func choose_atk():
 		non è in range'
 
 func _on_player_is_in_atk_range(is_in, body):
-	if is_in and body == self:
-		is_in_atk_range = is_in
+	if is_in and body == self and not is_in_atk_range:
+		is_in_atk_range = true
 	else:
 		is_in_atk_range = false
-
+	
 'DIGEST DEL SEGNALE DEL PLAYER "take_dmg"
 {
 	PARAMETRI
@@ -281,6 +281,8 @@ func _on_stun_timeout():
 func set_health_bar():
 	healthbar.value = health
 	if health <= 0:
+		if player.char_name == "Nathan":
+			emit_signal("got_grabbed", false)
 		queue_free()
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB

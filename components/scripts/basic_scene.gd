@@ -7,20 +7,31 @@ var boss_defeted_count = 0
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 
-@onready var canvas_layer = find_child("CanvasLayer")
+# il nodo canvaslayer serve per fissare la gui allo schermo
+@onready var canvas_layer = find_child("CanvasLayer") 
+# contenitore della gui della scena
 @onready var gui = canvas_layer.find_child("GUI")
+# contenitore della gui di game over
 @onready var game_over_container = gui.find_child("GameOver_container")
+# contenitore della gui di selezione del player
 @onready var chara_container = gui.find_child("Chara_selector_container")
+# contenitore della gui del combattimento
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
+# music player che contiene la ost
 @onready var ost_player = $Ost_player
+# music player che contiene la ost di pausa
 @onready var pause_ost_player = $Pause_ost_player
+# music player che contiene la ost di game over
 @onready var game_over_ost = $CanvasLayer/GUI/GameOver_container/GameOver_song
+# contenitore della gui di pausa
 @onready var pause_gui = $CanvasLayer/Pause_GUI
+# riferimento all'animation player della pause gui
 @onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
+# variabile che contiene la gui specifica per quel player
 var player_gui
 
-@export var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
-@export var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
+var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
+var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
 
 var portal
 
@@ -78,15 +89,19 @@ func _on_gui_select_character(char):
 	add_child(player_scene.instantiate())
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
-	player.scale = Vector2(0.9, 0.9)
+	player.scale = Vector2(1.0, 1.0)
 	
 	# creo la telecamera
 	var camera = Camera2D.new()
+	
 	# impostazioni per la telecamera
 	camera.zoom = Vector2(1.6,1.6)
-	#camera.zoom = Vector2(0.5,0.5)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 3
+	
+	# debug: zoom diminuito
+	#camera.zoom = Vector2(0.5,0.5)
+	
 	# condizione per collegare lo script della telecamera
 	if char == "nathan":
 		camera.set_script(load("res://components/scripts/Camera2D.gd"))
@@ -100,11 +115,11 @@ func _on_gui_select_character(char):
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
 	
-'METODO CHE CONNETTE I SEGNALI AL PLAYER
-	cicla ogni nodo figlio della root nella scena,
-		se il figlio è diverso dal player e il nome di quel nodo contiene "Enemy" setta il pamaretro "player" del nemico con il player effettivo
-		successivamente connette i segnali di base,
-		se il player ha dei segnali particolari (tipo Nathan con "grab")'
+# METODO CHE CONNETTE I SEGNALI AL PLAYER
+#	cicla ogni nodo figlio della root nella scena,
+#		se il figlio è diverso dal player e il nome di quel nodo contiene "Enemy" setta il pamaretro "player" del nemico con il player effettivo
+#		successivamente connette i segnali di base,
+#		se il player ha dei segnali particolari (tipo Nathan con "grab")
 
 func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 	for i in active_enemy_container.get_child_count(): #cicla per ogni figlio della scena
@@ -130,39 +145,49 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				current_node.set_health_bar.connect(round_gui._on_boss_set_healthbar)
 
 func pause_game(get_paused):
-	if get_paused: # se non sono in pausa
-		get_tree().paused = true
-		ost_player.stream_paused = true
-		pause_ost_player.play(0)
-		pause_gui.visible = true
-	else: # se sono in pausa
-		get_tree().paused = false
-		pause_ost_player.stop()
-		ost_player.stream_paused = false
-		pause_gui.visible = false
+	if get_paused: # se il player mette in pausa
+		get_tree().paused = true # metto in pausa l'albero
+		ost_player.stream_paused = true # metto in pausa l'ost_player
+		pause_ost_player.play(0) # faccio partire da capo l'ost della pausa
+		pause_gui.visible = true # mostro il menu di pausa
+	else: # se il player vuole togliere la pausa
+		get_tree().paused = false # tolgo la pausa dell'albero
+		pause_ost_player.stop() # fermo completamente l'ost della pausa
+		ost_player.stream_paused = false # faccio riprendere l'ost
+		pause_gui.visible = false # nascondo il menu di pausa
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
+	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA_DELL'ATTACCO) / TEMPRA_BERSAGLIO
 	var dmg = round((str * atk_str) / tem)
-	var rng = randi_range(0, 100)
-	if pbc > rng:
+	var rng = randi_range(0, 100) # genero un numero casuale tra 0 e 100
+	if pbc > rng: # se la probabilità brutto colpo è più alta del numero generato (esempio: 30 > 20)
+		# aumento il danno in base all'efficienza del colpo critico (es. 15 * 1.5 = 15 + 7.5 = 22.5 = 23)
 		dmg = round(dmg * efc)
 	return dmg
 
+# DIGEST DEL SEGNALE DELLA PLAYER_GUI CHE NOTIFICA QUANDO GLI HP SCENDONO A 0
 func _on_player_death():
-	ost_player.stop()
-	game_over_ost.play()
+	ost_player.stop() # stoppo la musica
+	game_over_ost.play() # faccio partire l'ost di game over
 	gui.visible = true # la GUI diventa visibile
 	game_over_container.visible = true # rendo visibile il game over
 	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
 	player_gui.visible = false # nascondo la gui del player
+	
+	# metto il focus sul pulsante riprova nell menu di game over
 	$CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry.grab_focus()
 
 func activate_player_GUI():
-	if player.char_name == "Rufus":
+	# il pg scelto è Rufus allora insanzia la sua GUI
+	if player.char_name == "Rufus": 
 		canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
-	elif player.char_name == "Nathan":
+	# il pg scelto è Nathan allora insanzia la sua GUI
+	elif player.char_name == "Nathan": 
 		canvas_layer.add_child(load("res://scenes/GUI/nathan_gui.tscn").instantiate(),true)
+	# connetto il segnale dell'enemy_container attivo con il digest _on_get_healed del player
 	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)
+	
+	# assegno i parametri della GUI:
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
 	player_gui.player = player
 	player_gui.player_death.connect(self._on_player_death)
@@ -170,12 +195,18 @@ func activate_player_GUI():
 	player_gui.healthbar.max_value = player.default_vit
 	player_gui.healthbar.value = player.default_vit
 	player_gui.healthbar_label.text = str(player.default_vit) + "/" + str(player.default_vit)
+	# connetto infine il segnale del player al digest della GUI 
+	# in modo da poter aggiornare la GUI al variare della vita
 	player.set_health_bar.connect(player_gui._on_player_set_health_bar)
 
 func _on_boss_defeted():
+	# istanzio il portale
 	add_child(load("res://scenes/miscellaneous/travel_portal.tscn").instantiate(),true)
+	# assegno alla variabile portal l'ultimo child della lista, cioè il nodo appena istanziato
 	portal = get_child(get_child_count()-1)
+	# assegno il paramentro player del portale al layer attivo
 	portal.player = player
+	# collego il segnale del portale allo scene manager per cambiare stage
 	portal.change_stage.connect(self._on_change_stage)
 
 func _on_change_stage():
@@ -184,15 +215,19 @@ func _on_change_stage():
 	if boss_defeted_count == tilesets.size():
 		boss_defeted_count = 0
 	
+	# libero le variabili attive per riassegnarle
 	active_tileset.queue_free()
 	active_enemy_container.queue_free()
 	
+	# istanzio un nuovo nodo tileset e assegno quest'ultimo alla variabile del tileset attivo
 	add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
 	active_tileset = get_child(get_child_count(true)-1)
 	
+	# istanzio un nuovo nodo enemy_container e assegno quest'ultimo alla variabile enemy_container attivo
 	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
 	active_enemy_container = get_child(get_child_count(true)-1)
 	
+	# collego tutti i segnali del container ai rispettivi digest
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
 	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)

@@ -27,7 +27,7 @@ func _ready():
 	sprite.play("spawn")
 	origin = global_position
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if sprite.animation == "effect":
 		go_to_player()
 
@@ -68,4 +68,3 @@ func impact():
 	sprite.offset.y = -32
 	sprite.scale = Vector2(0.47,0.47)
 	sprite.play("impact")
-

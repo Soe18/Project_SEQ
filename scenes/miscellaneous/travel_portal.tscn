@@ -89,6 +89,7 @@ _data = {
 [node name="Portal" type="AnimatedSprite2D"]
 process_mode = 1
 z_index = -1
+y_sort_enabled = true
 position = Vector2(939, 518)
 scale = Vector2(0.274, 0.274)
 sprite_frames = SubResource("SpriteFrames_olbyp")

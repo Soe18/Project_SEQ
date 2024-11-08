@@ -1,121 +1,138 @@
 extends Node2D
 
-var markers = []
-var active_markers = []
+var markers = [] # array che contiene tutti i marker della scena
+var active_markers = [] # array che si popola allo spawnare dei nemici
+# array contenente i percorsi dei nemici
 var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
+# array che contiene il percorso del boss
 var boss_scene = "res://scenes/enemies/lich.tscn"
 
-signal round_changed()
-signal heal_between_rounds(amount)
-signal boss_defeted()
-signal connect_boss_with_GUI(boss)
+signal round_changed() # segnale che manda alla GUI per incrementare il counter
+signal heal_between_rounds(amount) # segnale che manda al player per curarlo
+signal boss_defeted() # segnale che manda allo scene_manager per evocare il portale
+signal connect_boss_with_GUI(boss) # segnale che collega il boss alla barra della vita
 
-var fighting
-var boss_is_defeted = false
-var boss_spawned = false
-var portal_spawned = false
+var fighting # flag che determina quando esistono nemici
+var boss_is_defeted = false # flag che determina quando il boss è stato sconfitto
+var boss_spawned = false # flag che determina se il boss è spawnato
+var portal_spawned = false # flag che determina se il portale è spawnato
 
 @onready var time_between_rounds = $Round_cooldown
 @onready var boss_spawner = $Boss_Spawner
 
 func _ready():
+	# popolo l'array con tutti gli spawnpoint
 	for i in get_children():
 		if "Spawnpoint" in i.name:
 			markers.append(i)
 
-'METODO CHE VIENE EVOCATO AD OGNI FRAME, CONTROLLA SE I NEMICI SONO ANCORA PRESENTI IN GAME'
+#METODO CHE VIENE EVOCATO AD OGNI FRAME, CONTROLLA SE I NEMICI SONO ANCORA PRESENTI IN GAME
 func _process(_delta):
-	fighting = false
-	var boss_present = false
-	for i in get_children():
-		if "Enemy" in i.name:
-			fighting = true
-		if "Enemy" in i.name and is_boss_round():
-			boss_present = true
+	fighting = false # do per scontato che la battaglia sia finita
+	var boss_present = false # do per scontato che il boss non ci sia
+	for i in get_children(): # controllo tutti i figli
+		if "Enemy" in i.name: # se esiste almeno un nemico
+			fighting = true # sto combattendo
+		if "Boss" in i.name and is_boss_round(): # se esiste un nemico E questo è il round del boss
+			boss_present = true # allora il boss è presente
 	
+	# se il boss è stato spawnato E non è presente
 	if boss_spawned and not boss_present:
-		boss_is_defeted = true
+		boss_is_defeted = true # allora il boss è stato sconfitto
 	
-	if not boss_is_defeted:
+	if not boss_is_defeted: # se il boss non è stato sconfitto
+		# se non ci sono nemici e non sto aspettando l'ondata successiva
 		if not fighting and time_between_rounds.is_stopped():
-			time_between_rounds.start()
-	else:
-		if not portal_spawned:
-			emit_signal("boss_defeted")
-			portal_spawned = true
+			time_between_rounds.start() # faccio partire il timer
+	else: # altrimenti
+		if not portal_spawned: # se il portale non è spawnato
+			emit_signal("boss_defeted") # invio il segnale allo scene_manager che il boss è stato sconfitto
+			portal_spawned = true # ciò vuol dire che il portale si apre
 
+# DIGEST DEL TIMER CHE DETERMINA QUANDO DEVE PARTIRE UNA NUOVA ONDATA
 func _on_round_cooldown_timeout():
-	emit_signal("round_changed")
-	emit_signal("heal_between_rounds", 50)
-	fighting = true
-	if is_boss_round() and not boss_is_defeted:
-		spawn_boss()
-		boss_spawned = true
-	else:
-		activate_markers()
+	emit_signal("round_changed") # invio il segnale al round_gui per incremetare l'ondata
+	emit_signal("heal_between_rounds", 50) # invio il segnale al player per curarsi di una certa quantità
+	fighting = true # di conseguenza i nemici spawneranno quindi combatto
+	if is_boss_round() and not boss_is_defeted: # se è il round del boss e il boss non è stato sconfitto
+		spawn_boss() # spawno il boss
+		boss_spawned = true # ricordo che l'ho spawnato
+	else: # altrimenti
+		activate_markers() # evoco semplicemente i nemici normali
 
+# METODO CHE ATTIVA I MARKER E SPAWNA I NEMICI IN BASE AL NUMERO DI ONDATA
 func activate_markers():
-	active_markers.clear()
+	active_markers.clear() # pulisco i marker attivi così da poter popolarlo correttamente
 	
+	# prendo il numero di ondata dalla round_gui
 	var round_count = get_parent().round_gui.round_count
 	
+	# determino il numero minimo di nemici arrotondando per difetto
 	var min_count = ceil(round_count/2)
 	
-	if min_count < 1:
-		min_count = 1
-	elif min_count > markers.size():
-		min_count = markers.size()
+	if min_count < 1: # se il minimo è minore di 1
+		min_count = 1 # lo metto a 1
+	elif min_count > markers.size(): # se è maggiore del numero massimo di marker
+		min_count = markers.size() # lo metto al massimo
 	
-	if min_count == 1 and round_count > 2:
-		min_count = 2
+	var max_count = round_count # il massimo di nemici è uguale al numero di round
+	if max_count < 1: # se il massimo è minore di 1
+		max_count = 1 # lo metto a 1
+	elif max_count > markers.size(): # se è maggiore del numero massimo di marker
+		max_count = markers.size() # lo metto al massimo
 	
-	var max_count = round_count
-	if max_count < 1:
-		max_count = 1
-	elif max_count > markers.size():
-		max_count = markers.size()
-	
+	# genero randomicamente un numero compreso tra il minimo e il massimo
+	# questo è il numero di nemici di questo round
 	var enemy_count = randi_range(min_count, max_count)
+	
 	#enemy_count = markers.size()
+	
+	# ///////////// PRINT DI DEBUG ///////////// #
 	print("round_count = " + str(round_count))
 	print("min_count = " + str(min_count))
 	print("max_count = " + str(max_count))
 	print("enemy_count = " + str(enemy_count))
+	# ///////////// PRINT DI DEBUG ///////////// #
 	
-	for i in enemy_count:
-		var out = false
-		while not out:
-			var marker = markers.pick_random()
-			if not marker in active_markers:
-				active_markers.append(marker)
-				out = true
+	for i in enemy_count: # ciclo con i < enemy_count
+		var out = false # instanzio un bool sentinella
+		while not out: # finché la sentinella è falsa
+			var marker = markers.pick_random() # prendo un marker casuale
+			if not marker in active_markers: # se il marker NON è già stato attivato
+				active_markers.append(marker) # attivo il marker
+				out = true # esco appena ne ho attivato uno
 	
-	for i in active_markers:
-		var out = false
-		var enemy_scene
-		while not out:
-			enemy_scene = possible_enemies.pick_random()
-			if round_count < 4:
-				if enemy_scene == possible_enemies[2]:
-					out = false
-				else:
-					out = true
-			else:
-				out = true
+	for i in active_markers: # ciclo i marker attivi
+		var out = false # instanzio un bool sentinella
+		var enemy_scene # dichiaro una variabile d'appoggio
+		while not out: # finché la sentinella è falsa
+			enemy_scene = possible_enemies.pick_random() # prendo un nemico casuale dalla pool
+			# se l'ondata è minore di 5 E il nemico selezionato è il gigante
+			if round_count < 5 and enemy_scene == possible_enemies[2]: 
+				out = false # non esco e ne seleziono un altro
+			else: # altrimenti
+				out = true # seleziono il percorso
 		
-		add_child(load(enemy_scene).instantiate(),true)
-		#add_child(load(possible_enemies[0]).instantiate(),true)
-		get_child(get_child_count()-1).position = i.position
+		add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
+		#add_child(load(possible_enemies[0]).instantiate(),true) # debug
+		
+		# setto la posizione del nemico spawnato al marker attivo
+		get_child(get_child_count()-1).position = i.position 
 
+# METODO CHE SPAWNA IL BOSS
 func spawn_boss():
-	add_child(load(boss_scene).instantiate(),true)
-	var active_boss = get_child(get_child_count()-1)
-	active_boss.position = boss_spawner.position
-	emit_signal("connect_boss_with_GUI", active_boss)
+	add_child(load(boss_scene).instantiate(),true) # instanzio come nodo figlio il boss
+	var active_boss = get_child(get_child_count()-1) # salvo il nodo del boss come variabile
+	active_boss.position = boss_spawner.position # metto la posizione del boss nel suo marker
+	# segnalo alla round_gui che il boss è spawnato e glielo passo
+	emit_signal("connect_boss_with_GUI", active_boss) 
 
+# METODO CHE CONTROLLA SE E' IL ROUND IN CUI DEVE SPAWNARE IL BOSS
 func is_boss_round():
-	var round_count = get_parent().round_gui.round_count
-	if round_count > 0 and round_count % 1 == 0:
-		return true
-	else:
-		return false
+	# prendo il numero di ondata dalla round_gui
+	var round_count = get_parent().round_gui.round_count 
+	# se il round_count è > 0 ed è divisibile per n (ogni quanti round far spawnare il boss)
+	if round_count > 0 and round_count % 10 == 0: 
+		return true # ritorno vero
+	else: # altrimenti
+		return false # ritorno falso

@@ -115,7 +115,7 @@ func spawn_boss():
 
 func is_boss_round():
 	var round_count = get_parent().round_gui.round_count
-	if round_count > 0 and round_count % 1 == 0:
+	if round_count > 0 and round_count % 10 == 0:
 		return true
 	else:
 		return false
