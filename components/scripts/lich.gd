@@ -558,8 +558,8 @@ func _on_area_of_detection_body_exited(body):
 	if body == player:
 		player_entered = false
 
-func _on_change_stats(stat, amount, time_duration):
-	if (is_in_atk_range and !grabbed) or time_duration == 0:
+func _on_change_stats(stat, amount, time_duration, ally_sender):
+	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
 		if "str" in stat:
 			current_str += amount
 		elif "tem" in stat:

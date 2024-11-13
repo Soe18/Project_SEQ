@@ -6,7 +6,7 @@ var current_vit = default_vit
 var current_str = default_str
 @export var default_tem : int = 148
 var current_tem = default_tem
-@export var default_des : int = 145
+@export var default_des : int = 130
 var current_des = default_des
 @export var default_pbc : int = 30
 var current_pbc = default_pbc
@@ -65,6 +65,7 @@ func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
+	$Update_Atk.wait_time = randf_range(3, 5.8)
 
 'METODO CHE VIENE PROCESSATO PER FRAME
 	controlla se il player è entrato in area e si può muovere
@@ -86,7 +87,7 @@ func _physics_process(_delta):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * 150
+				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
 				sprite.play("idle")
@@ -224,7 +225,7 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 	if is_been_grabbed and !grabbed and is_in_atk_range:
 		_on_inhale_time_timeout()
 		if player.char_name == "Nathan":
-				emit_signal("got_grabbed", true)
+			emit_signal("got_grabbed", true)
 		choosed_atk = Possible_Attacks.IDLE
 		$Update_Atk.stop()
 		moving = false
@@ -234,7 +235,7 @@ func _on_player_grab(is_been_grabbed, is_flipped):
 		healthbar.visible = false
 	if !is_been_grabbed and grabbed:
 		if player.char_name == "Nathan":
-				emit_signal("got_grabbed", false)
+			emit_signal("got_grabbed", false)
 		$Update_Atk.start()
 		moving = true
 		grabbed = false
@@ -317,7 +318,7 @@ func _on_earthquake_area_body_entered(body):
 func _on_earthquake_area_body_exited(body):
 	if body == player:
 		player_in_atk_range = false
-		player.current_multiplyer = player.OK_MULTIPLYER
+		player.current_des = player.default_des
 # -------- SIGNAL DIGEST -------- #
 
 func _on_sprite_2d_animation_finished():
@@ -332,8 +333,7 @@ func _on_sprite_2d_frame_changed():
 		else:
 			earthquake_effect.play("effect")
 
-'FUNZIONE PER L\'ATTACCO PUGNO'
-
+# FUNZIONE PER L'ATTACCO PUGNO
 func punch():
 	if stun_timer.is_stopped() and not grabbed:
 		$Punch_Cooldown.start()
@@ -357,12 +357,11 @@ func _on_effect_animation_finished():
 func _on_effect_frame_changed():
 	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
 		emit_signal("take_dmg", current_str, 3.5, 0, 0, 0)
-		if player.current_multiplyer == player.OK_MULTIPLYER:
-			player.current_multiplyer -= 200
+		if player.current_des == player.default_des:
+			player.current_des /= 2.5
 			player.status_sprite.play("debuff")
 
-'FUNZIONE PER L\'ATTACCO TERREMOTO'
-
+# FUNZIONE PER L'ATTACCO TERREMOTO'
 func earthquake():
 	if player_entered and stun_timer.is_stopped() and not grabbed:
 		$Earthquake_Cooldown.start()
@@ -371,8 +370,7 @@ func earthquake():
 		sprite.play("earthquake")
 		earthquake_area.process_mode = Node.PROCESS_MODE_INHERIT
 
-'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
-
+# DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
 func _on_inhale_time_timeout():
 	sprite.position = Vector2(0,0)
 	moving = true
@@ -385,13 +383,14 @@ func _on_inhale_time_timeout():
 
 func _on_update_atk_timeout():
 	choose_atk()
+	$Update_Atk.wait_time = randf_range(3, 5.8)
 	$Update_Atk.start()
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 
-func _on_change_stats(stat, amount, time_duration):
-	if (is_in_atk_range and !grabbed) or time_duration == 0:
+func _on_change_stats(stat, amount, time_duration, ally_sender):
+	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
 		if "str" in stat:
 			current_str += amount
 		elif "tem" in stat:

@@ -1,8 +1,13 @@
 extends Node2D
 
-var markers = []
-var active_markers = []
+var markers = [] # array che contiene tutti i marker della scena
+var active_markers = [] # array che si popola allo spawnare dei nemici
+# array contenente i percorsi dei nemici
 var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
+# [0] = Zombie
+# [1] = Scheletro
+# [2] = Gigante
+
 var boss_scene = "res://scenes/enemies/lich.tscn"
 
 signal round_changed()

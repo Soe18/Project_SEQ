@@ -1,6 +1,6 @@
 extends Control
 
-var round_count = 1
+var round_count = 2
 @onready var round_displayer = $MarginContainer/PanelContainer/Round_displayer
 
 @onready var healthbar = $Boss_GUI/Health_bar
@@ -21,7 +21,7 @@ func _on_round_changed():
 
 func _on_boss_set_healthbar(vit):
 	if vit <= 0:
-		if get_parent().player.char_name == "Nathan":
+		if get_parent().get_parent().player.char_name == "Nathan":
 			emit_signal("got_grabbed", false)
 		boss.dying = true
 		boss.update_atk_timer.stop()

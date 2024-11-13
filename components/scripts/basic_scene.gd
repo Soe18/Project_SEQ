@@ -124,7 +124,10 @@ func _on_gui_select_character(char):
 func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 	for i in active_enemy_container.get_child_count(): #cicla per ogni figlio della scena
 		var current_node = active_enemy_container.get_child(i)
-		if "Enemy" in current_node.name: #se il nome del nemico contiene "Enemy"
+		
+		#se il nome del nemico contiene "Enemy"
+		if "Enemy" in current_node.name: 
+			# assegno il parametro player del nemico con il player attivo
 			current_node.player = player
 			# segnale tra player e nemici per capire se si è in range
 			player.is_in_atk_range.connect(current_node._on_player_is_in_atk_range)
@@ -132,16 +135,30 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			player.take_dmg.connect(current_node._on_player_take_dmg)
 			# segnale tra nemici e player per infliggere danno
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
+			
 			# se il player ha scelto nathan
 			if player.char_name == "Nathan":
 				# connetto il segnale della grab
 				player.grab.connect(current_node._on_player_grab)
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
-			else:
+			elif player.char_name == "Rufus":
 				player.change_stats.connect(current_node._on_change_stats)
+			
+			# se il nodo è un mezzo-umano
+			if "Werewolf" in current_node.name:
+				for j in active_enemy_container.get_child_count(): # cicla per ogni figlio della scena
+					var node = active_enemy_container.get_child(j) # prendo il singolo nodo
+					if "Enemy" in node.name: # se il nome del nemico contiene "Enemy"
+						current_node.change_stats.connect(node._on_change_stats) # connetto il segnale ad ogni nemico
+			
+			# se il nodo è il lich
 			if "Lich" in current_node.name:
+				# allora assegno i suoi marker di teletrasporto ai marker dell'enemy container attivo
 				current_node.possible_teleport_locations = active_enemy_container.markers
+			
+			# se il nodo è un boss
 			if "Boss" in current_node.name:
+				# allora connetto il segnale della barra della vita alla gui
 				current_node.set_health_bar.connect(round_gui._on_boss_set_healthbar)
 
 func pause_game(get_paused):

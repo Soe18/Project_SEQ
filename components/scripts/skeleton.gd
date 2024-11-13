@@ -6,7 +6,7 @@ var current_vit = default_vit
 var current_str = default_str
 @export var default_tem : int = 100
 var current_tem = default_tem
-@export var default_des : int = 145
+@export var default_des : int = 150
 var current_des = default_des
 @export var default_pbc : int = 30
 var current_pbc = default_pbc
@@ -84,7 +84,7 @@ func _physics_process(_delta):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * 150
+				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
 				sprite.play("idle")
@@ -399,8 +399,8 @@ func _on_sprite_2d_animation_finished():
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 
-func _on_change_stats(stat, amount, time_duration):
-	if (is_in_atk_range and !grabbed) or time_duration == 0:
+func _on_change_stats(stat, amount, time_duration, ally_sender):
+	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
 		if "str" in stat:
 			current_str += amount
 		elif "tem" in stat:

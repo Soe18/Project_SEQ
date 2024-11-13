@@ -553,7 +553,7 @@ func _on_get_healed(amount):
 		current_vit = default_vit
 	emit_signal("set_health_bar", current_vit)
 
-func _on_change_stats(stat, amount, time_duration):
+func _on_change_stats(stat, amount, time_duration, _ally_sender):
 		if "str" in stat:
 			current_str += amount
 		elif "tem" in stat:

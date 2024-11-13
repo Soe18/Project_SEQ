@@ -27,12 +27,10 @@ signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
-signal change_stats(stat, amount, time_duration)
+signal change_stats(stat, amount, time_duration, ally_sender)
 
 var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
-@export var OK_MULTIPLYER : float = 350.0
-var current_multiplyer = OK_MULTIPLYER
 @export var ACCELERATION : float = 10000.0
 @export var FRICTION : float = 7000.0
 
@@ -113,75 +111,6 @@ func _physics_process(delta):
 	altrimenti ci sarebbe il personaggio flippato ma l\'area rimane dall\'altra
 	parte'
 
-'func move():
-	# Reset velocity
-	velocity = Vector2(0, 0)
-	
-	" Implemento Last Win "
-	# Controllo se vecchi input sono stati rilasciati
-	if Input.is_action_just_released("move_up"):
-		sprite.play("idle")
-		# Se è stato rilasciato, metto altro input, se esiste ancora
-		if Input.is_action_pressed("move_down"):
-			move_vertical = Move_Keys.DOWN
-		# Se non esiste più, nessun tasto premuto, fermare personaggio
-		else:
-			move_vertical = null
-	if Input.is_action_just_released("move_down"):
-		sprite.play("idle")
-		if Input.is_action_pressed("move_up"):
-			move_vertical = Move_Keys.UP
-		else:
-			move_vertical = null
-	if Input.is_action_just_released("move_left"):
-		sprite.play("idle")
-		if Input.is_action_pressed("move_right"):
-			move_horizontal = Move_Keys.RIGHT
-		else:
-			move_horizontal = null
-	if Input.is_action_just_released("move_right"):
-		sprite.play("idle")
-		if Input.is_action_pressed("move_left"):
-			move_horizontal = Move_Keys.LEFT
-		else:
-			move_horizontal = null
-	
-	# Controllo se vengono inseriti nuovi input
-	if Input.is_action_just_pressed("move_up"):
-		move_vertical = Move_Keys.UP
-	if Input.is_action_just_pressed("move_down"):
-		move_vertical = Move_Keys.DOWN
-	if Input.is_action_just_pressed("move_left"):
-		move_horizontal = Move_Keys.LEFT
-	if Input.is_action_just_pressed("move_right"):
-		move_horizontal = Move_Keys.RIGHT
-	
-	" Muovo giocatore "
-	if move_vertical == Move_Keys.UP:
-		velocity.y = -current_multiplyer
-		sprite.play("Running")
-		
-	elif move_vertical == Move_Keys.DOWN:
-		velocity.y = +current_multiplyer
-		sprite.play("Running")
-		
-	if move_horizontal == Move_Keys.LEFT:
-		velocity.x = -current_multiplyer
-		flip_sprite(true)
-		sprite.play("Running")
-	elif move_horizontal == Move_Keys.RIGHT:
-		velocity.x = +current_multiplyer
-		flip_sprite(false)
-		sprite.play("Running")
-	
-	if move_vertical != null and move_horizontal != null:
-		# Teoricamente equivalente a fare il vettore serialized
-		velocity.x = velocity.x/sqrt(2)
-		velocity.y = velocity.y/sqrt(2)
-	
-	# Finalmente, muoviamo il player
-	move_and_slide()'
-
 func move(delta):
 	axis = get_input_axis()
 	if axis == Vector2.ZERO:
@@ -210,7 +139,7 @@ func apply_friction(amount):
 
 func apply_movement(accel):
 	velocity += accel
-	velocity = velocity.limit_length(current_multiplyer)
+	velocity = velocity.limit_length(current_des * 2.5)
 
 'METODO CHE GESTISCE TUTTE LE ABILITA\' DEL PLAYER
 	ad ogni if si controlla l\'azione possibile, per l\'attacco di base si trovano
@@ -326,7 +255,7 @@ func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
-		emit_signal("change_stats", "tem", -25, 10)
+		emit_signal("change_stats", "tem", -25, 10, false)
 
 func _on_skill_2_area_body_exited(body):
 	if body != self:
@@ -555,7 +484,7 @@ func _on_get_healed(amount):
 	status_sprite.play("recover")
 	emit_signal("set_health_bar", current_vit)
 
-func _on_change_stats(stat, amount, time_duration):
+func _on_change_stats(stat, amount, time_duration, _ally_sender):
 		if "str" in stat:
 			current_str += amount
 		elif "tem" in stat:
