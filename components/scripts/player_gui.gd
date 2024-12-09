@@ -47,6 +47,7 @@ func _on_nathan_grab(is_grabbed):
 	if is_grabbed:
 		player.skill2_cooldown.stop()
 		skill2_cooldown_time.tint_under = Color(Color.RED,1)
+		player._on_get_healed(player.bite_heal_force)
 	else:
 		player.skill2_cooldown.start()
 		skill2_cooldown_time.tint_under = Color(Color.WHITE,1)

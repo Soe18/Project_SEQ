@@ -82,6 +82,7 @@ z_index = 2
 
 [node name="Dmg_display" type="Label" parent="."]
 self_modulate = Color(1, 1, 1, 0)
+z_index = 99
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

@@ -28,8 +28,8 @@ signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
+signal inflict_knockback(amount, time, sender)
 
-var cooldown_state = {"sk1":false, "sk2":false, "eva":false, "ult":false}
 
 @export var ACCELERATION : float = 10000.0
 @export var FRICTION : float = 7000.0
@@ -96,9 +96,8 @@ func _ready():
 func _physics_process(delta):
 	if can_move:
 		move(delta)
-		#move(delta)
 	if stun_timer.is_stopped():
-		base_atk()
+		atk_handler()
 	if is_evading:
 		evade()
 	if is_moving_ult:
@@ -147,7 +146,7 @@ func apply_movement(accel):
 	si controlla come prima cosa se l\'input è stato premuto, se l\'animazione è diversa da idle o running (ovvero o è fermo
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
-func base_atk():
+func atk_handler():
 	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "Running") and atk_anim_finished:
 		can_move = false
 		bs_atk_collider.disabled = false
@@ -180,7 +179,7 @@ func base_atk():
 		$Combo_time.stop()
 		sprite.play("base atk5")
 	
-	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk1"]:
+	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and skill1_cooldown.is_stopped():
 		skill1_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK1
@@ -189,9 +188,8 @@ func base_atk():
 		skill1_effect.play("effect")
 		axis = Vector2.ZERO
 	
-	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["eva"]:
+	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and eva_cooldown.is_stopped():
 		eva_cooldown.start()
-		cooldown_state["eva"] = true
 		can_move = false
 		atk_state = Atk_States.EVA
 		$Eva_time.start()
@@ -199,7 +197,7 @@ func base_atk():
 		eva_collider.disabled = false
 		is_evading = true
 	
-	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["sk2"]:
+	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "Running") and skill2_cooldown.is_stopped():
 		skill2_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK2
@@ -207,7 +205,7 @@ func base_atk():
 		skill2_effect.play("effect")
 		axis = Vector2.ZERO
 
-	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and !cooldown_state["ult"]:
+	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and ulti_cooldown.is_stopped():
 		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
@@ -255,7 +253,9 @@ func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
-		emit_signal("change_stats", "tem", -25, 10, false)
+		emit_signal("change_stats", "tem", -25, 3, false)
+		emit_signal("inflict_knockback", 600, 0.2, self.global_position)
+		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
 	if body != self:
@@ -265,6 +265,7 @@ func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, 70, 6, current_pbc, current_efc)
+		emit_signal("inflict_knockback", 900, 0.3, self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -289,29 +290,29 @@ func flip_sprite(flip):
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
 		$Combo_time.start()
@@ -329,8 +330,8 @@ func _on_sprite_2d_animation_finished():
 
 func _on_sprite_2d_frame_changed():
 	if sprite.frame == 4 and sprite.animation == "base atk5":
-		bs_atk_collider.disabled = true
-		bs_atk_collider.disabled = false
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 13, 0.5, current_pbc, current_efc)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
@@ -343,10 +344,17 @@ func _on_effect_frame_changed():
 		emit_signal("take_dmg", current_str, 20, 0.6, current_pbc, current_efc)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
-		skill2_collider.disabled = false
+		skill2_collider.set_deferred("disabled", false)
+	
+	elif skill2_effect.frame == 3 and atk_state == Atk_States.SK2:
+		skill2_collider.set_deferred("disabled", true)
+	
+	if ult_effect.frame == 5:
+		ult_collider.set_deferred("disabled", true)
 
+# METODO CHE FA MUOVERE LO SPRITE IN ALTO DURANTE L'ANIMAZIONE DELLA ULTI #
 func ult_moving():
-	body_collider.disabled = true
+	body_collider.set_deferred("disabled", true)
 	sprite.z_index = 1
 	sprite.position.y += ult_moving_mod
 	if sprite.flip_h:
@@ -360,7 +368,7 @@ func ult_moving():
 		is_moving_ult = false
 		sprite.play()
 
-'  -- set_idle mi permette di resettare il player allo stato di idle --  '
+#  -- set_idle mi permette di resettare il player allo stato di idle --  #
 func _on_set_idle():
 	axis = Vector2.ZERO
 	
@@ -399,21 +407,18 @@ func _on_ult_time_timeout():
 '  -- quando finisce l\'effetto della skill allora disattivo l\'area e setto ad idle --  '
 func _on_effect_animation_finished():
 	if atk_state == Atk_States.SK1:
-		cooldown_state["sk1"] = true
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.SK2:
-		cooldown_state["sk2"] = true
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.ULT:
-		cooldown_state["ult"] = true
 		$Ult_area/Ult_time.start()
 
 func _on_eva_time_timeout():
 	emit_signal("set_idle")
 
-func _on_comb_time_timeout():
+func _on_combo_time_timeout():
 	emit_signal("set_idle")
 
 'METODO CHE GESTISCE L\'EVASIONE IN BASE ALLA DIREZIONE PREMUTA'
@@ -447,19 +452,6 @@ func evade():
 	else:
 		velocity.x += 35
 	move_and_slide()
-
-'  -- GESTIONE COOLDOWN --  '
-func _on_skill_1_cooldown_timeout():
-	cooldown_state["sk1"] = false
-
-func _on_skill_2_cooldown_timeout():
-	cooldown_state["sk2"] = false
-
-func _on_eva_cooldown_timeout():
-	cooldown_state["eva"] = false
-
-func _on_ult_cooldown_timeout():
-	cooldown_state["ult"] = false
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
@@ -506,6 +498,7 @@ func _on_change_stats(stat, amount, time_duration, _ally_sender):
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
+			new_timer.reset_stats.connect(self._on_change_stats)
 			new_timer.start()
 
 func _on_status_alert_sprite_animation_finished():

@@ -24,4 +24,3 @@ func _on_sprite_2d_animation_finished():
 func _on_sprite_2d_frame_changed():
 	if sprite.frame == 1:
 		area_of_effect.set_deferred("disabled", false)
-

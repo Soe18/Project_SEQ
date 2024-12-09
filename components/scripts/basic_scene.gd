@@ -33,13 +33,16 @@ var player_gui
 var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
 var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
 
+const RUFUS_ENEMY_REACH = [90, 100, 140, 60, 325]
+const NATHAN_ENEMY_REACH = [90, 100, 180, 80, 325]
+
 var portal
 
 func _ready():
-	add_child(load(tilesets[0]).instantiate(),true)
+	add_child(load(tilesets[1]).instantiate(),true)
 	active_tileset = get_child(get_child_count(true)-1)
 	
-	add_child(load(enemy_containers[0]).instantiate(),true)
+	add_child(load(enemy_containers[1]).instantiate(),true)
 	active_enemy_container = get_child(get_child_count(true)-1)
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
@@ -52,6 +55,9 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
+	
+	if Input.is_action_just_pressed("reload_scene"):
+		get_tree().change_scene_to_file("res://scenes/basic_scene.tscn")
 	
 	if player != null:
 		# Gestione del menu di pausa
@@ -143,6 +149,7 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
 			elif player.char_name == "Rufus":
 				player.change_stats.connect(current_node._on_change_stats)
+				player.inflict_knockback.connect(current_node.init_knockback)
 			
 			# se il nodo è un mezzo-umano
 			if "Werewolf" in current_node.name:
@@ -150,6 +157,9 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 					var node = active_enemy_container.get_child(j) # prendo il singolo nodo
 					if "Enemy" in node.name: # se il nome del nemico contiene "Enemy"
 						current_node.change_stats.connect(node._on_change_stats) # connetto il segnale ad ogni nemico
+			
+			if "Fae" in current_node.name:
+				current_node.flee_locations = active_enemy_container.markers
 			
 			# se il nodo è il lich
 			if "Lich" in current_node.name:
@@ -174,6 +184,8 @@ func pause_game(get_paused):
 		pause_gui.visible = false # nascondo il menu di pausa
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
+	if tem <= 0:
+		tem = 1
 	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA_DELL'ATTACCO) / TEMPRA_BERSAGLIO
 	var dmg = round((str * atk_str) / tem)
 	var rng = randi_range(0, 100) # genero un numero casuale tra 0 e 100

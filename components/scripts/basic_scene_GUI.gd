@@ -1,6 +1,6 @@
 extends Control
 
-var round_count = 2
+var round_count = 0
 @onready var round_displayer = $MarginContainer/PanelContainer/Round_displayer
 
 @onready var healthbar = $Boss_GUI/Health_bar
@@ -26,7 +26,10 @@ func _on_boss_set_healthbar(vit):
 		boss.dying = true
 		boss.update_atk_timer.stop()
 		boss.set_idle_timer.stop()
+		boss.stun_timer.stop()
 		animation_player.play("delete_boss_bar")
+	if vit > max_health:
+			vit = max_health
 	healthbar.value = vit
 	healthbar_label.text = boss.boss_name + ": " + str(vit) + "/" + str(max_health)
 

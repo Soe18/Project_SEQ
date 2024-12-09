@@ -1,8 +1,9 @@
-[gd_scene load_steps=85 format=3 uid="uid://dc4r0c3q4h1vo"]
+[gd_scene load_steps=86 format=3 uid="uid://dc4r0c3q4h1vo"]
 
 [ext_resource type="Script" path="res://components/scripts/skeleton.gd" id="1_ug4iq"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_64tus"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_lkymh"]
+[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_s0ujm"]
 [ext_resource type="Texture2D" uid="uid://5sc13wn7j33m" path="res://components/sprites/enemies/skeleton/skeleton_damaged.png" id="3_spfhf"]
 [ext_resource type="Texture2D" uid="uid://c12bybbikpkaw" path="res://components/sprites/enemies/skeleton/skeleton_dying.png" id="4_pey7m"]
 [ext_resource type="Texture2D" uid="uid://bsk3u3mw8jwhn" path="res://components/sprites/enemies/skeleton/skeleton_idle.png" id="5_hg8k2"]
@@ -509,7 +510,7 @@ bg_color = Color(1, 0, 0.0352941, 1)
 radius = 818.022
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kr4ka"]
-size = Vector2(63.5, 120)
+size = Vector2(63.5, 126)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pal7e"]
 atlas = ExtResource("13_qvr52")
@@ -567,6 +568,7 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_ug4iq")
 damage_node = ExtResource("2_64tus")
+knockback_timer_node = ExtResource("3_s0ujm")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(0, -59)
@@ -625,22 +627,17 @@ debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
-visible = false
-position = Vector2(40.25, 16)
+position = Vector2(48.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0, 0, 0.0784314)
 
 [node name="Effect" type="AnimatedSprite2D" parent="Basic_atk_Area"]
-position = Vector2(49, 12)
+position = Vector2(57, 12)
 scale = Vector2(0.0875, 0.133333)
 sprite_frames = SubResource("SpriteFrames_g7j7j")
 animation = &"idle"
 autoplay = "idle"
 flip_h = true
-
-[node name="Inhale_time" type="Timer" parent="."]
-wait_time = 0.8
-one_shot = true
 
 [node name="Basic_atk_Cooldown" type="Timer" parent="."]
 wait_time = 3.0
@@ -648,6 +645,10 @@ one_shot = true
 
 [node name="Parry_Cooldown" type="Timer" parent="."]
 wait_time = 6.0
+one_shot = true
+
+[node name="Parry_time" type="Timer" parent="."]
+wait_time = 5.0
 one_shot = true
 
 [node name="Update_Atk" type="Timer" parent="."]
@@ -664,9 +665,8 @@ wait_time = 4.0
 one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 71.3
+path_desired_distance = 90.0
 target_desired_distance = 100.0
-path_max_distance = 1000.0
 navigation_layers = 3
 avoidance_enabled = true
 radius = 20.0
@@ -682,7 +682,7 @@ max_speed = 1703.04
 [connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered"]
 [connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited"]
 [connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished"]
-[connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
+[connection signal="timeout" from="Parry_time" to="." method="_on_parry_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
 [connection signal="timeout" from="Soul_delay_time" to="." method="_on_soul_delay_time_timeout"]
 [connection signal="timeout" from="Soul_respawn_time" to="." method="_on_soul_respawn_time_timeout"]

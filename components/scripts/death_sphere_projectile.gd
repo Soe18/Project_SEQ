@@ -55,6 +55,7 @@ func _on_sprite_2d_animation_finished():
 		sprite.rotation_degrees = -90
 		look_at(player.global_position)
 		reparent(get_parent().get_parent())
+		player_position = player.global_position
 	else:
 		queue_free()
 

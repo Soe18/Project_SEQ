@@ -4,7 +4,6 @@
 
 [node name="Knockback_timer" type="Timer"]
 one_shot = true
-autostart = true
 script = ExtResource("1_kgfaa")
 
 [connection signal="timeout" from="." to="." method="_on_timeout"]

@@ -16,6 +16,7 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
+@export var knockback_timer_node : PackedScene
 
 # attributo contenente le scene dei proiettili
 @export var witchcraft_scene : PackedScene
@@ -25,6 +26,11 @@ var current_efc = default_efc
 var is_in_atk_range = false
 var moving = true # variabile che gestisce lo stun
 var grabbed = false # variabile che gestisce il grab
+var grab_position
+var knockbacked = false
+var knockback_force = 0
+var knockback_sender
+
 var spawning = true # variabile a true finché non finisce l'animazione di spawning, altrimenti false
 var dying = false # variabile a false finché il boss è in vita, poi a true per l'animazione di death
 
@@ -72,8 +78,9 @@ var choosed_atk
 var player_entered = true
 var player_in_atk_range = false
 
-# array da popolare nel ready, in modo da essere scalabile
 var possible_teleport_locations = []
+
+# array da popolare nel ready, in modo da essere scalabile
 var first_round_explosions = []
 var second_round_explosions = []
 var third_round_explosions = []
@@ -124,7 +131,9 @@ func _physics_process(_delta):
 		moving = false # non si deve muovere
 		sprite.play("death") # faccio partire l'animazione di morte
 	elif not spawning: # se non sta spawnando e non è morto allora sta combattendo
-		if player_entered and moving: # se vede il player (quindi è vivo) e può muoversi (non è stunnato)
+		if knockbacked:
+			apply_knockback(knockback_sender)
+		elif player_entered and moving: # se vede il player (quindi è vivo) e può muoversi (non è stunnato)
 			if player and not grabbed: # se esiste il player e non è grabbato gestisco gli attacchi
 				
 				# se l'attacco è TELEPORT e il cooldown è finito
@@ -140,7 +149,7 @@ func _physics_process(_delta):
 					death_sphere() # faccio partire il metodo death_sphere()
 				
 				# se l'attacco è ESPLOSIONS e il cooldown è finito
-				if choosed_atk == Possible_Attacks.EXPLOSIONS and explosions_cooldown.is_stopped() and stun_timer.is_stopped():
+				if choosed_atk == Possible_Attacks.EXPLOSIONS and explosions_cooldown.is_stopped() and stun_timer.is_stopped() and (second_round_timer.is_stopped() and third_round_timer.is_stopped() and reset_explosions.is_stopped()):
 					sprite.play("explosions") # faccio partire l'animazione del lich, vedi _on_sprite_animation_finished
 				
 				# se l'attacco è EVOCATION e il cooldown è finito
@@ -153,8 +162,6 @@ func _physics_process(_delta):
 				sprite.play("idle")
 		elif not player_entered and not moving: # se il player non è dentro e non può muoversi
 			sprite.play("idle") # lo metto in idle, non ha niente da fare tanto
-		elif grabbed: # se è grabbato faccio partire il metodo apposito
-			is_grabbed()
 
 # METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
 #	salvo la posizione attuale del player
@@ -238,82 +245,28 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 				stun_timer.start()
 				sprite.play("damaged")
 
-# DIGEST DEL SENGALE DEL PLAYER "grab"
-# {
-# 	PARAMETRI
-# 	boolean is_been_grabbed: controlla se il segnale è di entrata o di uscita dalla grab
-# 	booelan is_flipped: indica se il player è flippato o meno
-# }
-# se il segnale è di grab, il nodo non è già grabbato e il nodo è in range
-# 	faccio ricevere un danno al nodo
-# 	tolgo la possibilità di muoversi del nodo
-# 	setto il grabbed a true
-# 	lo sprite diventa invisibile
-# 	disattivo le collisioni
-# se il segnale è di uscita dalla grab e il nodo è grabbato
-# 	il nodo potrà di nuovo muoversi
-# 	setto il grabbed a false
-# 	se il nodo è flipped
-# 		spinge il nodo a sinistra di 450
-# 	altrimenti
-# 		spinge il nodo a destra di 450
-# 	lo sprite diventa visibile
-# 	faccio partire un timer per risettare le collisioni, se le riabilito insieme avviene un bug
+# DIGEST DEL SENGALE DEL PLAYER "grab" #
 
-func _on_player_grab(is_been_grabbed, is_flipped):
-	if not spawning:
-		if is_been_grabbed and !grabbed and is_in_atk_range:
-			if player.char_name == "Nathan":
-				emit_signal("got_grabbed", true)
-			_on_inhale_time_timeout()
-			choosed_atk = Possible_Attacks.IDLE
-			$Update_Atk.stop()
-			moving = false
-			grabbed = true
-			sprite.visible = false
-			body_collider.disabled = true
-		if !is_been_grabbed and grabbed:
-			if player.char_name == "Nathan":
-				emit_signal("got_grabbed", false)
-			$Update_Atk.start()
-			moving = true
-			grabbed = false
-			if is_flipped:
-				position.x = player.position.x + -450
-			else:
-				position.x = player.position.x + 450
-			sprite.visible = true
-			move_and_slide()
-			$GrabTime.start()
-
-'METODO CHE TELETRASPORTA IL NODO NELLA POSIZIONE DEL PLAYER DURANTE LA GRAB
-	setto la posizione uguale a quella del player'
-
-func is_grabbed():
-	position = player.position
+func _on_player_grab(is_been_grabbed, is_flipped, grab_position_marker):
+	# QUESTO BOSS NON E' GRABBABILE
+	pass
 
 'DIGEST DEL TIMER "Stun"
 	setto il movimento a true'
 
 func _on_stun_timeout():
 	choosed_atk = Possible_Attacks.IDLE
-	_on_inhale_time_timeout()
-
-'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
-	setto le collisioni a true'
-
-func _on_timer_timeout():
-	body_collider.disabled = false
+	set_idle()
 
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
-### TODO refactor di tutti questi metodi perché è deprecato
-func _on_inhale_time_timeout():
-	moving = true
-	choosed_atk = Possible_Attacks.IDLE
-	sprite.play("idle")
+func set_idle():
+	if not knockbacked:
+		moving = true
+		choosed_atk = Possible_Attacks.IDLE
+		sprite.play("idle")
 
 # DIGEST DI QUANDO LO SPRITE CAMBIA IL FRAME DI ANIMAZIONE
 func _on_sprite_2d_frame_changed():
@@ -334,12 +287,12 @@ func _on_sprite_2d_animation_finished():
 		self.name = "Slayed"
 		process_mode = Node.PROCESS_MODE_DISABLED
 	elif sprite.animation == "witchcraft":
-		_on_inhale_time_timeout()
+		set_idle()
 	elif sprite.animation == "death_sphere":
-		_on_inhale_time_timeout()
+		set_idle()
 	elif sprite.animation == "evocation":
 		evocation()
-		_on_inhale_time_timeout()
+		set_idle()
 
 # DIGEST DEL TIMER CHE SEGNALA DI SCEGLIERE UN ATTACCO
 func _on_update_atk_timeout():
@@ -349,7 +302,7 @@ func _on_update_atk_timeout():
 # METODO CHE FA TELETRASPORTARE IL LICH IN UNO DEI WAYPOINT
 func teleport():
 	var current_tp = possible_teleport_locations.pick_random()
-	self.global_position = current_tp.global_position
+	self.position = current_tp.global_position
 	teleport_cooldown.start()
 
 # METODO CHE FA PARTIRE L'ANIMAZIONE DELL'ATTACCO WITCHCRAFT
@@ -390,33 +343,34 @@ func launch_death_sphere():
 
 # METODO CHE FA PARTIRE IL PRIMO ROUND DI ESPLOSIONI
 func explosions():
-	explosion_container.reparent(get_parent())
 	for i in first_round_explosions:
 		if player != null:
 			add_child(explosion_scene.instantiate(),true)
-			var instantiate_explosion = get_child(get_child_count()-1)
-			instantiate_explosion.position = i.position
-			instantiate_explosion.player = player
-			instantiate_explosion.lich_str = current_str
-			instantiate_explosion.lich_pbc = current_pbc
-			instantiate_explosion.lich_efc = current_efc
-			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			var instantiated_explosion = get_child(get_child_count()-1,true)
+			instantiated_explosion.position = i.position
+			instantiated_explosion.player = player
+			instantiated_explosion.lich_str = current_str
+			instantiated_explosion.lich_pbc = current_pbc
+			instantiated_explosion.lich_efc = current_efc
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.reparent(get_parent())
 	second_round_timer.start() # faccio partire il timer per il secondo round
 	explosions_cooldown.start() # faccio partire il cooldown
-	_on_inhale_time_timeout()
+	sprite.play("idle")
 
 # METODO CHE FA PARTIRE IL SECONDO ROUND DI ESPLOSIONI
 func _on_second_round_timer_timeout():
 	for i in second_round_explosions:
 		if player != null:
 			add_child(explosion_scene.instantiate(),true)
-			var instantiate_explosion = get_child(get_child_count()-1)
-			instantiate_explosion.position = i.position
-			instantiate_explosion.player = player
-			instantiate_explosion.lich_str = current_str
-			instantiate_explosion.lich_pbc = current_pbc
-			instantiate_explosion.lich_efc = current_efc
-			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			var instantiated_explosion = get_child(get_child_count()-1,true)
+			instantiated_explosion.position = i.position
+			instantiated_explosion.player = player
+			instantiated_explosion.lich_str = current_str
+			instantiated_explosion.lich_pbc = current_pbc
+			instantiated_explosion.lich_efc = current_efc
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.reparent(get_parent())
 	third_round_timer.start() # faccio partire il timer per il terzo round
 
 # METODO CHE FA PARTIRE IL TERZO ROUND DI ESPLOSIONI
@@ -424,18 +378,19 @@ func _on_third_round_timer_timeout():
 	for i in third_round_explosions:
 		if player != null:
 			add_child(explosion_scene.instantiate(),true)
-			var instantiate_explosion = get_child(get_child_count()-1)
-			instantiate_explosion.position = i.position
-			instantiate_explosion.player = player
-			instantiate_explosion.lich_str = current_str
-			instantiate_explosion.lich_pbc = current_pbc
-			instantiate_explosion.lich_efc = current_efc
-			instantiate_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			var instantiated_explosion = get_child(get_child_count()-1,true)
+			instantiated_explosion.position = i.position
+			instantiated_explosion.player = player
+			instantiated_explosion.lich_str = current_str
+			instantiated_explosion.lich_pbc = current_pbc
+			instantiated_explosion.lich_efc = current_efc
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.reparent(get_parent())
 	reset_explosions.start() # faccio partire il timer per resettare le esplosioni
 
 # DIGEST DEL SEGNALE DI RESET DELLE ESPLOSIONI
 func _on_reset_timeout():
-	explosion_container.reparent(self) # faccio tornare come genitore del container il lich
+	set_idle()
 
 # METODO DELL'ATTACCO EVOCATION
 func evocation():
@@ -558,6 +513,27 @@ func _on_area_of_detection_body_exited(body):
 	if body == player:
 		player_entered = false
 
+func init_knockback(amount, time, sender):
+	if is_in_atk_range and not grabbed:
+		moving = false
+		knockbacked = true
+		knockback_force = amount
+		knockback_sender = sender
+		
+		self.add_child(knockback_timer_node.instantiate(), true)
+		var timer_node = get_child(get_child_count()-1)
+		timer_node.wait_time = time
+		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
+		timer_node.start()
+
+func apply_knockback(sender):
+	velocity = sender.direction_to(self.global_position) * knockback_force
+	move_and_slide()
+
+func _on_knockback_reset_timeout():
+	knockbacked = false
+	set_idle()
+
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
 		if "str" in stat:
@@ -582,6 +558,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
+			new_timer.reset_stats.connect(self._on_change_stats)
 			new_timer.start()
 
 func _on_status_alert_sprite_animation_finished():

@@ -1,0 +1,77 @@
+[gd_scene load_steps=8 format=3 uid="uid://uy8eytrdfgkh"]
+
+[ext_resource type="Script" path="res://components/scripts/magic_dart_projectile.gd" id="1_xjhbr"]
+[ext_resource type="Texture2D" uid="uid://dpxldhsvbrmwh" path="res://components/sprites/enemies/fae/fae_magic_dard_projectile.png" id="2_fnoec"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bvpuc"]
+atlas = ExtResource("2_fnoec")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walqq"]
+atlas = ExtResource("2_fnoec")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1ubdb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bvpuc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walqq")
+}],
+"loop": true,
+"name": &"effect",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l4qwa"]
+radius = 7.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7nfri"]
+radius = 9.0
+height = 34.0
+
+[node name="Magic_dart_projectile" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_xjhbr")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_1ubdb")
+animation = &"effect"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(33, 0)
+rotation = 1.5708
+shape = SubResource("CircleShape2D_l4qwa")
+disabled = true
+
+[node name="Time_to_live" type="Timer" parent="."]
+wait_time = 6.0
+one_shot = true
+autostart = true
+
+[node name="Area_to_impact" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area_to_impact"]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_7nfri")
+debug_color = Color(0.862745, 0.133333, 0.133333, 0.0666667)
+
+[connection signal="timeout" from="Time_to_live" to="." method="_on_time_to_live_timeout"]
+[connection signal="body_entered" from="Area_to_impact" to="." method="_on_area_to_impact_body_entered"]

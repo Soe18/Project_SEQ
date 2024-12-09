@@ -3,11 +3,12 @@ extends Node2D
 var markers = [] # array che contiene tutti i marker della scena
 var active_markers = [] # array che si popola allo spawnare dei nemici
 # array contenente i percorsi dei nemici
-var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn"]
+var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn"]
 # [0] = Zombie
 # [1] = Scheletro
 # [2] = Gigante
 # [3] = Mezzo-umano
+# [4] = Fata
 
 # array che contiene il percorso del boss
 var boss_scene = "res://scenes/enemies/lich.tscn"
@@ -113,13 +114,13 @@ func activate_markers():
 		while not out: # finché la sentinella è falsa
 			enemy_scene = possible_enemies.pick_random() # prendo un nemico casuale dalla pool
 			# se l'ondata è minore di 5 E il nemico selezionato è il gigante
-			if round_count < 5 and enemy_scene == possible_enemies[2]: 
+			if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[3]): 
 				out = false # non esco e ne seleziono un altro
 			else: # altrimenti
 				out = true # seleziono il percorso
 		
-		#add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
-		add_child(load(possible_enemies[3]).instantiate(),true) # debug
+		add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
+		#add_child(load(possible_enemies[2]).instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 

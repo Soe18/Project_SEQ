@@ -13,6 +13,8 @@ var lich_efc
 
 @onready var time_to_live = $Time_to_live
 
+@onready var collision = $Area_to_impact/CollisionShape2D
+
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 
 func _ready():
@@ -33,13 +35,13 @@ func go_to_player():
 	if global_position.distance_to(origin) >= player_position.distance_to(origin):
 		direction = first_direction
 		
-	velocity = direction * 900
+	velocity = direction * 800
 	move_and_slide()
 
 func _on_area_to_impact_body_entered(body):
 	if body == player:
 		impact()
-		emit_signal("take_dmg",lich_str, 10, 1, lich_pbc, lich_efc)
+		emit_signal("take_dmg",lich_str, 8, 0.5, lich_pbc, lich_efc)
 
 func _on_sprite_2d_animation_finished():
 	queue_free()
@@ -50,3 +52,4 @@ func _on_time_to_live_timeout():
 func impact():
 	sprite.offset = Vector2(280,-87)
 	sprite.play("impact")
+	collision.disabled = true

@@ -14,14 +14,23 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
+@export var knockback_timer_node : PackedScene
 
 var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
+var grab_position
+var knockbacked = false
+var knockback_force = 0
+var knockback_sender
+
 var parring = false
 var dying = false
 var soul_out = false
+
+@export var slice_force = 5
+@export var slice_stun_time = 0.5
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal got_grabbed(is_grabbed)
@@ -39,6 +48,10 @@ var choosed_atk
 @onready var stun_timer = $Stun
 @onready var body_collider = $Body_collider
 
+@onready var parry_time = $Parry_time
+
+@onready var soul_delay_timer = $Soul_delay_time
+
 @onready var navigation_agent = $NavigationAgent2D
 
 @onready var healthbar = $HealthBar
@@ -46,6 +59,11 @@ var choosed_atk
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
 @onready var status_sprite = $Status_alert_sprite
+
+@onready var update_atk_timer = $Update_Atk
+
+@onready var slash_cooldown = $Basic_atk_Cooldown
+@onready var patty_cooldown = $Parry_Cooldown
 
 var player_entered = true
 var player_in_atk_range = false
@@ -56,7 +74,7 @@ var player_in_atk_range = false
 	setta la barra della salute'
 
 func _ready():
-	$HealthBar.max_value = current_vit
+	healthbar.max_value = current_vit
 	set_health_bar()
 	sprite.play("idle")
 
@@ -73,11 +91,15 @@ func _physics_process(_delta):
 		pass
 	elif parring:
 		pass
+	elif knockbacked:
+		apply_knockback(knockback_sender)
+	elif grabbed:
+		is_grabbed()
 	elif player_entered and moving:
 		chase_player()
-		if choosed_atk == Possible_Attacks.BASIC_ATK and $Basic_atk_Cooldown.is_stopped():
+		if choosed_atk == Possible_Attacks.BASIC_ATK and slash_cooldown.is_stopped():
 			basic_atk()
-		elif choosed_atk == Possible_Attacks.PARRY and $Parry_Cooldown.is_stopped():
+		elif choosed_atk == Possible_Attacks.PARRY and patty_cooldown.is_stopped():
 			parry()
 	elif not player_entered and moving:
 		if player:
@@ -90,8 +112,6 @@ func _physics_process(_delta):
 				sprite.play("idle")
 	elif not player_entered and not moving and not parring:
 		sprite.play("idle")
-	if grabbed:
-		is_grabbed()
 
 'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
 	salvo la posizione attuale del player
@@ -101,19 +121,23 @@ func _physics_process(_delta):
 
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		basic_atk_effect.position = Vector2(-49, 12)
+		basic_atk_effect.position = Vector2(-57, 12)
 		basic_atk_effect.flip_h = false
 		sprite.flip_h = true
-		basic_atk_collider.position = Vector2(-42, 16)
+		basic_atk_collider.position = Vector2(-48, 16)
 		body_collider.position.x = 2
 		body_collider.rotation_degrees = -16
+		if grabbed:
+			sprite.rotation_degrees = -90;
 	elif distance_to_player.x > 0:
-		basic_atk_effect.position = Vector2(49, 12)
+		basic_atk_effect.position = Vector2(57, 12)
 		basic_atk_effect.flip_h = true
 		sprite.flip_h = false
-		basic_atk_collider.position = Vector2(42, 16)
+		basic_atk_collider.position = Vector2(48, 16)
 		body_collider.position.x = -1
 		body_collider.rotation_degrees = 16
+		if grabbed:
+			sprite.rotation_degrees = 90;
 
 func chase_player():
 	if player:
@@ -181,7 +205,8 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if dying and not soul_out:
-		pass
+		if knockbacked:
+			knockbacked = false
 	elif is_in_atk_range and !grabbed and not parring:
 		var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
 		show_hitmarker("-" + str(dmg))
@@ -193,73 +218,53 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 				stun_timer.start()
 				sprite.play("damaged")
 			elif current_vit <= 0 and not dying:
-				if player.char_name == "Nathan":
+				if player.char_name == "Nathan" and grabbed:
 					emit_signal("got_grabbed", false)
 				dying = true
 				if not sprite.animation == "dying":
 					sprite.play("dying")
 				current_vit = 1
 				body_collider.process_mode = Node.PROCESS_MODE_DISABLED
-				$Soul_delay_time.start()
+				soul_delay_timer.start()
 		set_health_bar()
 	elif is_in_atk_range and !grabbed and parring:
-		$Inhale_time.start(0.8)
+		parry_time.start(0.8)
 
-'DIGEST DEL SENGALE DEL PLAYER "grab"
-{
-	PARAMETRI
-	boolean is_been_grabbed: controlla se il segnale è di entrata o di uscita dalla grab
-	booelan is_flipped: indica se il player è flippato o meno
-}
-se il segnale è di grab, il nodo non è già grabbato e il nodo è in range
-	faccio ricevere un danno al nodo
-	tolgo la possibilità di muoversi del nodo
-	setto il grabbed a true
-	lo sprite diventa invisibile
-	disattivo le collisioni
-se il segnale è di uscita dalla grab e il nodo è grabbato
-	il nodo potrà di nuovo muoversi
-	setto il grabbed a false
-	se il nodo è flipped
-		spinge il nodo a sinistra di 450
-	altrimenti
-		spinge il nodo a destra di 450
-	lo sprite diventa visibile
-	faccio partire un timer per risettare le collisioni, se le riabilito insieme avviene un bug'
+# DIGEST DEL SENGALE DEL PLAYER "grab" #
 
-func _on_player_grab(is_been_grabbed, is_flipped):
-	if is_been_grabbed and !grabbed and is_in_atk_range:
-		if not soul_out or dying:
-			if player.char_name == "Nathan":
-				emit_signal("got_grabbed", true)
-			_on_inhale_time_timeout()
-			choosed_atk = Possible_Attacks.IDLE
-			$Update_Atk.stop()
-			moving = false
-			grabbed = true
-			sprite.visible = false
-			body_collider.disabled = true
+func _on_player_grab(is_been_grabbed, is_flipped, grab_position_marker):
+	if is_been_grabbed and !grabbed and is_in_atk_range and not dying and not soul_out:
+		set_idle()
+		sprite.play("damaged")
+		update_atk_timer.stop()
+		moving = false
+		grabbed = true
+		body_collider.set_deferred("disabled", true)
+		grab_position = grab_position_marker
+		
+		if player.char_name == "Nathan":
+			emit_signal("got_grabbed", true)
 			healthbar.visible = false
+		
 	if !is_been_grabbed and grabbed:
+		set_idle()
+		grabbed = false
+		body_collider.set_deferred("disabled", false)
+		is_in_atk_range = true
+		init_knockback(450, 0.5, player.global_position)
+		is_in_atk_range = false
+		healthbar.visible = true
+		
 		if player.char_name == "Nathan":
 			emit_signal("got_grabbed", false)
-		$Update_Atk.start()
-		moving = true
-		grabbed = false
-		if is_flipped:
-			position.x = player.position.x + -450
-		else:
-			position.x = player.position.x + 450
-		healthbar.visible = true
-		sprite.visible = true
-		move_and_slide()
-		$GrabTime.start()
+			sprite.rotation_degrees = 0;
+			healthbar.visible = true
 
-'METODO CHE TELETRASPORTA IL NODO NELLA POSIZIONE DEL PLAYER DURANTE LA GRAB
-	setto la posizione uguale a quella del player'
+# METODO CHE TELETRASPORTA IL NODO NELLA POSIZIONE DEL PLAYER DURANTE LA GRAB #
 
 func is_grabbed():
-	position = player.position
+	flip((player.position - position).normalized())
+	position = grab_position.global_position
 
 'DIGEST DEL TIMER "Stun"
 	setto il movimento a true'
@@ -267,7 +272,7 @@ func is_grabbed():
 func _on_stun_timeout():
 	if not dying:
 		choosed_atk = Possible_Attacks.IDLE
-		_on_inhale_time_timeout()
+		set_idle()
 
 'DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
 	il valore della barra diventa uguale a quello della vita attuale
@@ -275,10 +280,13 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	if soul_out:
+	if soul_out and current_vit == 1:
 		queue_free()
 	else:
-		$HealthBar.value = current_vit
+		if current_vit > default_vit:
+			current_vit = default_vit
+		
+		healthbar.value = current_vit
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
 	setto le collisioni a true'
@@ -323,7 +331,7 @@ func _on_update_direction_timeout():
 	moving = false
 	sprite.play("idle")
 	$Inhale_time.start()
-	await _on_inhale_time_timeout
+	await set_idle
 	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
 	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
 	var new_update_time = randf_range(3,6)
@@ -334,13 +342,14 @@ func _on_update_direction_timeout():
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
-func _on_inhale_time_timeout():
-	moving = true
-	dying = false
-	soul_out = false
-	if parring:
-		parring = false
-		sprite.play("idle")
+func set_idle():
+	if not knockbacked and not grabbed:
+		moving = true
+		dying = false
+		soul_out = false
+		if parring:
+			parring = false
+			sprite.play("idle")
 
 func _on_basic_atk_area_body_entered(body):
 	if body == player:
@@ -352,7 +361,7 @@ func _on_basic_atk_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, 5, 1, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, slice_force, slice_stun_time, current_pbc, current_efc)
 	basic_atk_effect.play("idle")
 	sprite.play("idle")
 	
@@ -360,14 +369,17 @@ func basic_atk():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
 		basic_atk_effect.play("effect")
 		sprite.play("attack")
-	$Basic_atk_Cooldown.start()
+	slash_cooldown.start()
 
 func parry():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
 		parring = true
 		sprite.play("parry")
-		$Inhale_time.start(3)
-	$Parry_Cooldown.start()
+		parry_time.start()
+	patty_cooldown.start()
+
+func _on_parry_time_timeout() -> void:
+	set_idle()
 
 func _on_update_atk_timeout():
 	choose_atk()
@@ -393,11 +405,35 @@ func _on_sprite_2d_animation_finished():
 		sprite.speed_scale = 1
 		current_vit = default_vit
 		set_health_bar()
-		_on_inhale_time_timeout()
+		set_idle()
 
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
+
+func init_knockback(amount, time, sender):
+	if is_in_atk_range and not grabbed and not parring:
+		moving = false
+		knockbacked = true
+		knockback_force = amount
+		knockback_sender = sender
+		
+		stun_timer.process_mode = Node.PROCESS_MODE_DISABLED
+		self.add_child(knockback_timer_node.instantiate(), true)
+		var timer_node = get_child(get_child_count()-1)
+		timer_node.wait_time = time
+		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
+		timer_node.start()
+
+func apply_knockback(sender):
+	velocity = sender.direction_to(self.global_position) * knockback_force
+	move_and_slide()
+
+func _on_knockback_reset_timeout():
+	knockbacked = false
+	stun_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
+	if not dying:
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
@@ -422,6 +458,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
+			new_timer.reset_stats.connect(self._on_change_stats)
 			new_timer.start()
 
 func _on_status_alert_sprite_animation_finished():

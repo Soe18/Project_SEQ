@@ -24,10 +24,10 @@ position = Vector2(1347, -112)
 position = Vector2(173, -14)
 
 [node name="Spawnpoint5" type="Marker2D" parent="."]
-position = Vector2(519, 412)
+position = Vector2(418, 288)
 
 [node name="Spawnpoint6" type="Marker2D" parent="."]
-position = Vector2(850, 783)
+position = Vector2(-72, 460)
 
 [node name="Spawnpoint7" type="Marker2D" parent="."]
 position = Vector2(1349, 460)
@@ -36,12 +36,12 @@ position = Vector2(1349, 460)
 position = Vector2(821, 38)
 
 [node name="Spawnpoint9" type="Marker2D" parent="."]
-position = Vector2(1216, 941)
+position = Vector2(1024, 944)
 
 [node name="Spawnpoint10" type="Marker2D" parent="."]
 position = Vector2(480, 987)
 
 [node name="Boss_Spawner" type="Marker2D" parent="."]
-position = Vector2(939, 518)
+position = Vector2(919, 494)
 
 [connection signal="timeout" from="Round_cooldown" to="." method="_on_round_cooldown_timeout"]

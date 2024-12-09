@@ -1,7 +1,8 @@
-[gd_scene load_steps=73 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=74 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_otfb6"]
+[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_80k0x"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="3_msf8r"]
 [ext_resource type="Texture2D" uid="uid://delgxc8luy00p" path="res://components/sprites/enemies/zombie/zombie_charging_sprint.png" id="4_0w33q"]
 [ext_resource type="Texture2D" uid="uid://c3ns4y7uooyhj" path="res://components/sprites/enemies/zombie/zombie_damaged.png" id="5_022jm"]
@@ -487,7 +488,9 @@ y_sort_enabled = true
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_4dl1i")
+default_tem = 117
 damage_node = ExtResource("2_otfb6")
+knockback_timer_node = ExtResource("3_80k0x")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(0, -64)
@@ -519,6 +522,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
 
 [node name="HealthBar" type="ProgressBar" parent="Control"]
 z_index = 2
@@ -533,13 +537,10 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_0rxx2")
 max_value = 150.0
 rounded = true
 show_percentage = false
+metadata/_edit_use_anchors_ = true
 
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
-one_shot = true
-
-[node name="GrabTime" type="Timer" parent="."]
-wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
@@ -552,7 +553,6 @@ debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 [node name="Basic_atk_Area" type="Area2D" parent="."]
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
-visible = false
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0.00392157, 0.0666667, 0.109804)
@@ -574,16 +574,16 @@ position = Vector2(-5, 17.25)
 shape = SubResource("RectangleShape2D_fhhjd")
 debug_color = Color(1, 1, 0, 0.054902)
 
-[node name="Inhale_time" type="Timer" parent="."]
-wait_time = 0.8
-one_shot = true
-
 [node name="Basic_atk_Cooldown" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
 
 [node name="Sprint_Cooldown" type="Timer" parent="."]
 wait_time = 6.0
+one_shot = true
+
+[node name="Sprint_time" type="Timer" parent="."]
+wait_time = 0.8
 one_shot = true
 
 [node name="Update_Atk" type="Timer" parent="."]
@@ -596,9 +596,8 @@ wait_time = 2.0
 one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 62.6
-target_desired_distance = 100.0
-path_max_distance = 1000.0
+path_desired_distance = 271.0
+target_desired_distance = 90.0
 navigation_layers = 3
 avoidance_enabled = true
 radius = 20.0
@@ -607,7 +606,6 @@ max_speed = 1703.04
 
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
-[connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
 [connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
 [connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered"]
@@ -615,7 +613,7 @@ max_speed = 1703.04
 [connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="body_entered" from="Sprint_Area" to="." method="_on_sprint_area_body_entered"]
 [connection signal="body_exited" from="Sprint_Area" to="." method="_on_sprint_area_body_exited"]
-[connection signal="timeout" from="Inhale_time" to="." method="_on_inhale_time_timeout"]
+[connection signal="timeout" from="Sprint_time" to="." method="_on_sprint_time_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
 [connection signal="timeout" from="Charge_Time" to="." method="_on_charge_time_timeout"]
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]

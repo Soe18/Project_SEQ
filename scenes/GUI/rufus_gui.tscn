@@ -92,6 +92,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Skill1_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
+clip_contents = true
 layout_mode = 2
 anchor_left = 0.746354
 anchor_top = 0.590074
@@ -105,9 +106,9 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("3_2maji")
 texture_progress = ExtResource("2_rdasp")
-metadata/_edit_use_anchors_ = true
 
 [node name="Eva_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
+clip_contents = true
 layout_mode = 2
 anchor_left = 0.755729
 anchor_top = 0.191176
@@ -121,9 +122,9 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("5_lwiw5")
 texture_progress = ExtResource("2_rdasp")
-metadata/_edit_use_anchors_ = true
 
 [node name="Skill2_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
+clip_contents = true
 layout_mode = 2
 anchor_left = 0.869
 anchor_top = 0.0992647
@@ -143,6 +144,7 @@ texture_under = ExtResource("4_7cjmb")
 texture_progress = ExtResource("2_rdasp")
 
 [node name="Ulti_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
+clip_contents = true
 layout_mode = 2
 anchor_left = 0.836
 anchor_top = 0.39
@@ -158,4 +160,3 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("6_8rr55")
 texture_progress = ExtResource("2_rdasp")
-metadata/_edit_use_anchors_ = true
