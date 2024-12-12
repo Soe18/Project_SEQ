@@ -11,17 +11,23 @@ config_version=5
 [application]
 
 config/name="Project_SEQ"
-run/main_scene="res://scenes/basic_scene.tscn"
+run/main_scene="res://overworld/scenes/game_manager.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 run/max_fps=60
 boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 1)
 config/icon="res://components/sprites/icon.svg"
 
+[autoload]
+
+Menu="*res://overworld/scenes/menu.tscn"
+QuestManager="*res://overworld/scripts/quest/quest_manager.gd"
+QuestStatus="*res://overworld/scripts/quest/quest_status.gd"
+
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=2
+window/size/mode=3
 window/size/initial_position_type=3
 window/stretch/aspect="expand"
 window/custom_image=""
@@ -39,6 +45,10 @@ enabled=PackedStringArray()
 
 import/blender/enabled=false
 import/fbx/enabled=false
+
+[global_group]
+
+gm="Here should be placed only GameManager"
 
 [input]
 

@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://b672pbqxqtbcx"]
+
+[ext_resource type="Script" path="res://overworld/scripts/quest/quest_label.gd" id="1_x5j2l"]
+
+[node name="QuestLabel" type="GridContainer"]
+process_mode = 3
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 2
+script = ExtResource("1_x5j2l")
+
+[node name="VERTICAL_CONTAINER" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ID+TITLE" type="HBoxContainer" parent="VERTICAL_CONTAINER"]
+layout_mode = 2
+
+[node name="ID" type="Label" parent="VERTICAL_CONTAINER/ID+TITLE"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0."
+
+[node name="TITLE" type="Label" parent="VERTICAL_CONTAINER/ID+TITLE"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TITLE"
+
+[node name="ONLY_DESCRIPTION" type="HBoxContainer" parent="VERTICAL_CONTAINER"]
+layout_mode = 2
+
+[node name="DESCRIPTION" type="Label" parent="VERTICAL_CONTAINER/ONLY_DESCRIPTION"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DESCRIPTION"
+
+[node name="ONLY_STATUS" type="HBoxContainer" parent="VERTICAL_CONTAINER"]
+layout_mode = 2
+
+[node name="STATUS" type="Label" parent="VERTICAL_CONTAINER/ONLY_STATUS"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "STATUS
+"

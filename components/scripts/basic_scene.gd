@@ -57,18 +57,10 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	
 	if Input.is_action_just_pressed("reload_scene"):
-		get_tree().change_scene_to_file("res://scenes/basic_scene.tscn")
+		# It reloads the dungeon, just for the demo, this is ok :D
+		get_tree().get_first_node_in_group("gm").load_dungeon()
 	
 	if player != null:
-		# Gestione del menu di pausa
-		if Input.is_action_just_pressed("pause"):
-			if not paused:
-				paused = true
-				pause_game(paused)
-			else:
-				paused = false
-				pause_game(paused)
-	
 		if not active_enemy_container.fighting:
 			connected = false
 		if active_enemy_container.fighting and not connected:
@@ -171,6 +163,8 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				# allora connetto il segnale della barra della vita alla gui
 				current_node.set_health_bar.connect(round_gui._on_boss_set_healthbar)
 
+# Penso che questa funzione sia inutile ora :/
+# Meglio toglierla in futuro per evitare comportamenti improvvisi
 func pause_game(get_paused):
 	if get_paused: # se il player mette in pausa
 		get_tree().paused = true # metto in pausa l'albero
@@ -202,7 +196,7 @@ func _on_player_death():
 	game_over_container.visible = true # rendo visibile il game over
 	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
 	player_gui.visible = false # nascondo la gui del player
-	
+	Menu.game_status = Menu.GAME_STATUSES.unopenable # Azione piu' forte di quel che si pensi, non usarlo a cuor leggero
 	# metto il focus sul pulsante riprova nell menu di game over
 	$CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry.grab_focus()
 

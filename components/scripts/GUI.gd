@@ -16,7 +16,9 @@ func _on_select_nathan_pressed():
 	emit_signal("select_character", "nathan")
 
 func _on_retry_pressed():
-	get_tree().change_scene_to_file("res://scenes/basic_scene.tscn")
+	# Modified :D
+	get_tree().get_first_node_in_group("gm").load_dungeon()
 
 func _on_exit_pressed():
-	get_tree().quit(0)
+	# Modified :D
+	get_tree().get_first_node_in_group("gm").load_map()

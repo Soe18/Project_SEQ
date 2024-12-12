@@ -1,0 +1,112 @@
+[gd_scene load_steps=3 format=3 uid="uid://dt7qg2616qjyl"]
+
+[ext_resource type="Script" path="res://overworld/scripts/menu.gd" id="1_icg54"]
+[ext_resource type="Script" path="res://overworld/scripts/quest/quest_display.gd" id="2_y0x1b"]
+
+[node name="Menu" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_icg54")
+
+[node name="ReOpenMenuDelay" type="Timer" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+wait_time = 0.5
+one_shot = true
+
+[node name="FirstMenu" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FirstMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.0
+offset_top = -39.0
+offset_right = 37.0
+offset_bottom = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContinueButton" type="Button" parent="FirstMenu/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Riprendi"
+
+[node name="QuestButton" type="Button" parent="FirstMenu/VBoxContainer"]
+layout_mode = 2
+text = "Missioni"
+
+[node name="EscapeButton" type="Button" parent="FirstMenu/VBoxContainer"]
+layout_mode = 2
+text = "Fuggi dal dungeon"
+
+[node name="QuitButton" type="Button" parent="FirstMenu/VBoxContainer"]
+layout_mode = 2
+text = "Esci dal gioco"
+
+[node name="QuestMenu" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BigContainer" type="VBoxContainer" parent="QuestMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="QuestMenu/BigContainer"]
+layout_mode = 2
+text = "Menù quest"
+
+[node name="FilterContainer" type="HBoxContainer" parent="QuestMenu/BigContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="AllQuestFilter" type="Button" parent="QuestMenu/BigContainer/FilterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Tutte
+"
+
+[node name="Button2" type="Button" parent="QuestMenu/BigContainer/FilterContainer"]
+layout_mode = 2
+text = "Solo \"Da fare\""
+
+[node name="Button3" type="Button" parent="QuestMenu/BigContainer/FilterContainer"]
+layout_mode = 2
+text = "Solo \"Completate\""
+
+[node name="QuestContainer" type="VBoxContainer" parent="QuestMenu/BigContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_y0x1b")
+
+[connection signal="timeout" from="ReOpenMenuDelay" to="." method="_on_re_open_menu_delay_timeout"]
+[connection signal="pressed" from="FirstMenu/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="FirstMenu/VBoxContainer/QuestButton" to="." method="_on_quest_button_pressed"]
+[connection signal="pressed" from="FirstMenu/VBoxContainer/EscapeButton" to="." method="_on_escape_button_pressed"]
+[connection signal="pressed" from="FirstMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2l7ibxskoamp"]
+
+[ext_resource type="Script" path="res://overworld/scripts/quest/quest_manager.gd" id="1_pr3df"]
+
+[node name="QuestManager" type="Node"]
+script = ExtResource("1_pr3df")

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://cbj05pq4o31ye"]
+
+[ext_resource type="Script" path="res://overworld/scripts/quest/quest.gd" id="1_jrmog"]
+
+[resource]
+script = ExtResource("1_jrmog")
+title = "Viaggiare!"
+description = "Spostati da un punto ad un altro!"
+steps = 1
+status = 0
+todo = "yey"
