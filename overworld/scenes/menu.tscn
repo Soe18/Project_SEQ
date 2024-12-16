@@ -5,6 +5,7 @@
 
 [node name="Menu" type="CanvasLayer"]
 process_mode = 3
+layer = 6
 script = ExtResource("1_icg54")
 
 [node name="ReOpenMenuDelay" type="Timer" parent="."]

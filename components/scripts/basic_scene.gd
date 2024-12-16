@@ -33,12 +33,10 @@ var player_gui
 var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
 var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
 
-const RUFUS_ENEMY_REACH = [90, 100, 140, 60, 325]
-const NATHAN_ENEMY_REACH = [90, 100, 180, 80, 325]
-
 var portal
 
 func _ready():
+	Menu.game_status = Menu.GAME_STATUSES.unopenable
 	add_child(load(tilesets[1]).instantiate(),true)
 	active_tileset = get_child(get_child_count(true)-1)
 	
@@ -57,7 +55,7 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	
 	if Input.is_action_just_pressed("reload_scene"):
-		# It reloads the dungeon, just for the demo, this is ok :D
+		# It reloads the dungeon, just for debuggin, this is ok :D
 		get_tree().get_first_node_in_group("gm").load_dungeon()
 	
 	if player != null:
@@ -78,8 +76,8 @@ func _process(_delta):
 
 func _on_gui_select_character(char):
 	var player_scene
-	if char == "stencil":
-		player_scene = load("res://scenes/characters/a_player.tscn")
+	if char == "jack":
+		player_scene = load("res://scenes/characters/jack.tscn")
 	elif char == "rufus":
 		player_scene = load("res://scenes/characters/rufus.tscn")
 	elif char == "nathan":
@@ -93,7 +91,7 @@ func _on_gui_select_character(char):
 	var camera = Camera2D.new()
 	
 	# impostazioni per la telecamera
-	camera.zoom = Vector2(1.6,1.6)
+	camera.zoom = Vector2(1.7,1.7)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 3
 	
@@ -112,7 +110,8 @@ func _on_gui_select_character(char):
 	connect_enemies_with_player() # connetto i nemici e il player
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
-	
+	Menu.game_status = Menu.GAME_STATUSES.dungeon
+
 # METODO CHE CONNETTE I SEGNALI AL PLAYER
 #	cicla ogni nodo figlio della root nella scena,
 #		se il figlio è diverso dal player e il nome di quel nodo contiene "Enemy" setta il pamaretro "player" del nemico con il player effettivo
@@ -163,6 +162,14 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 				# allora connetto il segnale della barra della vita alla gui
 				current_node.set_health_bar.connect(round_gui._on_boss_set_healthbar)
 
+func connect_player_projectile(projectile):
+	for i in active_enemy_container.get_child_count(): #cicla per ogni figlio della scena
+		var current_node = active_enemy_container.get_child(i)
+		#se il nome del nemico contiene "Enemy"
+		if "Enemy" in current_node.name: 
+			projectile.take_dmg.connect(current_node._on_player_take_dmg)
+	
+
 # Penso che questa funzione sia inutile ora :/
 # Meglio toglierla in futuro per evitare comportamenti improvvisi
 func pause_game(get_paused):
@@ -202,11 +209,13 @@ func _on_player_death():
 
 func activate_player_GUI():
 	# il pg scelto è Rufus allora insanzia la sua GUI
-	if player.char_name == "Rufus": 
+	if player.char_name == "Rufus":
 		canvas_layer.add_child(load("res://scenes/GUI/rufus_gui.tscn").instantiate(),true)
 	# il pg scelto è Nathan allora insanzia la sua GUI
 	elif player.char_name == "Nathan": 
 		canvas_layer.add_child(load("res://scenes/GUI/nathan_gui.tscn").instantiate(),true)
+	elif player.char_name == "Jack":
+		canvas_layer.add_child(load("res://scenes/GUI/jack_gui.tscn").instantiate(),true)
 	# connetto il segnale dell'enemy_container attivo con il digest _on_get_healed del player
 	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)
 	

@@ -1021,7 +1021,6 @@ process_mode = 1
 y_sort_enabled = true
 scale = Vector2(0.9, 0.9)
 motion_mode = 1
-wall_min_slide_angle = 0.0
 script = ExtResource("1_kqagk")
 damage_node = ExtResource("2_umg87")
 ACCELERATION = 8000.0

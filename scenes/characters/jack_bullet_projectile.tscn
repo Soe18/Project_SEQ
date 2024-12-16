@@ -1,0 +1,68 @@
+[gd_scene load_steps=6 format=3 uid="uid://dxg3446h3vq6m"]
+
+[ext_resource type="Texture2D" uid="uid://o7djtvp46drv" path="res://components/sprites/jack/jack_bullet.png" id="1_g184h"]
+[ext_resource type="Script" path="res://components/scripts/jack_bullet_projectile.gd" id="1_qdk7g"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1ubdb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_g184h")
+}],
+"loop": true,
+"name": &"effect",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l4qwa"]
+radius = 7.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7nfri"]
+radius = 5.0
+height = 10.0
+
+[node name="Bullet_projectile" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_qdk7g")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
+position = Vector2(-1.19209e-07, -1.19209e-07)
+sprite_frames = SubResource("SpriteFrames_1ubdb")
+animation = &"effect"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(33, 0)
+rotation = 1.5708
+shape = SubResource("CircleShape2D_l4qwa")
+disabled = true
+
+[node name="Time_to_live" type="Timer" parent="."]
+wait_time = 6.0
+one_shot = true
+autostart = true
+
+[node name="Area_to_impact" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area_to_impact"]
+z_index = 1
+position = Vector2(-4, 0)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_7nfri")
+debug_color = Color(0.862745, 0.133333, 0.133333, 0.0666667)
+
+[connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
+[connection signal="timeout" from="Time_to_live" to="." method="_on_time_to_live_timeout"]
+[connection signal="body_entered" from="Area_to_impact" to="." method="_on_area_to_impact_body_entered"]
