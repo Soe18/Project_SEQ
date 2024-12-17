@@ -211,9 +211,9 @@ func _on_player_is_in_atk_range(is_in, body):
 #		faccio partire il timer dello stun
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if is_in_atk_range and not grabbed and not knockbacked:
-		var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-		var rng = randi_range(0, 100)
-		show_hitmarker("-" + str(dmg))
+		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		var dmg = dmg_crit[0]
+		show_hitmarker("-" + str(dmg), dmg_crit[1])
 		current_vit -= dmg
 		set_health_bar()
 		
@@ -441,7 +441,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
 
-func show_hitmarker(dmg):
+func show_hitmarker(dmg, crit):
 	var hitmarker = damage_node.instantiate()
 	hitmarker.position = hitmarker_spawnpoint.global_position
 	
@@ -452,4 +452,6 @@ func show_hitmarker(dmg):
 						0.75)
 	
 	hitmarker.get_child(0).text = dmg
+	if crit:
+		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
 	get_tree().current_scene.add_child(hitmarker)

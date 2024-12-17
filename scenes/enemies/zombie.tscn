@@ -597,7 +597,7 @@ one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 path_desired_distance = 271.0
-target_desired_distance = 90.0
+target_desired_distance = 80.0
 navigation_layers = 3
 avoidance_enabled = true
 radius = 20.0

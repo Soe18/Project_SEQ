@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dxg3446h3vq6m"]
+[gd_scene load_steps=8 format=3 uid="uid://dxg3446h3vq6m"]
 
 [ext_resource type="Texture2D" uid="uid://o7djtvp46drv" path="res://components/sprites/jack/jack_bullet.png" id="1_g184h"]
 [ext_resource type="Script" path="res://components/scripts/jack_bullet_projectile.gd" id="1_qdk7g"]
@@ -25,6 +25,14 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_l4qwa"]
 radius = 7.0
 
+[sub_resource type="Curve" id="Curve_alqxg"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_w44gm"]
+offsets = PackedFloat32Array(0.140496, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7nfri"]
 radius = 5.0
 height = 10.0
@@ -48,6 +56,14 @@ position = Vector2(33, 0)
 rotation = 1.5708
 shape = SubResource("CircleShape2D_l4qwa")
 disabled = true
+
+[node name="Line2D" type="Line2D" parent="."]
+top_level = true
+z_index = 2
+width = 5.0
+width_curve = SubResource("Curve_alqxg")
+gradient = SubResource("Gradient_w44gm")
+joint_mode = 2
 
 [node name="Time_to_live" type="Timer" parent="."]
 wait_time = 6.0

@@ -112,8 +112,8 @@ func activate_markers():
 			else:
 				out = true
 		
-		add_child(load(enemy_scene).instantiate(),true)
-		#add_child(load(possible_enemies[4]).instantiate(),true)
+		#add_child(load(enemy_scene).instantiate(),true)
+		add_child(load(possible_enemies[0]).instantiate(),true)
 		
 		get_child(get_child_count()-1).position = i.position
 

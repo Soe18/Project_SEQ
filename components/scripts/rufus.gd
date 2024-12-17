@@ -455,10 +455,11 @@ func evade():
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	var dmg = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	var dmg_crit = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	var dmg = dmg_crit[0]
+	show_hitmarker("-" + str(dmg), dmg_crit[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	show_hitmarker("-" + str(dmg))
 	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")
@@ -504,7 +505,7 @@ func _on_change_stats(stat, amount, time_duration, _ally_sender):
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
 
-func show_hitmarker(dmg):
+func show_hitmarker(dmg, crit):
 	var hitmarker = damage_node.instantiate()
 	hitmarker.position = hitmarker_spawnpoint.global_position
 	
@@ -515,4 +516,6 @@ func show_hitmarker(dmg):
 						0.75)
 	
 	hitmarker.get_child(0).text = dmg
+	if crit:
+		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
 	get_tree().current_scene.add_child(hitmarker)

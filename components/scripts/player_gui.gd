@@ -9,6 +9,8 @@ var player
 
 @onready var healthbar = $MarginContainer/PanelContainer/Control/Health_bar
 @onready var healthbar_label = $MarginContainer/PanelContainer/Control/Health_bar/Health_label
+
+@onready var animation_player = $AnimationPlayer
 var max_health
 
 signal player_death()
@@ -51,3 +53,6 @@ func _on_nathan_grab(is_grabbed):
 	else:
 		player.skill2_cooldown.start()
 		skill2_cooldown_time.tint_under = Color(Color.WHITE,1)
+
+func _on_jack_flashbang():
+	animation_player.play("flashbang")

@@ -185,15 +185,17 @@ func pause_game(get_paused):
 		pause_gui.visible = false # nascondo il menu di pausa
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
+	var crit = false
 	if tem <= 0:
 		tem = 1
-	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA_DELL'ATTACCO) / TEMPRA_BERSAGLIO
+	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA DELL'ATTACCO) / TEMPRA_BERSAGLIO
 	var dmg = round((str * atk_str) / tem)
 	var rng = randi_range(0, 100) # genero un numero casuale tra 0 e 100
 	if pbc > rng: # se la probabilità brutto colpo è più alta del numero generato (esempio: 30 > 20)
 		# aumento il danno in base all'efficienza del colpo critico (es. 15 * 1.5 = 15 + 7.5 = 22.5 = 23)
 		dmg = round(dmg * efc)
-	return dmg
+		crit = true
+	return [dmg, crit]
 
 # DIGEST DEL SEGNALE DELLA PLAYER_GUI CHE NOTIFICA QUANDO GLI HP SCENDONO A 0
 func _on_player_death():
@@ -221,6 +223,8 @@ func activate_player_GUI():
 	
 	# assegno i parametri della GUI:
 	player_gui = canvas_layer.get_child(canvas_layer.get_child_count()-1)
+	if player.char_name == "Jack":
+		player.launched_flashbang.connect(player_gui._on_jack_flashbang)
 	player_gui.player = player
 	player_gui.player_death.connect(self._on_player_death)
 	player_gui.max_health = player.default_vit

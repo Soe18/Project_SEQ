@@ -30,6 +30,7 @@ signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal inflict_knockback(amount, time, sender)
 
+signal launched_flashbang()
 
 @export var ACCELERATION : float = 10000.0
 @export var FRICTION : float = 7000.0
@@ -45,12 +46,17 @@ var can_move = true
 var atk_anim_finished = true
 
 var Guns = {
-	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 15}
+	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 6, "prefix" : "p_"}
 }
 
+var gun_prefix
 var gun_force
 var gun_precision
 var gun_str
+var gun_knockback_flag
+var gun_stun_time
+var max_bullet_count
+var gun_bullet_count
 
 @export var bullet_scene : PackedScene
 
@@ -64,6 +70,11 @@ var gun_str
 @onready var ulti_cooldown = $Ulti_cooldown
 
 @onready var body_collider = $Body_collider
+
+@onready var remaining_bullets_label = $Control/HBoxContainer/Label
+
+@onready var flashbang_area = $Flashbang_area
+@onready var flashbang_collider = $Flashbang_area/Collider
 
 @onready var stun_timer = $Stun
 @onready var shooting_delay_timer = $Shooting_delay_time
@@ -105,7 +116,11 @@ func move(delta):
 	if axis == Vector2.ZERO:
 		apply_friction(FRICTION * delta)
 	else:
-		sprite.play("running")
+		if not "reload" in sprite.animation:
+			sprite.play(gun_prefix+"running")
+		else:
+			switch_between_reload_animation(true)
+		
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)
@@ -124,11 +139,30 @@ func apply_friction(amount):
 		velocity -= velocity.normalized() * amount
 	else:
 		velocity = Vector2.ZERO
-		sprite.play("idle")
+		if not "reload" in sprite.animation:
+			sprite.play(gun_prefix+"idle")
+		else:
+			switch_between_reload_animation(false)
 
 func apply_movement(accel):
 	velocity += accel
 	velocity = velocity.limit_length(current_des * 2.5)
+
+func reset_axis():
+	velocity = Vector2.ZERO
+	axis = Vector2.ZERO
+
+func switch_between_reload_animation(running):
+	var frame = sprite.frame
+	var frame_progress = sprite.frame_progress
+	if running and sprite.animation != "p_running_reload":
+		sprite.play("p_running_reload")
+		sprite.frame = frame
+		sprite.frame_progress = frame_progress
+	elif not running and sprite.animation != "p_reload":
+		sprite.play("p_reload")
+		sprite.frame = frame
+		sprite.frame_progress = frame_progress
 
 'METODO CHE GESTISCE TUTTE LE ABILITA\' DEL PLAYER
 	ad ogni if si controlla l\'azione possibile, per l\'attacco di base si trovano
@@ -137,38 +171,27 @@ func apply_movement(accel):
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished:
+	if Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0:
+		if gun_prefix == "p_":
+			sprite.play("p_reload")
+			axis = Vector2.ZERO
+		else:
+			gun_handler("pistol")
+		
+	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and atk_anim_finished and gun_bullet_count > 0:
 		can_move = false
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
-		sprite.play("p_shooting")
-		axis = Vector2.ZERO
+		sprite.play(gun_prefix+"shooting")
+		reset_axis()
 	
-	elif Input.is_action_pressed("base_atk") and (sprite.animation == "p_shooting" or sprite.animation == "p_continue_shooting") and atk_anim_finished and shooting_delay_timer.is_stopped():
+	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"shooting" or sprite.animation == gun_prefix+"continue_shooting") and atk_anim_finished and shooting_delay_timer.is_stopped() and gun_bullet_count > 0:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		reaction_timer.stop()
-		sprite.play("p_continue_shooting")
-	#
-	#elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk2" and atk_anim_finished:
-		#atk_state = Atk_States.BASE_ATK
-		#atk_anim_finished = false
-		#shooting_delay_timer.stop()
-		#sprite.play("base atk3")
-	#
-	#elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk3" and atk_anim_finished:
-		#atk_state = Atk_States.BASE_ATK
-		#atk_anim_finished = false
-		#shooting_delay_timer.stop()
-		#sprite.play("base atk4")
-	#
-	#elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk4" and atk_anim_finished:
-		#atk_state = Atk_States.BASE_ATK
-		#atk_anim_finished = false
-		#shooting_delay_timer.stop()
-		#sprite.play("base atk5")
-	#
-	#elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "running") and skill1_cooldown.is_stopped():
+		sprite.play(gun_prefix+"continue_shooting")
+	
+	#elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == gun_prefix+"running") and skill1_cooldown.is_stopped():
 		#skill1_cooldown.start()
 		#can_move = false
 		#atk_state = Atk_States.SK1
@@ -177,16 +200,14 @@ func atk_handler():
 		#skill1_effect.play("effect")
 		#axis = Vector2.ZERO
 	#
-	#elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "running") and eva_cooldown.is_stopped():
-		#eva_cooldown.start()
-		#can_move = false
-		#atk_state = Atk_States.EVA
-		#$Eva_time.start()
-		#sprite.play("Eva")
-		#eva_collider.disabled = false
-		#is_evading = true
-	#
-	#elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "running") and skill2_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("evade") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and eva_cooldown.is_stopped():
+		eva_cooldown.start()
+		can_move = false
+		atk_state = Atk_States.EVA
+		sprite.play(gun_prefix+"flashbang")
+		reset_axis()
+	
+	#elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == gun_prefix+"running") and skill2_cooldown.is_stopped():
 		#skill2_cooldown.start()
 		#can_move = false
 		#atk_state = Atk_States.SK2
@@ -194,7 +215,7 @@ func atk_handler():
 		#skill2_effect.play("effect")
 		#axis = Vector2.ZERO
 #
-	#elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "running") and ulti_cooldown.is_stopped():
+	#elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == gun_prefix+"running") and ulti_cooldown.is_stopped():
 		#ulti_cooldown.start()
 		#can_move = false
 		#atk_state = Atk_States.ULT
@@ -202,7 +223,7 @@ func atk_handler():
 		#ult_moving_mod = -9
 		#axis = Vector2.ZERO
 
-	elif sprite.animation != "idle" or sprite.animation != "running":
+	elif sprite.animation != gun_prefix+"idle" or sprite.animation != gun_prefix+"running":
 		pass
 
 
@@ -230,10 +251,20 @@ func flip_sprite(flip):
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and "shooting" in sprite.animation:
 		shooting_delay_timer.start()
+	if "reload" in sprite.animation:
+		gun_bullet_count = max_bullet_count
+		set_bullet_count_label()
+		emit_signal("set_idle")
+	if "flashbang" in sprite.animation:
+		flashbang_collider.set_deferred("disabled", true)
+		emit_signal("set_idle")
 
 func _on_sprite_2d_frame_changed():
 	if (sprite.animation == "p_shooting" and sprite.frame == 3) or (sprite.animation == "p_continue_shooting" and sprite.frame == 1):
 		gun_handler()
+	if "flashbang" in sprite.animation and sprite.frame == 4:
+		emit_signal("launched_flashbang")
+		flashbang_collider.set_deferred("disabled", false)
 
 func _on_effect_frame_changed():
 	pass
@@ -241,12 +272,21 @@ func _on_effect_frame_changed():
 
 func gun_handler(param = "shoot"):
 	if param == "shoot":
-		shoot()
+		if gun_bullet_count > 0:
+			shoot()
+			gun_bullet_count -= 1
+			set_bullet_count_label()
 	else:
+		gun_prefix = Guns[param]["prefix"]
 		gun_force = Guns[param]["force"]
 		gun_precision = Guns[param]["precision"]
 		shooting_delay_timer.wait_time = Guns[param]["delay"]
 		gun_str = Guns[param]["gun_str"]
+		gun_knockback_flag = Guns[param]["knockback"]
+		gun_stun_time = Guns[param]["stun_time"]
+		max_bullet_count = Guns[param]["bullet_count"]
+		gun_bullet_count = max_bullet_count
+		set_bullet_count_label()
 		
 		if param == "shotgun":
 			pass
@@ -263,11 +303,13 @@ func shoot():
 	instantiated_bullet.global_position = bullets_spawnpoint.global_position
 	instantiated_bullet.bullet_str = gun_str
 	instantiated_bullet.bullet_force = gun_force
+	instantiated_bullet.knockback_flag = gun_knockback_flag
+	instantiated_bullet.gun_stun_time = gun_stun_time
 	get_parent().connect_player_projectile(instantiated_bullet)
 	instantiated_bullet.reparent(get_parent())
-	
-	
 
+func set_bullet_count_label():
+	remaining_bullets_label.text = "x" + str(gun_bullet_count)
 
 
 #  -- set_idle mi permette di resettare il player allo stato di idle --  #
@@ -278,7 +320,7 @@ func _on_set_idle():
 	
 	sprite.z_index = 0
 	
-	sprite.play("idle")
+	sprite.play(gun_prefix+"idle")
 	
 	self.set_collision_layer_value(1, true)
 	self.set_collision_layer_value(2, false)
@@ -301,14 +343,25 @@ func _on_shooting_delay_time_timeout():
 func _on_reaction_time_timeout() -> void:
 	emit_signal("set_idle")
 
+func _on_flashbang_area_body_entered(body: Node2D) -> void:
+	if body != self:
+		emit_signal("is_in_atk_range", true, body)
+		emit_signal("take_dmg", 0, 0, 3, 0, 0)
+		emit_signal("inflict_knockback", 0.2, 600, self)
+
+
+func _on_flashbang_area_body_exited(body: Node2D) -> void:
+	emit_signal("is_in_atk_range", false, body)
+
 
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	var dmg = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	var dmg_crit = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+	var dmg = dmg_crit[0]
+	show_hitmarker("-" + str(dmg), dmg_crit[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	show_hitmarker("-" + str(dmg))
 	if stun_sec > 0:
 		shooting_delay_timer.stop()
 		emit_signal("set_idle")
@@ -355,7 +408,7 @@ func _on_change_stats(stat, amount, time_duration, _ally_sender):
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
 
-func show_hitmarker(dmg):
+func show_hitmarker(dmg, crit):
 	var hitmarker = damage_node.instantiate()
 	hitmarker.position = hitmarker_spawnpoint.global_position
 	
@@ -366,4 +419,6 @@ func show_hitmarker(dmg):
 						0.75)
 	
 	hitmarker.get_child(0).text = dmg
+	if crit:
+		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
 	get_tree().current_scene.add_child(hitmarker)
