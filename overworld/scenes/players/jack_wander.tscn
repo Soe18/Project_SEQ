@@ -1,0 +1,94 @@
+[gd_scene load_steps=13 format=3 uid="uid://cywythfims3hi"]
+
+[ext_resource type="Script" path="res://overworld/scripts/players/player_wander.gd" id="1_fr2sc"]
+[ext_resource type="Texture2D" uid="uid://ctcf43dptrdq1" path="res://components/sprites/jack/pistol/jack_idle.png" id="2_6yi8o"]
+[ext_resource type="Texture2D" uid="uid://btjg1uvmks8gk" path="res://components/sprites/jack/pistol/jack_running_p.png" id="3_6tv0s"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t28pf"]
+atlas = ExtResource("2_6yi8o")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3x36m"]
+atlas = ExtResource("2_6yi8o")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ugy3b"]
+atlas = ExtResource("2_6yi8o")
+region = Rect2(0, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4w5re"]
+atlas = ExtResource("3_6tv0s")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4vaqh"]
+atlas = ExtResource("3_6tv0s")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6iw7f"]
+atlas = ExtResource("3_6tv0s")
+region = Rect2(0, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e4k3s"]
+atlas = ExtResource("3_6tv0s")
+region = Rect2(128, 128, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_477y8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t28pf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3x36m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ugy3b")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4w5re")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4vaqh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6iw7f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e4k3s")
+}],
+"loop": true,
+"name": &"running",
+"speed": 8.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6ihhs"]
+radius = 17.0
+height = 50.0
+
+[node name="JackWander" type="CharacterBody2D"]
+motion_mode = 1
+slide_on_ceiling = false
+script = ExtResource("1_fr2sc")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(1.2, 1.2)
+sprite_frames = SubResource("SpriteFrames_477y8")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0, -35)
+metadata/_edit_group_ = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.6, 1.6)
+position_smoothing_enabled = true
+position_smoothing_speed = 3.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, -1)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_6ihhs")

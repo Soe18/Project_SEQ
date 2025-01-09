@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dt7qg2616qjyl"]
+[gd_scene load_steps=4 format=3 uid="uid://dt7qg2616qjyl"]
 
 [ext_resource type="Script" path="res://overworld/scripts/menu.gd" id="1_icg54"]
+[ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_0a4l1"]
 [ext_resource type="Script" path="res://overworld/scripts/quest/quest_display.gd" id="2_y0x1b"]
 
 [node name="Menu" type="CanvasLayer"]
@@ -46,18 +47,34 @@ grow_vertical = 2
 [node name="ContinueButton" type="Button" parent="FirstMenu/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Riprendi"
 
 [node name="QuestButton" type="Button" parent="FirstMenu/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Missioni"
 
 [node name="EscapeButton" type="Button" parent="FirstMenu/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Fuggi dal dungeon"
 
 [node name="QuitButton" type="Button" parent="FirstMenu/VBoxContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Esci dal gioco"
 
 [node name="QuestMenu" type="Control" parent="."]
@@ -80,6 +97,10 @@ grow_vertical = 2
 
 [node name="Title" type="Label" parent="QuestMenu/BigContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Menù quest"
 
 [node name="FilterContainer" type="HBoxContainer" parent="QuestMenu/BigContainer"]
@@ -90,15 +111,27 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Tutte
 "
 
 [node name="Button2" type="Button" parent="QuestMenu/BigContainer/FilterContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Solo \"Da fare\""
 
 [node name="Button3" type="Button" parent="QuestMenu/BigContainer/FilterContainer"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
 text = "Solo \"Completate\""
 
 [node name="QuestContainer" type="VBoxContainer" parent="QuestMenu/BigContainer"]

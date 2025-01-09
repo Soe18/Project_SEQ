@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btjg1uvmks8gk"
-path="res://.godot/imported/jack_running_p.png-3cac72b6dab496935e79ed43ede1a6d1.ctex"
+uid="uid://d28in2rnnrxcf"
+path="res://.godot/imported/jack_flashbang_sh.png-d6ecf733e73bc17945da9da2efcd41db.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_running_p.png"
-dest_files=["res://.godot/imported/jack_running_p.png-3cac72b6dab496935e79ed43ede1a6d1.ctex"]
+source_file="res://components/sprites/jack/shotgun/jack_flashbang_sh.png"
+dest_files=["res://.godot/imported/jack_flashbang_sh.png-d6ecf733e73bc17945da9da2efcd41db.ctex"]
 
 [params]
 

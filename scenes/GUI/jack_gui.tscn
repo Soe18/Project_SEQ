@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_sbc0r"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_0n4u8"]
-[ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="3_eqh8b"]
+[ext_resource type="Texture2D" uid="uid://qa3t1ulvjv5f" path="res://components/sprites/GUI/player_GUI/jack/Skill1_GUI_jack.png" id="3_nlart"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="4_0xiyi"]
-[ext_resource type="Texture2D" uid="uid://bflcuuauxyxfi" path="res://components/sprites/GUI/player_GUI/rufus/Eva_GUI_rufus.png" id="5_mq7rm"]
-[ext_resource type="Texture2D" uid="uid://bciywb7l5cwth" path="res://components/sprites/GUI/player_GUI/rufus/Skill2_GUI_rufus.png" id="6_kx1cw"]
-[ext_resource type="Texture2D" uid="uid://cega3rs3chnkn" path="res://components/sprites/GUI/player_GUI/rufus/Ulti_GUI_rufus.png" id="7_q4a6a"]
+[ext_resource type="Texture2D" uid="uid://l8k1jxx2kwr" path="res://components/sprites/GUI/player_GUI/jack/Eva_GUI_jack.png" id="5_m06he"]
+[ext_resource type="Texture2D" uid="uid://h7ndo2pp08vu" path="res://components/sprites/GUI/player_GUI/jack/Skill2_GUI_jack.png" id="6_twk8r"]
+[ext_resource type="Texture2D" uid="uid://dnoi4w0757nmf" path="res://components/sprites/GUI/player_GUI/jack/Ulti_GUI_jack.png" id="7_ui6vk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dcn56"]
 bg_color = Color(0.219608, 0.219608, 0.219608, 1)
@@ -16,6 +16,21 @@ bg_color = Color(1, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c681g"]
 bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="Animation" id="Animation_gea2b"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flashbang_effect:theme_override_styles/panel:bg_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_ujtmg"]
 resource_name = "flashbang"
@@ -31,21 +46,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_gea2b"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Flashbang_effect:theme_override_styles/panel:bg_color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hqk6k"]
@@ -144,7 +144,7 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("3_eqh8b")
+texture_under = ExtResource("3_nlart")
 texture_progress = ExtResource("4_0xiyi")
 
 [node name="Eva_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
@@ -160,7 +160,7 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("5_mq7rm")
+texture_under = ExtResource("5_m06he")
 texture_progress = ExtResource("4_0xiyi")
 
 [node name="Skill2_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
@@ -180,7 +180,7 @@ scale = Vector2(0.329, 0.329)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("6_kx1cw")
+texture_under = ExtResource("6_twk8r")
 texture_progress = ExtResource("4_0xiyi")
 
 [node name="Ulti_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
@@ -198,7 +198,7 @@ scale = Vector2(0.465, 0.465)
 step = 0.001
 allow_greater = true
 fill_mode = 5
-texture_under = ExtResource("7_q4a6a")
+texture_under = ExtResource("7_ui6vk")
 texture_progress = ExtResource("4_0xiyi")
 
 [node name="Flashbang_effect" type="Panel" parent="."]

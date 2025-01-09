@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dyy88jjv1m7uy"
-path="res://.godot/imported/jack_p_running_reload.png-21cc2ad5dfd7b3e0eb5ea5e206068501.ctex"
+uid="uid://iiwhblervbq4"
+path="res://.godot/imported/jack_change_p.png-310b1f81a5d1dab6c13154b9e6f0fd1c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_p_running_reload.png"
-dest_files=["res://.godot/imported/jack_p_running_reload.png-21cc2ad5dfd7b3e0eb5ea5e206068501.ctex"]
+source_file="res://components/sprites/jack/pistol/jack_change_p.png"
+dest_files=["res://.godot/imported/jack_change_p.png-310b1f81a5d1dab6c13154b9e6f0fd1c.ctex"]
 
 [params]
 

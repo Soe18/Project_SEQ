@@ -8,10 +8,11 @@ var player_in_range = false
 signal change_stage()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_pressed("base_atk") and player_in_range:
-		self.z_index = 99
+		player._on_set_idle()
 		player.can_move = false
+		self.z_index = 99
 		animation_player.play("travel")
 
 func _on_area_of_interaction_body_entered(body):

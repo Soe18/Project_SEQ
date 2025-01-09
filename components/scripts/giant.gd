@@ -209,7 +209,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		show_hitmarker("-" + str(dmg), dmg_crit[1])
 		current_vit -= dmg
 		set_health_bar()
-		if dmg >= 25 and stun_sec > 0:
+		if (dmg >= 25 or dmg <= 0) and stun_sec > 0:
 			punch_effect.play("idle")
 			sprite.position = Vector2(0,0)
 			attacking = false
@@ -405,7 +405,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

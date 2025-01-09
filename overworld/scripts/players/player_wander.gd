@@ -1,8 +1,11 @@
 extends CharacterBody2D
 
 @onready var sprite = $AnimatedSprite2D
+@onready var collider = $CollisionShape2D
 
 const is_player = true
+
+var moving = true
 
 @export var OK_MULTIPLYER : float = 350.0
 var current_multiplyer = OK_MULTIPLYER
@@ -12,14 +15,15 @@ var current_multiplyer = OK_MULTIPLYER
 @onready var axis = Vector2.ZERO
 
 func _physics_process(delta):
-	move(delta)
+	if moving:
+		move(delta)
 
 func move(delta):
 	axis = get_input_axis()
 	if axis == Vector2.ZERO:
 		apply_friction(FRICTION * delta)
 	else:
-		sprite.play("Running")
+		sprite.play("running")
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)

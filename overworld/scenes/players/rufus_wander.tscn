@@ -1,16 +1,8 @@
 [gd_scene load_steps=12 format=3 uid="uid://ddy0votrhsoys"]
 
-[ext_resource type="Script" path="res://overworld/scripts/players/rufus_wander.gd" id="1_30747"]
+[ext_resource type="Script" path="res://overworld/scripts/players/player_wander.gd" id="1_30747"]
 [ext_resource type="Texture2D" uid="uid://d0sp863w364p2" path="res://components/sprites/rufus/Rufus_idle.png" id="1_mxkhv"]
 [ext_resource type="Texture2D" uid="uid://g2nafuf0dsep" path="res://components/sprites/rufus/Rufus_running.png" id="2_uwi0t"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_umgu0"]
-atlas = ExtResource("2_uwi0t")
-region = Rect2(0, 0, 800, 800)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0xqo1"]
-atlas = ExtResource("2_uwi0t")
-region = Rect2(0, 800, 800, 800)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aodrr"]
 atlas = ExtResource("1_mxkhv")
@@ -28,19 +20,16 @@ region = Rect2(0, 800, 800, 800)
 atlas = ExtResource("1_mxkhv")
 region = Rect2(800, 800, 800, 800)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_umgu0"]
+atlas = ExtResource("2_uwi0t")
+region = Rect2(0, 0, 800, 800)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0xqo1"]
+atlas = ExtResource("2_uwi0t")
+region = Rect2(0, 800, 800, 800)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_477y8"]
 animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_umgu0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0xqo1")
-}],
-"loop": true,
-"name": &"Running",
-"speed": 5.0
-}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_aodrr")
@@ -57,6 +46,17 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_umgu0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0xqo1")
+}],
+"loop": true,
+"name": &"running",
+"speed": 5.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6ihhs"]
@@ -71,7 +71,7 @@ script = ExtResource("1_30747")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.157, 0.157)
 sprite_frames = SubResource("SpriteFrames_477y8")
-animation = &"Running"
+animation = &"idle"
 autoplay = "idle"
 offset = Vector2(0, -300)
 metadata/_edit_group_ = true

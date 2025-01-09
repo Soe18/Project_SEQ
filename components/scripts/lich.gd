@@ -228,9 +228,9 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
 			var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-			current_vit -= dmg
+			current_vit -= dmg[0]
 			emit_signal("set_health_bar", current_vit)
-			show_hitmarker("-" + str(dmg))
+			show_hitmarker("-" + str(dmg[0]), dmg[1])
 			
 			# sto stronzo ha uno stun_reduction, cioè diminuisce i secondi di stun
 			stun_sec -= 0.5
@@ -239,7 +239,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 				stun_sec = 0 # semplicemente li riporta a 0
 			
 			# se ha secondi di stun e se il danno è maggiore uguale a 15 allora lo sente effettivamente
-			if stun_sec > 0 and dmg >= 15: # ha pure l'armor sta merda
+			if (dmg[0] >= 15 or dmg[0] <= 0) and stun_sec > 0: # ha pure l'armor sta merda
 				moving = false
 				stun_timer.wait_time = stun_sec
 				stun_timer.start()
@@ -532,7 +532,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:
@@ -564,7 +563,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
 
-func show_hitmarker(dmg):
+func show_hitmarker(dmg, crit):
 	var hitmarker = damage_node.instantiate()
 	hitmarker.position = hitmarker_spawnpoint.global_position
 	
@@ -575,4 +574,6 @@ func show_hitmarker(dmg):
 						0.75)
 	
 	hitmarker.get_child(0).text = dmg
+	if crit:
+		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
 	get_tree().current_scene.add_child(hitmarker)

@@ -8,4 +8,4 @@ func set_labels(id_t, title_t, description_t, status_t):
 	id.text = str(id_t)
 	title.text = title_t
 	description.text = description_t
-	status.text = str(status_t)
+	status.text = str(QuestStatus.of_type.find_key(status_t))

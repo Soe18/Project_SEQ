@@ -127,17 +127,13 @@ func _physics_process(_delta):
 #		muovo il nodo verso il player con la velocità di 3
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		body_collider.position = Vector2(19, 16)
-		body_collider.rotation_degrees = -11
-		body_collider.position.x = 7
+		body_collider.position.x = 4
 		claws_collider.position.x = -33
 		sprite.flip_h = true
 		if grabbed:
 			sprite.rotation_degrees = -90;
 	elif distance_to_player.x > 0:
-		body_collider.position = Vector2(-6, 16)
-		body_collider.rotation_degrees = 11
-		body_collider.position.x = -7
+		body_collider.position.x = -4
 		claws_collider.position.x = 33
 		sprite.flip_h = false
 		if grabbed:
@@ -234,13 +230,13 @@ func _on_player_is_in_atk_range(is_in, body):
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if is_in_atk_range and not grabbed and not knockbacked:
 		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		var dmg = dmg_crit[0]
 		
 		var rng = randi_range(0, 100)
 		if agility_cooldown.is_stopped() and rng <= agility_percentage:
 			agility()
 		
-		if not agility_activated: 
-			var dmg = dmg_crit[0]
+		if not agility_activated or dmg <= 0:
 			show_hitmarker("-" + str(dmg), dmg_crit[1])
 			current_vit -= dmg
 			set_health_bar()
@@ -331,7 +327,8 @@ func _on_sprite_2d_animation_finished() -> void:
 		sprite.play("claws")
 		second_time_claw = true
 	else:
-		set_idle()
+		if stun_timer.is_stopped():
+			set_idle()
 
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "claws" and (sprite.frame == 1 or sprite.frame == 4):
@@ -396,7 +393,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

@@ -2,6 +2,7 @@ extends Node
 
 var quests : Dictionary = {
 	1 : preload("res://overworld/resources/a_to_b.tres"),
+	2 : preload("res://overworld/resources/try.tres"),
 }
 
 func _ready():

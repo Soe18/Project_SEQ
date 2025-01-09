@@ -38,7 +38,7 @@ var sprinting = false
 
 @export var bite_force = 5
 @export var bite_stun_time = 0.5
-@export var sprint_force = 15
+@export var sprint_force = 10
 @export var sprint_stun_time = 0.3
 @export var sprint_multiplyer = 5
 @export var sprint_duration = 6.0
@@ -390,7 +390,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

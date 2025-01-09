@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ctcf43dptrdq1"
-path="res://.godot/imported/jack_idle.png-1733187de78d1341c0cd1be17269f1d6.ctex"
+uid="uid://b5n73bxvsflih"
+path="res://.godot/imported/jack_change_as.png-9e7c542bb2c27e46799308b539d1ce4a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_idle.png"
-dest_files=["res://.godot/imported/jack_idle.png-1733187de78d1341c0cd1be17269f1d6.ctex"]
+source_file="res://components/sprites/jack/assault/jack_change_as.png"
+dest_files=["res://.godot/imported/jack_change_as.png-9e7c542bb2c27e46799308b539d1ce4a.ctex"]
 
 [params]
 

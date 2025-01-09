@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://n5eeephddexo"
-path="res://.godot/imported/jack_shooting_p.png-3191b29f43b91f237a73461d657b8c30.ctex"
+uid="uid://bv1k64smt6fmr"
+path="res://.godot/imported/jack_damaged_sh.png-dc8e690bb7f547e71c7cc679cf8e18da.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_shooting_p.png"
-dest_files=["res://.godot/imported/jack_shooting_p.png-3191b29f43b91f237a73461d657b8c30.ctex"]
+source_file="res://components/sprites/jack/shotgun/jack_damaged_sh.png"
+dest_files=["res://.godot/imported/jack_damaged_sh.png-dc8e690bb7f547e71c7cc679cf8e18da.ctex"]
 
 [params]
 

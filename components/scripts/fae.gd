@@ -217,10 +217,10 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		current_vit -= dmg
 		set_health_bar()
 		
-		if not flee_activated and flee_cooldown.is_stopped():
-			flee_delay.start()
-		
 		if stun_sec > 0 and not flee_activated:
+			if flee_cooldown.is_stopped():
+				flee_delay.start()
+			
 			moving = false
 			heal_charge_time.stop()
 			stun_timer.wait_time = stun_sec
@@ -228,7 +228,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 			sprite.play("damaged")
 
 func _on_sprite_2d_animation_finished() -> void:
-	set_idle()
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "launch_dart" and sprite.frame == 1 and choosed_atk == Possible_Attacks.MAGIC_DART:
@@ -395,7 +396,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
@@ -407,7 +407,7 @@ func _on_area_of_detection_body_exited(body):
 
 # DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
 func set_idle():
-	if not knockbacked and not grabbed:
+	if (not knockbacked and not grabbed) or not flee_activated:
 		moving = true
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")

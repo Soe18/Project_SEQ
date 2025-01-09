@@ -204,30 +204,19 @@ func _on_player_is_in_atk_range(is_in, body):
 		faccio partire il timer dello stun'
 
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	if dying and not soul_out:
-		if knockbacked:
-			knockbacked = false
-	elif is_in_atk_range and !grabbed and not parring:
+	if is_in_atk_range and !grabbed and not parring:
 		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
 		var dmg = dmg_crit[0]
 		show_hitmarker("-" + str(dmg), dmg_crit[1])
 		current_vit -= dmg
-		moving = false
-		if stun_sec > 0:
-			if current_vit > 0:
-				stun_timer.wait_time = stun_sec
-				stun_timer.start()
-				sprite.play("damaged")
-			elif current_vit <= 0 and not dying:
-				if player.char_name == "Nathan" and grabbed:
-					emit_signal("got_grabbed", false)
-				dying = true
-				if not sprite.animation == "dying":
-					sprite.play("dying")
-				current_vit = 1
-				body_collider.process_mode = Node.PROCESS_MODE_DISABLED
-				soul_delay_timer.start()
+		
+		if stun_sec > 0 and not (dying or soul_out):
+			moving = false
+			stun_timer.wait_time = stun_sec
+			stun_timer.start()
+			sprite.play("damaged")
 		set_health_bar()
+	
 	elif is_in_atk_range and !grabbed and parring:
 		parry_time.start(0.8)
 
@@ -281,13 +270,19 @@ func _on_stun_timeout():
 		cancello il nodo dalla scena'
 
 func set_health_bar():
-	if soul_out and current_vit == 1:
+	if soul_out and current_vit <= 0:
 		queue_free()
-	else:
-		if current_vit > default_vit:
+	elif current_vit <= 0 and not dying:
+			set_idle()
+			dying = true
+			sprite.play("dying")
+			current_vit = 1
+			body_collider.process_mode = Node.PROCESS_MODE_DISABLED
+			soul_delay_timer.start()
+	elif current_vit > default_vit:
 			current_vit = default_vit
-		
-		healthbar.value = current_vit
+	
+	healthbar.value = current_vit
 
 'DIGEST DEL TIMER "GrabTime", IMPOSTA UN DELAY DOPO LA GRAB
 	setto le collisioni a true'
@@ -319,38 +314,20 @@ func _on_area_of_detection_body_exited(body):
 	if body == player:
 		player_entered = false
 
-'DIGEST CHE AGGIORNA LA DIREZIONE QUANDO IL NODO VAGA
-	ferma il movimento
-	fa partire il tempo di fermo
-	aspetta il segnale
-	crea un vettore con direzione casuale
-	aggiorna il target con il vettore appena creato
-	crea una variabile randomica che determina quanto durerà lo spostamento
-	aggiorna il wait_time del timer'
-
-func _on_update_direction_timeout():
-	moving = false
-	sprite.play("idle")
-	$Inhale_time.start()
-	await set_idle
-	var updated_vector = Vector2(randf_range(-1,1), randf_range(-1,1))
-	target_position = Vector2(updated_vector.x/sqrt(2),updated_vector.y/sqrt(2))
-	var new_update_time = randf_range(3,6)
-	$Update_Atk.wait_time = new_update_time
-
 
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
 func set_idle():
-	if not knockbacked and not grabbed:
+	if not knockbacked and not grabbed and not (dying or soul_out):
 		moving = true
 		dying = false
 		soul_out = false
 		if parring:
 			parring = false
 			sprite.play("idle")
+		basic_atk_effect.play("idle")
 
 func _on_basic_atk_area_body_entered(body):
 	if body == player:
@@ -361,10 +338,9 @@ func _on_basic_atk_area_body_exited(body):
 		player_in_atk_range = false
 
 func _on_effect_animation_finished():
-	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range:
+	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range and not (soul_out or dying):
 		emit_signal("take_dmg", current_str, slice_force, slice_stun_time, current_pbc, current_efc)
-	basic_atk_effect.play("idle")
-	sprite.play("idle")
+	set_idle()
 	
 func basic_atk():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
@@ -384,7 +360,7 @@ func _on_parry_time_timeout() -> void:
 
 func _on_update_atk_timeout():
 	choose_atk()
-	$Update_Atk.start()
+	update_atk_timer.start()
 
 func _on_soul_delay_time_timeout():
 	sprite.play("soul_spawning")
@@ -406,6 +382,7 @@ func _on_sprite_2d_animation_finished():
 		sprite.speed_scale = 1
 		current_vit = default_vit
 		set_health_bar()
+		dying = false
 		set_idle()
 
 
@@ -433,8 +410,6 @@ func apply_knockback(sender):
 func _on_knockback_reset_timeout():
 	knockbacked = false
 	stun_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
-	if not dying:
-		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

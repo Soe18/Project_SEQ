@@ -1,6 +1,7 @@
 extends Node2D
 
 var player
+var selected_character
 var paused = false
 var connected = false
 var boss_defeted_count = 0
@@ -13,8 +14,6 @@ var active_enemy_container : Node2D
 @onready var gui = canvas_layer.find_child("GUI")
 # contenitore della gui di game over
 @onready var game_over_container = gui.find_child("GameOver_container")
-# contenitore della gui di selezione del player
-@onready var chara_container = gui.find_child("Chara_selector_container")
 # contenitore della gui del combattimento
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
 # music player che contiene la ost
@@ -53,10 +52,10 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-	
-	if Input.is_action_just_pressed("reload_scene"):
-		# It reloads the dungeon, just for debuggin, this is ok :D
-		get_tree().get_first_node_in_group("gm").load_dungeon()
+	#
+	#if Input.is_action_just_pressed("reload_scene"):
+		## It reloads the dungeon, just for debuggin, this is ok :D
+		#get_tree().get_first_node_in_group("gm").load_dungeon()
 	
 	if player != null:
 		if not active_enemy_container.fighting:
@@ -76,6 +75,7 @@ func _process(_delta):
 
 func _on_gui_select_character(char):
 	var player_scene
+	selected_character = char
 	if char == "jack":
 		player_scene = load("res://scenes/characters/jack.tscn")
 	elif char == "rufus":
@@ -141,6 +141,8 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			elif player.char_name == "Rufus":
 				player.change_stats.connect(current_node._on_change_stats)
 				player.inflict_knockback.connect(current_node.init_knockback)
+			elif player.char_name == "Jack":
+				player.inflict_knockback.connect(current_node.init_knockback)
 			
 			# se il nodo è un mezzo-umano
 			if "Werewolf" in current_node.name:
@@ -203,7 +205,6 @@ func _on_player_death():
 	game_over_ost.play() # faccio partire l'ost di game over
 	gui.visible = true # la GUI diventa visibile
 	game_over_container.visible = true # rendo visibile il game over
-	chara_container.visible = false # nascondo i pulsanti della selezione dei personaggi
 	player_gui.visible = false # nascondo la gui del player
 	Menu.game_status = Menu.GAME_STATUSES.unopenable # Azione piu' forte di quel che si pensi, non usarlo a cuor leggero
 	# metto il focus sul pulsante riprova nell menu di game over

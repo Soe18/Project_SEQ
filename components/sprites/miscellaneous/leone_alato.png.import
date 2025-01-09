@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://o1s5vs53dc4a"
-path="res://.godot/imported/jack_damaged_p.png-a59141f59fef6dd79a784a67e2104fe1.ctex"
+uid="uid://bwkgwudqgd7k"
+path="res://.godot/imported/leone_alato.png-3c86281d482f665c6d421a9f51547d98.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_damaged_p.png"
-dest_files=["res://.godot/imported/jack_damaged_p.png-a59141f59fef6dd79a784a67e2104fe1.ctex"]
+source_file="res://components/sprites/miscellaneous/leone_alato.png"
+dest_files=["res://.godot/imported/leone_alato.png-3c86281d482f665c6d421a9f51547d98.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://vgy3nolswcyb"
-path="res://.godot/imported/jack_p_reload.png-585f2595d65d0aca3a02c7f39161378d.ctex"
+uid="uid://ib2oxxketbvi"
+path="res://.godot/imported/jack_running_as.png-f13d182d8731096c258905c715f42f0e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://components/sprites/jack/jack_p_reload.png"
-dest_files=["res://.godot/imported/jack_p_reload.png-585f2595d65d0aca3a02c7f39161378d.ctex"]
+source_file="res://components/sprites/jack/assault/jack_running_as.png"
+dest_files=["res://.godot/imported/jack_running_as.png-f13d182d8731096c258905c715f42f0e.ctex"]
 
 [params]
 
