@@ -8,6 +8,9 @@ var player_in_area_to_change_char = false
 @onready var dungeon_entrance = $Dungeon
 @onready var player_spawnpoint = $Marker2D
 
+func _ready():
+	Menu.game_status = Menu.GAME_STATUSES.unopenable
+
 func _process(_delta):
 	if Input.is_action_pressed("base_atk") and player_in_area_to_change_char:
 		player.sprite.play("idle") # se il player si sta spostando mi pare giusto fermarlo

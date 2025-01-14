@@ -56,6 +56,7 @@ var choosed_atk
 
 @onready var heal_charge_time = $Heal_charge_time
 @onready var flee_delay = $Flee_delay
+@onready var flee_timeout_timer = $Flee_timeout
 
 @onready var magic_dart_cooldown = $Magic_dart_cooldown
 @onready var enchantment_cooldown = $Enchantment_cooldown
@@ -103,7 +104,7 @@ func _physics_process(_delta):
 				moving = false
 				magic_dart_cooldown.start()
 			if choosed_atk == Possible_Attacks.ENCHANTMENT and enchantment_cooldown.is_stopped() and not flee_activated:
-				sprite.play("launch_dart")
+				sprite.play("launch_dart", 0.75)
 				moving = false
 				enchantment_cooldown.start()
 			if choosed_atk == Possible_Attacks.HEAL and heal_cooldown.is_stopped() and not flee_activated:
@@ -116,7 +117,7 @@ func _physics_process(_delta):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * 150
+				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
 				sprite.play("idle")
@@ -219,13 +220,21 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		
 		if stun_sec > 0 and not flee_activated:
 			if flee_cooldown.is_stopped():
+				heal_charge_time.stop()
+				moving = false
 				flee_delay.start()
-			
-			moving = false
-			heal_charge_time.stop()
-			stun_timer.wait_time = stun_sec
-			stun_timer.start()
-			sprite.play("damaged")
+				flee_timeout_timer.start()
+				sprite.play("damaged")
+				self.set_collision_layer_value(1, false)
+				self.set_collision_layer_value(3, true)
+				self.set_collision_mask_value(1, false)
+				self.set_collision_mask_value(3, true)
+			else:
+				moving = false
+				heal_charge_time.stop()
+				stun_timer.wait_time = stun_sec
+				stun_timer.start()
+				sprite.play("damaged")
 
 func _on_sprite_2d_animation_finished() -> void:
 	if stun_timer.is_stopped():
@@ -265,11 +274,8 @@ func launch_enchantment():
 	set_idle()
 
 func _on_flee_delay_timeout() -> void:
+	moving = true
 	flee_activated = true
-	self.set_collision_layer_value(1, false)
-	self.set_collision_layer_value(3, true)
-	self.set_collision_mask_value(1, false)
-	self.set_collision_mask_value(3, true)
 	
 	var most_distant = flee_locations[0]
 	for i in flee_locations:
@@ -281,16 +287,21 @@ func _on_flee_delay_timeout() -> void:
 	current_des += 300
 	flee_cooldown.start()
 
-func _on_navigation_agent_2d_target_reached() -> void:
-	if flee_activated:
-		flee_activated = false
-		self.set_collision_layer_value(1, true)
-		self.set_collision_layer_value(3, false)
-		self.set_collision_mask_value(1, true)
-		self.set_collision_mask_value(3, false)
-		navigation_agent.target_desired_distance = 250
-		current_des -= 300
-		set_idle()
+func _on_navigation_agent_2d_target_reached(timeout = false) -> void:
+	if player:
+		if navigation_agent.target_position != player.global_position or timeout:
+			flee_activated = false
+			flee_timeout_timer.stop()
+			self.set_collision_layer_value(1, true)
+			self.set_collision_layer_value(3, false)
+			self.set_collision_mask_value(1, true)
+			self.set_collision_mask_value(3, false)
+			navigation_agent.target_desired_distance = 250
+			current_des -= 300
+			set_idle()
+
+func _on_flee_timeout_timeout() -> void:
+	_on_navigation_agent_2d_target_reached(true)
 
 func _on_heal_charge_time_timeout() -> void:
 	sprite.play("heal")
@@ -372,7 +383,7 @@ func _on_timer_timeout():
 
 func _on_update_atk_timeout():
 	choose_atk()
-	update_atk_timer.start(randi_range(2, 4.5))
+	update_atk_timer.start(randf_range(2, 4.5))
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
@@ -436,6 +447,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 			new_timer.stat = stat
 			new_timer.amount = -amount
 			new_timer.wait_time = time_duration
+			new_timer.reset_stats.connect(self._on_change_stats)
 			new_timer.start()
 
 func _on_status_alert_sprite_animation_finished():

@@ -36,10 +36,10 @@ var portal
 
 func _ready():
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
-	add_child(load(tilesets[1]).instantiate(),true)
+	add_child(load(tilesets[0]).instantiate(),true)
 	active_tileset = get_child(get_child_count(true)-1)
 	
-	add_child(load(enemy_containers[1]).instantiate(),true)
+	add_child(load(enemy_containers[0]).instantiate(),true)
 	active_enemy_container = get_child(get_child_count(true)-1)
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
@@ -134,14 +134,13 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
 			
 			# se il player ha scelto nathan
-			if player.char_name == "Nathan":
-				# connetto il segnale della grab
+			if player.char_name == "Nathan": # connetto il segnale della grab
 				player.grab.connect(current_node._on_player_grab)
 				current_node.got_grabbed.connect(player_gui._on_nathan_grab)
-			elif player.char_name == "Rufus":
+			elif player.char_name == "Rufus": # connetto il segnale del knockback e del cambio statistiche
 				player.change_stats.connect(current_node._on_change_stats)
 				player.inflict_knockback.connect(current_node.init_knockback)
-			elif player.char_name == "Jack":
+			elif player.char_name == "Jack": # connetto il segnale del knockback
 				player.inflict_knockback.connect(current_node.init_knockback)
 			
 			# se il nodo è un mezzo-umano
@@ -153,6 +152,10 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			
 			if "Fae" in current_node.name:
 				current_node.flee_locations = active_enemy_container.markers
+			
+			if "Centaur" in current_node.name:
+				current_node.grab_player.connect(player._on_enemy_grab)
+				current_node.inflict_knockback.connect(player.init_knockback)
 			
 			# se il nodo è il lich
 			if "Lich" in current_node.name:
@@ -170,6 +173,7 @@ func connect_player_projectile(projectile):
 		#se il nome del nemico contiene "Enemy"
 		if "Enemy" in current_node.name: 
 			projectile.take_dmg.connect(current_node._on_player_take_dmg)
+			projectile.inflict_knockback.connect(current_node.init_knockback)
 	
 
 # Penso che questa funzione sia inutile ora :/

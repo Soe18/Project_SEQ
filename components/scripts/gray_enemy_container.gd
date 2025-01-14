@@ -3,12 +3,13 @@ extends Node2D
 var markers = [] # array che contiene tutti i marker della scena
 var active_markers = [] # array che si popola allo spawnare dei nemici
 # array contenente i percorsi dei nemici
-var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn"]
+var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn","res://scenes/enemies/centaur.tscn"]
 # [0] = Zombie
 # [1] = Scheletro
 # [2] = Gigante
 # [3] = Mezzo-umano
 # [4] = Fata
+# [5] = Centauro
 
 # array che contiene il percorso del boss
 var boss_scene = "res://scenes/enemies/lich.tscn"
@@ -34,26 +35,24 @@ func _ready():
 
 #METODO CHE VIENE EVOCATO AD OGNI FRAME, CONTROLLA SE I NEMICI SONO ANCORA PRESENTI IN GAME
 func _process(_delta):
-	fighting = false # do per scontato che la battaglia sia finita
-	var boss_present = false # do per scontato che il boss non ci sia
-	for i in get_children(): # controllo tutti i figli
-		if "Enemy" in i.name: # se esiste almeno un nemico
-			fighting = true # sto combattendo
-		if "Boss" in i.name and is_boss_round(): # se esiste un nemico E questo è il round del boss
-			boss_present = true # allora il boss è presente
+	fighting = false
+	var boss_present = false
+	for i in get_children():
+		if "Enemy" in i.name:
+			fighting = true
+		if "Enemy" in i.name and is_boss_round():
+			boss_present = true
 	
-	# se il boss è stato spawnato E non è presente
 	if boss_spawned and not boss_present:
-		boss_is_defeted = true # allora il boss è stato sconfitto
+		boss_is_defeted = true
 	
-	if not boss_is_defeted: # se il boss non è stato sconfitto
-		# se non ci sono nemici e non sto aspettando l'ondata successiva
+	if not boss_is_defeted:
 		if not fighting and time_between_rounds.is_stopped():
-			time_between_rounds.start() # faccio partire il timer
-	else: # altrimenti
-		if not portal_spawned: # se il portale non è spawnato
-			emit_signal("boss_defeted") # invio il segnale allo scene_manager che il boss è stato sconfitto
-			portal_spawned = true # ciò vuol dire che il portale si apre
+			time_between_rounds.start()
+	else:
+		if not portal_spawned:
+			emit_signal("boss_defeted")
+			portal_spawned = true
 
 # DIGEST DEL TIMER CHE DETERMINA QUANDO DEVE PARTIRE UNA NUOVA ONDATA
 func _on_round_cooldown_timeout():
@@ -92,6 +91,7 @@ func activate_markers():
 	var enemy_count = randi_range(min_count, max_count)
 	
 	#enemy_count = markers.size()
+	enemy_count = 1
 	
 	# ///////////// PRINT DI DEBUG ///////////// #
 	print("round_count = " + str(round_count))
@@ -119,8 +119,8 @@ func activate_markers():
 			else: # altrimenti
 				out = true # seleziono il percorso
 		
-		add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
-		#add_child(load(possible_enemies[2]).instantiate(),true) # debug
+		#add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
+		add_child(load(possible_enemies[5]).instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 

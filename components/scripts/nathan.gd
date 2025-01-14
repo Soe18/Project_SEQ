@@ -451,7 +451,7 @@ func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	var dmg = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	show_hitmarker("-" + str(dmg))
+	show_hitmarker("-" + str(dmg), false)
 	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")

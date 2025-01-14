@@ -3,12 +3,20 @@ extends Node2D
 var markers = [] # array che contiene tutti i marker della scena
 var active_markers = [] # array che si popola allo spawnare dei nemici
 # array contenente i percorsi dei nemici
-var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn"]
+var possible_enemies = [
+	"res://scenes/enemies/zombie.tscn",
+	"res://scenes/enemies/skeleton.tscn",
+	"res://scenes/enemies/giant.tscn",
+	"res://scenes/enemies/werewolf.tscn",
+	"res://scenes/enemies/fae.tscn"#,
+	#"res://scenes/enemies/centaur.tscn"
+	]
 # [0] = Zombie
 # [1] = Scheletro
 # [2] = Gigante
 # [3] = Mezzo-umano
 # [4] = Fata
+# [5] = Centauro TOLTO
 
 var boss_scene = "res://scenes/enemies/lich.tscn"
 
@@ -85,6 +93,7 @@ func activate_markers():
 	var enemy_count = randi_range(min_count, max_count)
 	
 	#enemy_count = 1
+	enemy_count = max_count
 	
 	print("round_count = " + str(round_count))
 	print("min_count = " + str(min_count))
@@ -113,7 +122,7 @@ func activate_markers():
 				out = true
 		
 		add_child(load(enemy_scene).instantiate(),true)
-		#add_child(load(possible_enemies[0]).instantiate(),true)
+		#add_child(load(possible_enemies[5]).instantiate(),true)
 		
 		get_child(get_child_count()-1).position = i.position
 

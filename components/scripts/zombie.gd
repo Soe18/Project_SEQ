@@ -31,7 +31,7 @@ signal got_grabbed(is_grabbed)
 var target_position
 var player
 
-enum Possible_Attacks {IDLE, BASIC_ATK, SPRINT}
+enum Possible_Attacks {IDLE, BITE, SPRINT}
 var choosed_atk
 
 var sprinting = false
@@ -46,14 +46,14 @@ var sprinting = false
 @onready var navigation_agent = $NavigationAgent2D
 
 @onready var sprite = $Sprite2D
-@onready var bite_effect = $Basic_atk_Area/Effect
-@onready var basic_atk_collider = $Basic_atk_Area/Skill_collider
+@onready var bite_effect = $Bite_Area/Effect
+@onready var bite_collider = $Bite_Area/Collider
 @onready var stun_timer = $Stun
 
 @onready var body_collider = $Body_collider
 
 @onready var sprint_area = $Sprint_Area
-@onready var sprint_collider = $Sprint_Area/Skill_collider
+@onready var sprint_collider = $Sprint_Area/Collider
 
 @onready var sprint_charge_time = $Charge_Time
 @onready var sprint_time = $Sprint_time
@@ -68,7 +68,7 @@ var sprinting = false
 
 @onready var update_atk_timer = $Update_Atk
 
-@onready var bite_cooldown = $Basic_atk_Cooldown
+@onready var bite_cooldown = $Bite_Cooldown
 @onready var sprint_cooldown = $Sprint_Cooldown
 
 var player_entered = true
@@ -101,8 +101,8 @@ func _physics_process(_delta):
 		sprint_to_player()
 	elif player_entered and moving:
 		chase_player()
-		if choosed_atk == Possible_Attacks.BASIC_ATK and bite_cooldown.is_stopped():
-			basic_atk()
+		if choosed_atk == Possible_Attacks.BITE and bite_cooldown.is_stopped():
+			bite()
 		if choosed_atk == Possible_Attacks.SPRINT and sprint_cooldown.is_stopped() and not sprinting and $Stun.is_stopped():
 			sprint()
 	elif not player_entered and moving:
@@ -129,7 +129,7 @@ func flip(distance_to_player):
 		bite_effect.flip_h = false
 		body_collider.position = Vector2(19, 16)
 		sprite.flip_h = true
-		basic_atk_collider.position = Vector2(-42, 16)
+		bite_collider.position = Vector2(-42, 16)
 		body_collider.rotation_degrees = -11
 		body_collider.position.x = 7
 		if grabbed:
@@ -139,7 +139,7 @@ func flip(distance_to_player):
 		bite_effect.flip_h = true
 		body_collider.position = Vector2(-6, 16)
 		sprite.flip_h = false
-		basic_atk_collider.position = Vector2(42, 16)
+		bite_collider.position = Vector2(42, 16)
 		body_collider.rotation_degrees = 11
 		body_collider.position.x = -7
 		if grabbed:
@@ -155,7 +155,7 @@ func chase_player():
 		else:
 			target_position = navigation_agent.get_next_path_position()
 			
-			var new_velocity = global_position.direction_to(target_position) * 200
+			var new_velocity = global_position.direction_to(target_position) * current_des
 			
 			if navigation_agent.avoidance_enabled:
 				navigation_agent.set_velocity(new_velocity)
@@ -181,7 +181,7 @@ func choose_atk():
 	if rng >= 0 and rng < 10:
 		choosed_atk = Possible_Attacks.IDLE
 	elif rng >= 10 and rng < 85:
-		choosed_atk = Possible_Attacks.BASIC_ATK
+		choosed_atk = Possible_Attacks.BITE
 	else:
 		choosed_atk = Possible_Attacks.SPRINT
 
@@ -230,6 +230,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		if sprinting and dmg >= 25:
 			sprinting = false
 			sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
+			sprite.play("damaged")
 		if stun_sec > 0:
 			moving = false
 			stun_timer.wait_time = stun_sec
@@ -315,11 +316,11 @@ func _on_area_of_detection_body_exited(body):
 	if body == player:
 		player_entered = false
 
-func _on_basic_atk_area_body_entered(body):
+func _on_bite_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
 
-func _on_basic_atk_area_body_exited(body):
+func _on_bite_area_body_exited(body):
 	if body == player:
 		player_in_atk_range = false
 
@@ -341,8 +342,9 @@ func _on_effect_animation_finished():
 	bite_effect.play("idle")
 	sprite.play("idle")
 
-func basic_atk():
+func bite():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not sprinting:
+		moving = false
 		bite_effect.play("effect")
 		sprite.play("attack")
 	bite_cooldown.start()
@@ -374,6 +376,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 func init_knockback(amount, time, sender):
 	if is_in_atk_range and not grabbed:
 		moving = false
+		sprinting = false
 		knockbacked = true
 		knockback_force = amount
 		knockback_sender = sender

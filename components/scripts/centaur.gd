@@ -1,16 +1,16 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 225
+@export var default_vit : int = 385
 var current_vit = default_vit
 @export var default_str : int = 175
 var current_str = default_str
-@export var default_tem : int = 100
+@export var default_tem : int = 120
 var current_tem = default_tem
-@export var default_des : int = 200
+@export var default_des : int = 300
 var current_des = default_des
-@export var default_pbc : int = 40
+@export var default_pbc : int = 20
 var current_pbc = default_pbc
-@export var default_efc : float = 1.5
+@export var default_efc : float = 1.3
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
@@ -26,13 +26,33 @@ var knockback_sender
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal got_grabbed(is_grabbed)
+signal grab_player(has_grabbed, grab_position_marker, sender)
 signal change_stats(stat, amount, time_duration, ally_sender)
+signal inflict_knockback(amount, time, sender)
 
 var target_position
 var player
 
-enum Possible_Attacks {IDLE, CLAWS, HOWL, AGILITY}
+enum Possible_Attacks {IDLE, HALBERD, SPRINT, TEMPERANCE}
 var choosed_atk
+
+var sprinting = false
+
+var target_location
+var origin
+var first_direction
+var first_enter = true
+
+@export var halberd_force = 10
+@export var halberd_stun_time = 2
+@export var sprint_duration = 5
+@export var sprint_force = 17
+@export var sprint_multiplyer = 800
+@export var sprint_knockback_force = 2000
+@export var sprint_knockback_time = 1
+@export var temperance_changed_stat = "tem"
+@export var temperance_amount = 60
+@export var temperance_duration = 20
 
 @onready var navigation_agent = $NavigationAgent2D
 
@@ -41,6 +61,15 @@ var choosed_atk
 @onready var stun_timer = $Stun
 
 @onready var body_collider = $Body_collider
+@onready var upper_body_collider = $Body_collider_upper
+
+@onready var halberd_area = $Halberd_area
+@onready var halberd_collider = $Halberd_area/Collider
+
+@onready var sprint_area = $Sprint_area
+@onready var sprint_collider = $Sprint_area/Collider
+@onready var sprint_duration_timer = $Sprint_area/Sprint_duration
+@onready var sprint_reset_collider = $Reset_sprint_area/Collision
 
 @onready var healthbar = $Control/HealthBar
 
@@ -51,6 +80,13 @@ var choosed_atk
 @onready var status_sprite = $Status_alert_sprite
 
 @onready var update_atk_timer = $Update_Atk
+
+@onready var grab_position_marker = $Grab_position
+@onready var animation_player = $AnimationPlayer
+
+@onready var halberd_cooldown = $Halberd_cooldown
+@onready var sprint_cooldown = $Sprint_cooldown
+@onready var temperance_cooldown = $Temperance_cooldown
 
 var player_entered = true
 var player_in_atk_range = false
@@ -74,8 +110,16 @@ func _ready():
 func _physics_process(_delta):
 	if knockbacked:
 		apply_knockback(knockback_sender)
+	elif sprinting:
+		sprint_to_target()
 	elif player_entered and moving:
 		chase_player()
+		if choosed_atk == Possible_Attacks.HALBERD and halberd_cooldown.is_stopped():
+			halberd()
+		if choosed_atk == Possible_Attacks.SPRINT and sprint_cooldown.is_stopped():
+			sprint()
+		if choosed_atk == Possible_Attacks.TEMPERANCE and temperance_cooldown.is_stopped():
+			temperance()
 	elif not player_entered and moving:
 		if player:
 			if not navigation_agent.is_navigation_finished():
@@ -98,8 +142,14 @@ func _physics_process(_delta):
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
 		sprite.flip_h = true
+		upper_body_collider.position.x = -38
+		halberd_collider.position.x = -83
+		sprint_collider.position.x = -134
 	elif distance_to_player.x > 0:
 		sprite.flip_h = false
+		upper_body_collider.position.x = 38
+		halberd_collider.position.x = 83
+		sprint_collider.position.x = 134
 
 func chase_player():
 	if player:
@@ -123,8 +173,30 @@ func chase_player():
 		var player_position = (player.position - position).normalized()
 		flip(player_position)
 
+func sprint_to_target():
+	if player != null:
+		var direction = global_position.direction_to(target_location)
+		
+		if first_enter:
+			first_direction = direction
+			first_enter = false
+		
+		if global_position.distance_to(origin) >= target_location.distance_to(origin):
+			direction = first_direction
+			
+		velocity = direction * sprint_multiplyer
+		move_and_slide()
+
 func choose_atk():
 	var rng = randi_range(0,100)
+	if rng >= 0 and rng < 40:
+		choosed_atk = Possible_Attacks.HALBERD
+	elif rng >= 40 and rng < 80:
+		choosed_atk = Possible_Attacks.SPRINT
+	else:
+		choosed_atk = Possible_Attacks.TEMPERANCE
+	
+	#choosed_atk = Possible_Attacks.SPRINT
 
 #DIGEST DEL SEGNALE DEL PLAYER "is_in_atk_range"
 #{
@@ -163,6 +235,9 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		show_hitmarker("-" + str(dmg), dmg_crit[1])
 		current_vit -= dmg
 		set_health_bar()
+		if sprinting and dmg >= 25:
+			sprinting = false
+			sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
 		if stun_sec > 0:
 			moving = false
 			stun_timer.wait_time = stun_sec
@@ -229,6 +304,107 @@ func _on_stun_timeout():
 	choosed_atk = Possible_Attacks.IDLE
 	set_idle()
 
+func _on_sprite_2d_animation_finished() -> void:
+	if sprite.animation == "charging_sprint":
+		sprinting = true
+		moving = false
+		target_location = player.global_position
+		origin = global_position
+		flip((target_location - global_position).normalized())
+		sprint_collider.set_deferred("disabled", false)
+		sprint_reset_collider.set_deferred("disabled", false)
+		sprint_duration_timer.start(sprint_duration)
+		sprite.play("sprint")
+		update_atk_timer.stop()
+	if sprite.animation == "grab" or sprite.animation == "halberd" or sprite.animation == "temperance":
+		set_idle()
+
+func _on_sprite_2d_frame_changed() -> void:
+	if sprite.animation == "grab" and sprite.frame == 5:
+		emit_signal("grab_player", false, null, null)
+		emit_signal("take_dmg", current_str, sprint_force, 0, current_pbc, current_efc)
+		emit_signal("inflict_knockback", 600, 0.3, self.global_position)
+	if sprite.animation == "halberd" and (sprite.frame == 4 or sprite.frame == 8) and player_in_atk_range:
+		emit_signal("take_dmg", current_str, halberd_force, halberd_stun_time, current_pbc, current_efc)
+	if sprite.animation == "temperance" and sprite.frame == 2:
+		_on_change_stats(temperance_changed_stat, temperance_amount, temperance_duration, true)
+
+func halberd():
+	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting and player_in_atk_range:
+		moving = false
+		sprite.play("halberd")
+		update_atk_timer.stop()
+	halberd_cooldown.start()
+
+func sprint():
+	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting:
+		sprite.play("charging_sprint")
+		moving = false
+		first_enter = true
+		update_atk_timer.stop()
+	sprint_cooldown.start()
+
+func temperance():
+	if stun_timer.is_stopped() and not grabbed and not sprinting:
+		sprite.play("temperance")
+		moving = false
+		update_atk_timer.stop()
+	temperance_cooldown.start()
+
+func _on_sprint_duration_timeout() -> void:
+	set_idle()
+
+func _on_area_of_detection_body_entered(body):
+	if body == player:
+		player_entered = true
+
+func _on_area_of_detection_body_exited(body):
+	if body == player:
+		player_entered = false
+
+func _on_halberd_area_body_entered(body: Node2D) -> void:
+	if body == player:
+		player_in_atk_range = true
+
+func _on_halberd_area_body_exited(body: Node2D) -> void:
+	if body == player:
+		player_in_atk_range = false
+
+func _on_sprint_area_body_entered(body: Node2D) -> void:
+	if body == player:
+		sprint_collider.set_deferred("disabled", true)
+		sprint_reset_collider.set_deferred("disabled", true)
+		sprint_duration_timer.stop()
+		sprinting = false
+		if sprite.flip_h:
+			animation_player.play("marker_movement_flip")
+		else:
+			animation_player.play("marker_movement")
+		sprite.play("grab")
+		emit_signal("grab_player", true, grab_position_marker, self)
+	elif body is TileMapLayer:
+		set_idle()
+
+func _on_reset_sprint_area_body_entered(body: Node2D) -> void:
+	if body is TileMapLayer or body == player:
+		set_idle()
+
+func _on_sprint_area_body_exited(body: Node2D) -> void:
+	pass # Replace with function body.
+
+#DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
+func set_idle():
+	if not knockbacked:
+		moving = true
+		sprinting = false
+		choosed_atk = Possible_Attacks.IDLE
+		sprite.play("idle")
+		halberd_collider.set_deferred("disabled", false)
+		sprint_collider.set_deferred("disabled", true)
+		sprint_reset_collider.set_deferred("disabled", true)
+		sprint_duration_timer.stop()
+		update_atk_timer.start()
+
 #DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
 #	il valore della barra diventa uguale a quello della vita attuale
 #	se il valore della vita è minore o uguale a 0
@@ -237,9 +413,6 @@ func set_health_bar():
 	healthbar.value = current_vit
 	if current_vit <= 0:
 		queue_free()
-
-func _on_timer_timeout():
-	body_collider.disabled = false
 
 # //////////// AREA COMUNE TRA NODI //////////// #
 
@@ -253,6 +426,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 func init_knockback(amount, time, sender):
 	if is_in_atk_range and not grabbed:
 		moving = false
+		sprinting = false
 		knockbacked = true
 		knockback_force = amount
 		knockback_sender = sender
@@ -269,22 +443,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	set_idle()
-
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
-#DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
-func set_idle():
-	if not knockbacked:
-		moving = true
-		choosed_atk = Possible_Attacks.IDLE
-		sprite.play("idle")
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

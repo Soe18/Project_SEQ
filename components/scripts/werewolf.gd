@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 @export var default_vit : int = 225
 var current_vit = default_vit
-@export var default_str : int = 175
+@export var default_str : int = 150
 var current_str = default_str
 @export var default_tem : int = 100
 var current_tem = default_tem
@@ -113,7 +113,7 @@ func _physics_process(_delta):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * 150
+				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
 				sprite.play("idle")

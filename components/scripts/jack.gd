@@ -8,7 +8,7 @@ var current_vit = default_vit
 var current_str = default_str
 @export var default_tem : int = 80
 var current_tem = default_tem
-@export var default_des : int = 165
+@export var default_des : int = 150
 var current_des = default_des
 @export var default_pbc : int = 30
 var current_pbc = default_pbc
@@ -37,13 +37,20 @@ signal launched_flashbang()
 var atk_state = Atk_States.IDLE
 
 var can_move = true
+var grabbed = false
+var grab_marker
+var grab_sender
+
+var knockbacked = false
+var knockback_force
+var knockback_sender
 
 var atk_anim_finished = true
 
 var Guns = {
-	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_"},
-	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 40, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_"},
-	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 60, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_"}
+	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_"},
+	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_"},
+	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 45, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_"}
 }
 
 var gun_prefix
@@ -66,10 +73,12 @@ var SHOTGUN_ROUNDS_COUNT = 6
 
 @export var bullet_scene : PackedScene
 @export var change_stats_timer_node : PackedScene
+@export var knockback_timer_node : PackedScene
 
 @onready var sprite = $Sprite2D
 
 @onready var bullets_spawnpoint = $Bullets_spawnpoint
+@onready var control_node = $Control
 
 @onready var skill1_cooldown = $Skill1_cooldown
 @onready var skill2_cooldown = $Skill2_cooldown
@@ -114,6 +123,10 @@ func _ready():
 	set_bullet_count_label()
 
 func _physics_process(delta):
+	if knockbacked:
+		apply_knockback(knockback_sender)
+	if grabbed:
+		is_grabbed()
 	if can_move:
 		move(delta)
 	if stun_timer.is_stopped():
@@ -208,6 +221,8 @@ func atk_handler():
 	elif Input.is_action_just_pressed("evade") and not ("damaged" in sprite.animation or "flashbang" in sprite.animation) and eva_cooldown.is_stopped():
 		eva_cooldown.start()
 		can_move = false
+		shooting_delay_timer.stop()
+		reaction_timer.stop()
 		atk_state = Atk_States.EVA
 		sprite.play(gun_prefix+"flashbang")
 		reset_axis()
@@ -242,12 +257,11 @@ func atk_handler():
 	elif Input.is_action_just_pressed("ult") and not ("damaged" in sprite.animation or "flashbang" in sprite.animation) and ulti_cooldown.is_stopped():
 		ulti_cooldown.start()
 		ulti_duration_timer.start(ULTI_DURATION)
-		skill1_cooldown.wait_time = 0.1
-		skill1_cooldown.start()
-		skill2_cooldown.wait_time = 0.1
-		skill2_cooldown.start()
+		skill1_cooldown.start(0.1)
+		skill2_cooldown.start(0.1)
 		atk_state = Atk_States.ULT
 		_on_change_stats("pbc", 100, ULTI_DURATION, false)
+		_on_change_stats("str", 100, ULTI_DURATION, false)
 
 	elif sprite.animation != gun_prefix+"idle" or sprite.animation != gun_prefix+"running":
 		pass
@@ -404,24 +418,32 @@ func set_bullet_count_label():
 
 #  -- set_idle mi permette di resettare il player allo stato di idle --  #
 func _on_set_idle():
-	axis = Vector2.ZERO
-	
-	atk_state = Atk_States.IDLE
-	
-	sprite.z_index = 0
-	
-	sprite.play(gun_prefix+"idle")
-	
-	self.set_collision_layer_value(1, true)
-	self.set_collision_layer_value(2, false)
-	
-	self.set_collision_mask_value(1, true)
-	self.set_collision_mask_value(2, false)
-	
-	can_move = true
-	atk_anim_finished = true
-	changing_gun = false
-	reaction_timer.stop()
+	if not knockbacked:
+		self.rotation_degrees = 0
+		
+		axis = Vector2.ZERO
+		
+		atk_state = Atk_States.IDLE
+		
+		sprite.z_index = 0
+		sprite.flip_v = false
+		
+		sprite.play(gun_prefix+"idle")
+		
+		self.set_collision_layer_value(1, true)
+		self.set_collision_layer_value(2, false)
+		
+		self.set_collision_mask_value(1, true)
+		self.set_collision_mask_value(2, false)
+		
+		control_node.rotation_degrees = 0
+		control_node.position.y = -53
+		
+		can_move = true
+		atk_anim_finished = true
+		changing_gun = false
+		shooting_delay_timer.stop()
+		reaction_timer.stop()
 
 '  -- quando finisce l\'effetto della skill allora disattivo l\'area e setto ad idle --  '
 func _on_effect_animation_finished():
@@ -454,6 +476,45 @@ func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		stun_timer.wait_time = stun_sec
 		stun_timer.start()
 
+func _on_enemy_grab(is_been_grabbed, grab_position_marker, sender):
+	if is_been_grabbed and not grabbed:
+		emit_signal("set_idle")
+		sprite.play(gun_prefix+"damaged")
+		can_move = false
+		grabbed = true
+		
+		self.set_collision_layer_value(1, false)
+		self.set_collision_layer_value(2, true)
+		self.set_collision_mask_value(1, false)
+		self.set_collision_mask_value(2, true)
+		
+		grab_marker = grab_position_marker
+		grab_sender = sender
+		
+		
+		if not sender.sprite.flip_h:
+			flip_sprite(true)
+		else: 
+			flip_sprite(false)
+		
+		if sprite.flip_h:
+			control_node.position.y = 53
+			sprite.flip_v = true 
+			sprite.flip_h = false
+		else:
+			sprite.flip_v = false
+		
+	elif not is_been_grabbed:
+		emit_signal("set_idle")
+		grabbed = false
+
+#METODO CHE TELETRASPORTA IL NODO NELLA POSIZIONE DEL PLAYER DURANTE LA GRAB
+#	setto la posizione uguale a quella del player
+func is_grabbed():
+	self.look_at(grab_sender.global_position)
+	control_node.rotation_degrees = -self.rotation_degrees
+	position = grab_marker.global_position
+
 func _on_stun_timeout():
 	emit_signal("set_idle")
 
@@ -463,6 +524,28 @@ func _on_get_healed(amount):
 		current_vit = default_vit
 	status_sprite.play("recover")
 	emit_signal("set_health_bar", current_vit)
+
+func init_knockback(amount, time, sender):
+	if is_in_atk_range and not grabbed:
+		can_move = false
+		knockbacked = true
+		knockback_force = amount
+		knockback_sender = sender
+		sprite.play(gun_prefix+"damaged")
+		
+		self.add_child(knockback_timer_node.instantiate(), true)
+		var timer_node = get_child(get_child_count()-1)
+		timer_node.wait_time = time
+		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
+		timer_node.start()
+
+func apply_knockback(sender):
+	velocity = sender.direction_to(self.global_position) * knockback_force
+	move_and_slide()
+
+func _on_knockback_reset_timeout():
+	knockbacked = false
+	reaction_timer.start()
 
 func _on_change_stats(stat, amount, time_duration, _ally_sender):
 		if "str" in stat:

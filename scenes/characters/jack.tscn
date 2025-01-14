@@ -1,4 +1,4 @@
-[gd_scene load_steps=181 format=3 uid="uid://b3nwx0erq4kqx"]
+[gd_scene load_steps=182 format=3 uid="uid://b3nwx0erq4kqx"]
 
 [ext_resource type="Script" path="res://components/scripts/jack.gd" id="1_4tu1l"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_wfp2a"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bxnjew7afln68" path="res://components/sprites/jack/jack_bullet_icon.png" id="4_kwi4y"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="4_q3k4l"]
 [ext_resource type="Texture2D" uid="uid://ctcf43dptrdq1" path="res://components/sprites/jack/pistol/jack_idle.png" id="4_xllxl"]
+[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="5_it00f"]
 [ext_resource type="Texture2D" uid="uid://n5eeephddexo" path="res://components/sprites/jack/pistol/jack_shooting_p.png" id="5_ltcqf"]
 [ext_resource type="Texture2D" uid="uid://btjg1uvmks8gk" path="res://components/sprites/jack/pistol/jack_running_p.png" id="5_pnxoj"]
 [ext_resource type="Texture2D" uid="uid://iiwhblervbq4" path="res://components/sprites/jack/pistol/jack_change_p.png" id="6_ovxgh"]
@@ -1233,6 +1234,7 @@ script = ExtResource("1_4tu1l")
 damage_node = ExtResource("2_wfp2a")
 bullet_scene = ExtResource("3_wfqrd")
 change_stats_timer_node = ExtResource("4_bxdqx")
+knockback_timer_node = ExtResource("5_it00f")
 
 [node name="Control" type="Control" parent="."]
 z_index = 6
@@ -1240,10 +1242,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -4.44444
-offset_top = -48.8889
-offset_right = -4.44444
-offset_bottom = -48.8889
+offset_top = -53.0
+offset_bottom = -53.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 4
@@ -1329,11 +1329,13 @@ wait_time = 16.0
 one_shot = true
 
 [node name="Eva_cooldown" type="Timer" parent="."]
+wait_time = 12.0
 one_shot = true
 
 [node name="Ulti_cooldown" type="Timer" parent="."]
-wait_time = 30.0
+wait_time = 90.0
 one_shot = true
+autostart = true
 
 [node name="Shooting_delay_time" type="Timer" parent="."]
 wait_time = 0.4

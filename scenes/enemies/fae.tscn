@@ -439,7 +439,6 @@ radius = 1116.03
 [node name="FaeEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
-collision_layer = 3
 collision_mask = 3
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -456,7 +455,7 @@ position = Vector2(0, -64)
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"idle"
+animation = &"launch_dart"
 autoplay = "idle"
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
@@ -476,6 +475,7 @@ shape = SubResource("CapsuleShape2D_7foa3")
 debug_color = Color(0, 0, 1, 0.0666667)
 
 [node name="Control" type="Control" parent="."]
+z_index = 10
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -509,6 +509,7 @@ one_shot = true
 autostart = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
+collision_mask = 3
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false
@@ -516,7 +517,10 @@ shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 
 [node name="Flee_delay" type="Timer" parent="."]
-wait_time = 0.5
+one_shot = true
+
+[node name="Flee_timeout" type="Timer" parent="."]
+wait_time = 20.0
 one_shot = true
 
 [node name="Heal_charge_time" type="Timer" parent="."]
@@ -542,11 +546,12 @@ one_shot = true
 [node name="Projectile_spawnpoint" type="Marker2D" parent="."]
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 249.37
+path_desired_distance = 30.0
 target_desired_distance = 325.0
+path_max_distance = 10.0
 path_postprocessing = 1
+simplify_path = true
 avoidance_enabled = true
-radius = 20.0
 max_neighbors = 20
 max_speed = 1703.04
 
@@ -559,6 +564,7 @@ max_speed = 1703.04
 [connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
 [connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="timeout" from="Flee_delay" to="." method="_on_flee_delay_timeout"]
+[connection signal="timeout" from="Flee_timeout" to="." method="_on_flee_timeout_timeout"]
 [connection signal="timeout" from="Heal_charge_time" to="." method="_on_heal_charge_time_timeout"]
 [connection signal="target_reached" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_target_reached"]
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]

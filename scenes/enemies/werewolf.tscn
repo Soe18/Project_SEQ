@@ -530,11 +530,11 @@ bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
 bg_color = Color(1, 0, 0.0352941, 1)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_vnrqd"]
-size = Vector2(40.5, 115)
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
 radius = 1116.03
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vnrqd"]
+size = Vector2(40.5, 115)
 
 [node name="WerewolfEnemy" type="CharacterBody2D"]
 process_mode = 1
@@ -576,6 +576,7 @@ shape = SubResource("CapsuleShape2D_7foa3")
 debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Control" type="Control" parent="."]
+z_index = 10
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -604,20 +605,21 @@ one_shot = true
 wait_time = 0.365
 one_shot = true
 
+[node name="Area_of_detection" type="Area2D" parent="."]
+visible = false
+collision_mask = 3
+
+[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
+visible = false
+shape = SubResource("CircleShape2D_y6mgf")
+debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
+
 [node name="Claws_area" type="Area2D" parent="."]
 
 [node name="Collider" type="CollisionShape2D" parent="Claws_area"]
 position = Vector2(33, 5)
 shape = SubResource("RectangleShape2D_vnrqd")
 debug_color = Color(1, 0, 0, 0.0352941)
-
-[node name="Area_of_detection" type="Area2D" parent="."]
-visible = false
-
-[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-visible = false
-shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 
 [node name="Claws_cooldown" type="Timer" parent="."]
 wait_time = 4.0
@@ -645,9 +647,10 @@ one_shot = true
 autostart = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 224.2
 target_desired_distance = 80.0
+path_max_distance = 10.0
 navigation_layers = 3
+path_postprocessing = 1
 avoidance_enabled = true
 radius = 30.0
 max_neighbors = 20
@@ -659,10 +662,10 @@ max_speed = 1703.04
 [connection signal="animation_finished" from="Howl_effect" to="." method="_on_howl_effect_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
 [connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
-[connection signal="body_entered" from="Claws_area" to="." method="_on_claws_area_body_entered"]
-[connection signal="body_exited" from="Claws_area" to="." method="_on_claws_area_body_exited"]
 [connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
 [connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
+[connection signal="body_entered" from="Claws_area" to="." method="_on_claws_area_body_entered"]
+[connection signal="body_exited" from="Claws_area" to="." method="_on_claws_area_body_exited"]
 [connection signal="timeout" from="Howl_charge_time" to="." method="_on_howl_charge_time_timeout"]
 [connection signal="timeout" from="Agility_duration" to="." method="_on_agility_duration_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]

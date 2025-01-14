@@ -4,10 +4,10 @@ extends Node
 
 func _ready():
 	# Depends on starting scene
-	Menu.game_status = Menu.GAME_STATUSES.overworld
+	Menu.game_status = Menu.GAME_STATUSES.unopenable
 
 func _process(delta):
-	if Input.is_action_pressed("pause") and Menu.game_status!=Menu.GAME_STATUSES.unopenable:
+	if Input.is_action_pressed("pause") and Menu.game_status != Menu.GAME_STATUSES.unopenable:
 		Menu.pause_game()
 
 func load_dungeon():

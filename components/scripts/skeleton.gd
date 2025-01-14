@@ -149,7 +149,7 @@ func chase_player():
 		else:
 			target_position = navigation_agent.get_next_path_position()
 			
-			var new_velocity = global_position.direction_to(target_position) * 200
+			var new_velocity = global_position.direction_to(target_position) * current_des
 			
 			if navigation_agent.avoidance_enabled:
 				navigation_agent.set_velocity(new_velocity)
@@ -344,6 +344,7 @@ func _on_effect_animation_finished():
 	
 func basic_atk():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
+		moving = false
 		basic_atk_effect.play("effect")
 		sprite.play("attack")
 	slash_cooldown.start()

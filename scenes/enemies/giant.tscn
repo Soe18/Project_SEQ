@@ -696,7 +696,7 @@ wait_time = 3.0
 one_shot = true
 
 [node name="HealthBar" type="ProgressBar" parent="."]
-z_index = 2
+z_index = 10
 y_sort_enabled = true
 offset_left = -66.7914
 offset_top = -74.5755
@@ -713,6 +713,7 @@ wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
+collision_mask = 3
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false
@@ -771,10 +772,11 @@ one_shot = true
 autostart = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 192.0
+path_desired_distance = 200.0
 target_desired_distance = 180.0
-path_max_distance = 1000.0
+path_max_distance = 10.0
 navigation_layers = 3
+path_postprocessing = 1
 avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20

@@ -6,7 +6,7 @@ var current_vit = default_vit
 var current_str = default_str
 @export var default_tem : int = 148
 var current_tem = default_tem
-@export var default_des : int = 130
+@export var default_des : int = 125
 var current_des = default_des
 @export var default_pbc : int = 30
 var current_pbc = default_pbc
@@ -148,7 +148,7 @@ func chase_player():
 			var current_agent_position = global_position
 			target_position = navigation_agent.get_next_path_position()
 			
-			var new_velocity = global_position.direction_to(target_position) * 125
+			var new_velocity = global_position.direction_to(target_position) * current_des
 			
 			if navigation_agent.avoidance_enabled:
 				navigation_agent.set_velocity(new_velocity)

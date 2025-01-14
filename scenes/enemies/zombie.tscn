@@ -487,6 +487,7 @@ process_mode = 1
 y_sort_enabled = true
 motion_mode = 1
 wall_min_slide_angle = 0.0
+safe_margin = 1.0
 script = ExtResource("1_4dl1i")
 default_tem = 117
 damage_node = ExtResource("2_otfb6")
@@ -518,6 +519,7 @@ shape = SubResource("CapsuleShape2D_7foa3")
 debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Control" type="Control" parent="."]
+z_index = 10
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -544,20 +546,21 @@ wait_time = 3.0
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
+collision_mask = 3
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 visible = false
 shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 
-[node name="Basic_atk_Area" type="Area2D" parent="."]
+[node name="Bite_Area" type="Area2D" parent="."]
 
-[node name="Skill_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
+[node name="Collider" type="CollisionShape2D" parent="Bite_Area"]
 position = Vector2(40.25, 16)
 shape = SubResource("RectangleShape2D_kr4ka")
 debug_color = Color(1, 0.00392157, 0.0666667, 0.109804)
 
-[node name="Effect" type="AnimatedSprite2D" parent="Basic_atk_Area"]
+[node name="Effect" type="AnimatedSprite2D" parent="Bite_Area"]
 position = Vector2(49, 12)
 scale = Vector2(0.0875, 0.133333)
 sprite_frames = SubResource("SpriteFrames_g7j7j")
@@ -568,13 +571,13 @@ flip_h = true
 [node name="Sprint_Area" type="Area2D" parent="."]
 process_mode = 4
 
-[node name="Skill_collider" type="CollisionShape2D" parent="Sprint_Area"]
+[node name="Collider" type="CollisionShape2D" parent="Sprint_Area"]
 visible = false
 position = Vector2(-5, 17.25)
 shape = SubResource("RectangleShape2D_fhhjd")
 debug_color = Color(1, 1, 0, 0.054902)
 
-[node name="Basic_atk_Cooldown" type="Timer" parent="."]
+[node name="Bite_Cooldown" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
 
@@ -596,9 +599,10 @@ wait_time = 2.0
 one_shot = true
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 271.0
 target_desired_distance = 80.0
+path_max_distance = 10.0
 navigation_layers = 3
+path_postprocessing = 1
 avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20
@@ -608,9 +612,9 @@ max_speed = 1703.04
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
 [connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
 [connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
-[connection signal="body_entered" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_entered"]
-[connection signal="body_exited" from="Basic_atk_Area" to="." method="_on_basic_atk_area_body_exited"]
-[connection signal="animation_finished" from="Basic_atk_Area/Effect" to="." method="_on_effect_animation_finished"]
+[connection signal="body_entered" from="Bite_Area" to="." method="_on_basic_atk_area_body_entered"]
+[connection signal="body_exited" from="Bite_Area" to="." method="_on_basic_atk_area_body_exited"]
+[connection signal="animation_finished" from="Bite_Area/Effect" to="." method="_on_effect_animation_finished"]
 [connection signal="body_entered" from="Sprint_Area" to="." method="_on_sprint_area_body_entered"]
 [connection signal="body_exited" from="Sprint_Area" to="." method="_on_sprint_area_body_exited"]
 [connection signal="timeout" from="Sprint_time" to="." method="_on_sprint_time_timeout"]

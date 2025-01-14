@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://ls0nkq0enla7"]
+
+[ext_resource type="Script" path="res://overworld/scripts/quest/quest.gd" id="1_0ca58"]
+
+[resource]
+script = ExtResource("1_0ca58")
+title = "Più grandi sono..."
+description = "Sconfiggi il Boss una volta"
+steps = 1
+status = 1
+todo = "yey"

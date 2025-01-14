@@ -16,6 +16,7 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
+@export var knockback_timer_node : PackedScene
 
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
@@ -43,6 +44,13 @@ var atk_state = Atk_States.IDLE
 var move_state = Moving_States.IDLE
 
 var can_move = true
+var grabbed = false
+var grab_marker
+var grab_sender
+
+var knockbacked = false
+var knockback_force
+var knockback_sender
 
 var is_evading = false
 
@@ -75,6 +83,7 @@ var ult_moving_mod
 @onready var body_collider = $Body_collider
 
 @onready var stun_timer = $Stun
+@onready var combo_time = $Combo_time
 
 @onready var status_sprite = $Status_alert_sprite
 
@@ -94,6 +103,10 @@ func _ready():
 	emit_signal("set_health_bar", default_vit)
 
 func _physics_process(delta):
+	if knockbacked:
+		apply_knockback(knockback_sender)
+	if grabbed:
+		is_grabbed()
 	if can_move:
 		move(delta)
 	if stun_timer.is_stopped():
@@ -158,25 +171,25 @@ func atk_handler():
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
-		$Combo_time.stop()
+		combo_time.stop()
 		sprite.play("base atk2")
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk2" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
-		$Combo_time.stop()
+		combo_time.stop()
 		sprite.play("base atk3")
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk3" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
-		$Combo_time.stop()
+		combo_time.stop()
 		sprite.play("base atk4")
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk4" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
-		$Combo_time.stop()
+		combo_time.stop()
 		sprite.play("base atk5")
 	
 	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and skill1_cooldown.is_stopped():
@@ -294,28 +307,28 @@ func _on_sprite_2d_animation_finished():
 		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
-		$Combo_time.start()
+		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
-		$Combo_time.start()
+		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
 		atk_anim_finished = true
-		$Combo_time.start()
+		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
 		atk_anim_finished = true
-		$Combo_time.start()
+		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk5":
 		emit_signal("set_idle")
@@ -374,7 +387,9 @@ func _on_set_idle():
 	
 	atk_state = Atk_States.IDLE
 	
+	self.rotation_degrees = 0
 	sprite.z_index = 0
+	sprite.flip_v = false
 	
 	sprite.play("idle")
 	skill1_effect.play("idle")
@@ -467,6 +482,40 @@ func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		stun_timer.wait_time = stun_sec
 		stun_timer.start()
 
+func _on_enemy_grab(is_been_grabbed, grab_position_marker, sender):
+	if is_been_grabbed and not grabbed:
+		emit_signal("set_idle")
+		sprite.play("damaged")
+		can_move = false
+		grabbed = true
+		
+		self.set_collision_layer_value(1, false)
+		self.set_collision_layer_value(2, true)
+		self.set_collision_mask_value(1, false)
+		self.set_collision_mask_value(2, true)
+		
+		grab_marker = grab_position_marker
+		grab_sender = sender
+		
+		if not sender.sprite.flip_h:
+			flip_sprite(true)
+		else: 
+			flip_sprite(false)
+		
+		if sprite.flip_h:
+			sprite.flip_v = true 
+			sprite.flip_h = false
+		else:
+			sprite.flip_v = false
+		
+	elif not is_been_grabbed:
+		emit_signal("set_idle")
+		grabbed = false
+
+func is_grabbed():
+	self.look_at(grab_sender.global_position)
+	global_position = grab_marker.global_position
+
 func _on_stun_timeout():
 	emit_signal("set_idle")
 
@@ -476,6 +525,28 @@ func _on_get_healed(amount):
 		current_vit = default_vit
 	status_sprite.play("recover")
 	emit_signal("set_health_bar", current_vit)
+
+func init_knockback(amount, time, sender):
+	if is_in_atk_range and not grabbed:
+		can_move = false
+		knockbacked = true
+		knockback_force = amount
+		knockback_sender = sender
+		sprite.play("damaged")
+		
+		self.add_child(knockback_timer_node.instantiate(), true)
+		var timer_node = get_child(get_child_count()-1)
+		timer_node.wait_time = time
+		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
+		timer_node.start()
+
+func apply_knockback(sender):
+	velocity = sender.direction_to(self.global_position) * knockback_force
+	move_and_slide()
+
+func _on_knockback_reset_timeout():
+	knockbacked = false
+	combo_time.start()
 
 func _on_change_stats(stat, amount, time_duration, _ally_sender):
 		if "str" in stat:
