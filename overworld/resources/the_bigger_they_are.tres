@@ -7,5 +7,5 @@ script = ExtResource("1_0ca58")
 title = "Più grandi sono..."
 description = "Sconfiggi il Boss una volta"
 steps = 1
-status = 1
+status = 0
 todo = "yey"

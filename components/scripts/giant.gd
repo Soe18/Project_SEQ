@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 350
+@export var default_vit : int = 120
 var current_vit = default_vit
 @export var default_str : int = 180
 var current_str = default_str
@@ -42,11 +42,9 @@ var choosed_atk
 
 @onready var sprite = $Sprite2D
 
-@onready var punch_area = $Punch_Area
 @onready var punch_collider = $Punch_Area/Skill_collider
 @onready var punch_effect = $Punch_Area/Effect
 
-@onready var earthquake_area = $Earthquake_Area
 @onready var earthquake_collider = $Earthquake_Area/Skill_collider
 @onready var earthquake_effect = $Earthquake_Area/Effect
 
@@ -60,6 +58,9 @@ var choosed_atk
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
+@onready var punch_cooldown = $Punch_Cooldown
+@onready var earthquake_cooldown = $Earthquake_Cooldown
+
 @onready var status_sprite = $Status_alert_sprite
 
 @onready var update_atk_timer = $Update_Atk
@@ -67,24 +68,24 @@ var choosed_atk
 var player_entered = true
 var player_in_atk_range = false
 
-'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
-	setta la vita attuale a quella massima
-	imposta il valore massimo della barra della salute al massimo
-	setta la barra della salute'
+#METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
+	#setta la vita attuale a quella massima
+	#imposta il valore massimo della barra della salute al massimo
+	#setta la barra della salute
 
 func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
-	$Update_Atk.wait_time = randf_range(3, 5.8)
+	update_atk_timer.wait_time = randf_range(3, 5.8)
 
-'METODO CHE VIENE PROCESSATO PER FRAME
-	controlla se il player è entrato in area e si può muovere
-		allora si muove
-	altrimenti se il player NON è entrato in area e si può muovere
-		allora comincia a vagare
-	controlla se è grabbato
-		allora fa partire il metodo grab()'
+#METODO CHE VIENE PROCESSATO PER FRAME
+	#controlla se il player è entrato in area e si può muovere
+		#allora si muove
+	#altrimenti se il player NON è entrato in area e si può muovere
+		#allora comincia a vagare
+	#controlla se è grabbato
+		#allora fa partire il metodo grab()
 
 func _physics_process(_delta):
 	if knockbacked:
@@ -93,9 +94,9 @@ func _physics_process(_delta):
 		is_grabbed()
 	elif player_entered and moving and not attacking:
 		chase_player()
-		if choosed_atk == Possible_Attacks.PUNCH and $Punch_Cooldown.is_stopped():
+		if choosed_atk == Possible_Attacks.PUNCH and punch_cooldown.is_stopped():
 			punch()
-		if choosed_atk == Possible_Attacks.EARTHQUAKE and $Earthquake_Cooldown.is_stopped() and stun_timer.is_stopped():
+		if choosed_atk == Possible_Attacks.EARTHQUAKE and earthquake_cooldown.is_stopped() and stun_timer.is_stopped():
 			earthquake()
 	elif not player_entered and moving:
 		if player:
@@ -119,8 +120,8 @@ func _physics_process(_delta):
 
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		punch_collider.position = Vector2(-62.95, 13)
-		punch_effect.position = Vector2(-59,-5)
+		punch_collider.position.x = -62.95
+		punch_effect.position.x = -59
 		punch_effect.flip_h = true
 		sprite.flip_h = true
 		body_collider.rotation_degrees = -16.5
@@ -128,8 +129,8 @@ func flip(distance_to_player):
 		if grabbed:
 			sprite.rotation_degrees = -90;
 	elif distance_to_player.x > 0:
-		punch_collider.position = Vector2(62.95, 13)
-		punch_effect.position = Vector2(59,-5)
+		punch_collider.position.x = 62.95
+		punch_effect.position.x = 59
 		punch_effect.flip_h = false
 		sprite.flip_h = false
 		body_collider.rotation_degrees = 16.5
@@ -211,7 +212,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		set_health_bar()
 		if (dmg >= 25 or dmg <= 0) and stun_sec > 0:
 			punch_effect.play("idle")
-			sprite.position = Vector2(0,0)
+			sprite.position = Vector2.ZERO
 			attacking = false
 			moving = false
 			stun_timer.start(stun_sec)
@@ -331,7 +332,7 @@ func _on_sprite_2d_frame_changed():
 # FUNZIONE PER L'ATTACCO PUGNO
 func punch():
 	if stun_timer.is_stopped() and not grabbed:
-		$Punch_Cooldown.start()
+		punch_cooldown.start()
 		attacking = true
 		if sprite.flip_h:
 			sprite.position = Vector2(-40,0)
@@ -340,7 +341,7 @@ func punch():
 		moving = false
 		sprite.play("punch")
 		punch_effect.play("effect")
-		punch_area.process_mode = Node.PROCESS_MODE_INHERIT
+		punch_collider.set_deferred("disabled", false)
 
 func _on_effect_animation_finished():
 	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
@@ -359,28 +360,28 @@ func _on_effect_frame_changed():
 # FUNZIONE PER L'ATTACCO TERREMOTO'
 func earthquake():
 	if player_entered and stun_timer.is_stopped() and not grabbed:
-		$Earthquake_Cooldown.start()
+		earthquake_cooldown.start()
 		attacking = true
 		moving = false
 		sprite.play("earthquake")
-		earthquake_area.process_mode = Node.PROCESS_MODE_INHERIT
+		earthquake_collider.set_deferred("disabled", false)
 
 # DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
 func set_idle():
 	if not knockbacked and not grabbed:
-		sprite.position = Vector2(0,0)
+		sprite.position = Vector2.ZERO
 		moving = true
 		attacking = false
-		punch_area.process_mode = Node.PROCESS_MODE_DISABLED
-		earthquake_area.process_mode = Node.PROCESS_MODE_DISABLED
+		punch_collider.set_deferred("disabled", true)
+		earthquake_collider.set_deferred("disabled", true)
 		sprite.play("idle")
 		punch_effect.play("idle")
 		earthquake_effect.play("idle")
 
 func _on_update_atk_timeout():
 	choose_atk()
-	$Update_Atk.wait_time = randf_range(3, 5.8)
-	$Update_Atk.start()
+	update_atk_timer.wait_time = randf_range(3, 5.8)
+	update_atk_timer.start()
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
@@ -405,6 +406,8 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

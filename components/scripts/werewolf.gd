@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 225
+@export var default_vit : int = 60
 var current_vit = default_vit
 @export var default_str : int = 150
 var current_str = default_str
@@ -87,7 +87,7 @@ var player_in_atk_range = false
 func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
-	sprite.play("idle")
+	set_idle()
 
 #METODO CHE VIENE PROCESSATO PER FRAME
 #	controlla se il player è entrato in area e si può muovere
@@ -386,13 +386,14 @@ func init_knockback(amount, time, sender):
 		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
 		timer_node.start()
 
-
 func apply_knockback(sender):
 	velocity = sender.direction_to(self.global_position) * knockback_force
 	move_and_slide()
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

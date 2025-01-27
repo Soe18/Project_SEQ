@@ -8,13 +8,29 @@ var player_in_area_to_change_char = false
 @onready var dungeon_entrance = $Dungeon
 @onready var player_spawnpoint = $Marker2D
 
+@onready var ost_player = $AudioStreamPlayer
+
+@onready var leone_first_dialogue_bubble = $Change_char/MarginContainer
+@onready var leone_second_dialogue_bubble = $Change_char/MarginContainer2
+@onready var bubble_showing_time = $Change_char/Timer
+
 func _ready():
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
 
 func _process(_delta):
-	if Input.is_action_pressed("base_atk") and player_in_area_to_change_char:
-		player.sprite.play("idle") # se il player si sta spostando mi pare giusto fermarlo
-		change_player_menu()
+	if Input.is_action_just_pressed("base_atk") and player_in_area_to_change_char:
+		if QuestManager.quests[3].status == QuestStatus.of_type.hidden:
+			QuestManager.quests[3].display_quest()
+			QuestManager.quests[3].start_quest()
+			leone_first_dialogue_bubble.visible = true
+			bubble_showing_time.start()
+		elif QuestManager.quests[3].status == QuestStatus.of_type.reached_goal:
+			QuestManager.quests[3].complete_quest()
+			leone_second_dialogue_bubble.visible = true
+			bubble_showing_time.start()
+		else:
+			player.sprite.play("idle") # se il player si sta spostando mi pare giusto fermarlo
+			change_player_menu()
 
 func _on_gui_select_character(char: String) -> void:
 	if selected_character == char: # se il player ha cliccato sullo stesso personaggio istanziato
@@ -54,11 +70,18 @@ func change_player_menu():
 	player.moving = false # rendo paraplegico il player
 	player.collider.set_deferred("disabled", true) # rendo immateriale il player
 	canvas_layer.get_child(0).jack_button.grab_focus() # il pulsante di jack prende focus
+	
 
 # DIGEST DEI SEGNALI BODY ENTERED/EXITED PER CAMBIARE PERSONAGGIO
 
 func _on_change_char_body_entered(body: Node2D) -> void:
-	player_in_area_to_change_char = true
+	if body == player:
+		player_in_area_to_change_char = true
 
 func _on_change_char_body_exited(body: Node2D) -> void:
-	player_in_area_to_change_char = false
+	if body == player:
+		player_in_area_to_change_char = false
+
+func _on_timer_timeout() -> void:
+	leone_first_dialogue_bubble.visible = false
+	leone_second_dialogue_bubble.visible = false

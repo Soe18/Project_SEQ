@@ -721,7 +721,6 @@ shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 
 [node name="Punch_Area" type="Area2D" parent="."]
-process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Punch_Area"]
 visible = false
@@ -734,11 +733,10 @@ debug_color = Color(0.592157, 0.854902, 0.105882, 0.0352941)
 position = Vector2(59, -5)
 scale = Vector2(0.279167, 0.279167)
 sprite_frames = SubResource("SpriteFrames_rxp4i")
-animation = &"effect"
+animation = &"idle"
 autoplay = "idle"
 
 [node name="Earthquake_Area" type="Area2D" parent="."]
-process_mode = 4
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Earthquake_Area"]
 visible = false

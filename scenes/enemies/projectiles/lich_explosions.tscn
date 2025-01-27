@@ -75,6 +75,7 @@ radius = 74.3773
 height = 192.308
 
 [node name="Lich_explosion" type="CharacterBody2D"]
+process_mode = 1
 z_index = 2
 scale = Vector2(1.3, 1.3)
 script = ExtResource("1_8njou")

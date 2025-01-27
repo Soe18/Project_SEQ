@@ -110,6 +110,7 @@ radius = 8.0
 height = 56.0
 
 [node name="Witchcraft_Projectile" type="CharacterBody2D"]
+process_mode = 1
 collision_layer = 2
 collision_mask = 3
 motion_mode = 1

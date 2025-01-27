@@ -12,6 +12,7 @@ func _process(delta):
 
 func load_dungeon():
 	Menu.game_status = Menu.GAME_STATUSES.dungeon
+	get_child(0).ost_player.stop()
 	var selected_character # attributo da passare
 	add_child(load("res://scenes/basic_scene.tscn").instantiate())
 	if get_child(0).selected_character: # se l'attributo che devo passare è presente

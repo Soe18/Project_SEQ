@@ -12,6 +12,7 @@ enum GAME_STATUSES{
 @onready var re_open_menu_delay = %ReOpenMenuDelay
 @onready var all_quest_filter = %AllQuestFilter
 @onready var quest_container = %QuestContainer
+@onready var pause_ost = %Pause_ost_player
 
 var is_delay_finished : bool = true
 var game_status : GAME_STATUSES = GAME_STATUSES.unopenable
@@ -21,21 +22,23 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 
 func _input(event):
-	if event.is_action_pressed("pause") and first_menu.visible:
+	if (event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel")) and first_menu.visible:
 		resume_game()
-	if event.is_action_pressed("pause") and quest_menu.visible:
+	if (event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel")) and quest_menu.visible:
 		quest_menu.visible = false
 		first_menu.visible = true
 		continue_button.grab_focus()
 
 func pause_game():
 	if is_delay_finished:
+		pause_ost.play()
 		is_delay_finished = false
 		get_tree().paused = true
 		visible = true
 		continue_button.grab_focus()
 
 func resume_game():
+	pause_ost.stop()
 	visible = false
 	get_tree().paused = false
 	re_open_menu_delay.start()

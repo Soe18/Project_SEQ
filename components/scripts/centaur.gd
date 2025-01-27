@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 385
+@export var default_vit : int = 200
 var current_vit = default_vit
 @export var default_str : int = 175
 var current_str = default_str
@@ -99,6 +99,7 @@ func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
+	set_idle()
 
 #METODO CHE VIENE PROCESSATO PER FRAME
 #	controlla se il player è entrato in area e si può muovere
@@ -112,6 +113,8 @@ func _physics_process(_delta):
 		apply_knockback(knockback_sender)
 	elif sprinting:
 		sprint_to_target()
+		if sprint_duration_timer.time_left == sprint_duration/2:
+			sprint_reset_collider.set_deferred("disabled", true)
 	elif player_entered and moving:
 		chase_player()
 		if choosed_atk == Possible_Attacks.HALBERD and halberd_cooldown.is_stopped():
@@ -237,8 +240,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		set_health_bar()
 		if sprinting and dmg >= 25:
 			sprinting = false
-			sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
-		if stun_sec > 0:
+		elif stun_sec > 0:
 			moving = false
 			stun_timer.wait_time = stun_sec
 			stun_timer.start()
@@ -311,12 +313,12 @@ func _on_sprite_2d_animation_finished() -> void:
 		target_location = player.global_position
 		origin = global_position
 		flip((target_location - global_position).normalized())
+		upper_body_collider.set_deferred("disabled", true)
 		sprint_collider.set_deferred("disabled", false)
-		sprint_reset_collider.set_deferred("disabled", false)
 		sprint_duration_timer.start(sprint_duration)
 		sprite.play("sprint")
 		update_atk_timer.stop()
-	if sprite.animation == "grab" or sprite.animation == "halberd" or sprite.animation == "temperance":
+	elif sprite.animation != "damaged":
 		set_idle()
 
 func _on_sprite_2d_frame_changed() -> void:
@@ -399,6 +401,7 @@ func set_idle():
 		sprinting = false
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")
+		upper_body_collider.set_deferred("disabled", false)
 		halberd_collider.set_deferred("disabled", false)
 		sprint_collider.set_deferred("disabled", true)
 		sprint_reset_collider.set_deferred("disabled", true)
@@ -443,6 +446,8 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

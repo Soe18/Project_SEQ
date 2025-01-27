@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxfyupfofq4sq"]
+
+[ext_resource type="Script" path="res://components/scripts/gray_enemy_container.gd" id="1_xtmke"]
+
+[node name="Enemy_container" type="Node2D"]
+process_mode = 1
+script = ExtResource("1_xtmke")
+
+[node name="Round_cooldown" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+
+[node name="Spawnpoint" type="Marker2D" parent="."]
+position = Vector2(609.5, 86.5)
+
+[node name="Spawnpoint2" type="Marker2D" parent="."]
+position = Vector2(184, -31.5)
+
+[node name="Spawnpoint3" type="Marker2D" parent="."]
+position = Vector2(494, 357)
+
+[node name="Spawnpoint4" type="Marker2D" parent="."]
+position = Vector2(-170.5, 93)
+
+[node name="Spawnpoint5" type="Marker2D" parent="."]
+position = Vector2(-149.5, 249)
+
+[node name="Spawnpoint6" type="Marker2D" parent="."]
+position = Vector2(134.5, 357)
+
+[node name="Spawnpoint7" type="Marker2D" parent="."]
+position = Vector2(-79.5, -64)
+
+[node name="Spawnpoint8" type="Marker2D" parent="."]
+position = Vector2(351.5, 92)
+
+[node name="Boss_Spawner" type="Marker2D" parent="."]
+position = Vector2(155, 79.5)
+
+[connection signal="timeout" from="Round_cooldown" to="." method="_on_round_cooldown_timeout"]

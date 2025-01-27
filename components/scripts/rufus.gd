@@ -4,7 +4,7 @@ var char_name = "Rufus"
 
 @export var default_vit : int = 200
 var current_vit = default_vit
-@export var default_str : int = 150
+@export var default_str : int = 195
 var current_str = default_str
 @export var default_tem : int = 121
 var current_tem = default_tem
@@ -31,13 +31,16 @@ signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal inflict_knockback(amount, time, sender)
 
-
 @export var ACCELERATION : float = 10000.0
 @export var FRICTION : float = 7000.0
 
 @onready var axis = Vector2.ZERO
 
 var initial_y_position = 0
+const MAX_Y_POSITION = 270
+
+var BASIC_ATK_COLLIDER_POSITION_X
+var SKILL1_COLLIDER_POSITION_X
 
 var atk_state = Atk_States.IDLE
 
@@ -59,6 +62,26 @@ var atk_anim_finished = true
 var is_moving_ult = false
 var ult_moving_mod
 
+@export var basic_atk_force = 10
+@export var basic_stun_time = 0.4
+
+@export var evade_amount = 1000
+
+@export var skill1_force = 20
+@export var skill1_stun_time = 0.6
+
+@export var skill2_force = 23
+@export var skill2_stun_time = 1.4
+@export var skill2_changed_stat = "tem"
+@export var skill2_stat_amount = -25
+@export var skill2_duration = 10
+@export var skill2_knockback_force = 600
+@export var skill2_knockback_duration = 0.2
+
+@export var ult_force = 80
+@export var ult_stun_time = 6
+@export var ult_knockback_force = 900
+@export var ult_knockback_duration = 0.3
 
 @onready var sprite = $Sprite2D
 
@@ -68,12 +91,14 @@ var ult_moving_mod
 @onready var skill1_effect = $Skill_1_area/Effect
 
 @onready var eva_collider = $Eva_area/Eva_collider
+@onready var eva_duration_timer = $Eva_area/Eva_time
 
 @onready var skill2_collider = $Skill2_area/Skill_collider
 @onready var skill2_effect = $Skill2_area/Effect
 
 @onready var ult_collider = $Ult_area/Ult_collider
 @onready var ult_effect = $Ult_area/Effect
+@onready var ult_stop_timer = $Ult_area/Ult_time
 
 @onready var skill1_cooldown = $Skill1_cooldown
 @onready var skill2_cooldown = $Skill2_cooldown
@@ -100,6 +125,8 @@ var ult_moving_mod
 
 @warning_ignore("unused_parameter")
 func _ready():
+	BASIC_ATK_COLLIDER_POSITION_X = bs_atk_collider.position.x
+	SKILL1_COLLIDER_POSITION_X = skill1_collider.position.x
 	emit_signal("set_health_bar", default_vit)
 
 func _physics_process(delta):
@@ -153,6 +180,10 @@ func apply_movement(accel):
 	velocity += accel
 	velocity = velocity.limit_length(current_des * 2.5)
 
+func reset_axis():
+	velocity = Vector2.ZERO
+	axis = Vector2.ZERO
+
 'METODO CHE GESTISCE TUTTE LE ABILITA\' DEL PLAYER
 	ad ogni if si controlla l\'azione possibile, per l\'attacco di base si trovano
 	dei controlli aggiuntivi in base alla combo:
@@ -166,7 +197,7 @@ func atk_handler():
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
 		sprite.play("base atk1")
-		axis = Vector2.ZERO
+		reset_axis()
 	
 	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished:
 		atk_state = Atk_States.BASE_ATK
@@ -199,13 +230,13 @@ func atk_handler():
 		skill1_collider.disabled = false
 		sprite.play("skill1")
 		skill1_effect.play("effect")
-		axis = Vector2.ZERO
+		reset_axis()
 	
 	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and eva_cooldown.is_stopped():
 		eva_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.EVA
-		$Eva_time.start()
+		eva_duration_timer.start()
 		sprite.play("Eva")
 		eva_collider.disabled = false
 		is_evading = true
@@ -216,7 +247,7 @@ func atk_handler():
 		atk_state = Atk_States.SK2
 		sprite.play("skill2")
 		skill2_effect.play("effect")
-		axis = Vector2.ZERO
+		reset_axis()
 
 	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and ulti_cooldown.is_stopped():
 		ulti_cooldown.start()
@@ -224,7 +255,7 @@ func atk_handler():
 		atk_state = Atk_States.ULT
 		sprite.play("charging_ult")
 		ult_moving_mod = -9
-		axis = Vector2.ZERO
+		reset_axis()
 
 	elif sprite.animation != "idle" or sprite.animation != "Running":
 		pass
@@ -265,9 +296,9 @@ func _on_skill_1_area_body_exited(body):
 func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 17, 1.4, current_pbc, current_efc)
-		emit_signal("change_stats", "tem", -25, 3, false)
-		emit_signal("inflict_knockback", 600, 0.2, self.global_position)
+		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc)
+		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
+		emit_signal("inflict_knockback", skill2_knockback_force, skill2_knockback_duration, self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
@@ -277,8 +308,8 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 70, 6, current_pbc, current_efc)
-		emit_signal("inflict_knockback", 900, 0.3, self.global_position)
+		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc)
+		emit_signal("inflict_knockback", ult_knockback_force, ult_knockback_duration, self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -292,41 +323,41 @@ func _on_ult_area_body_exited(body):
 func flip_sprite(flip):
 	if flip:
 		sprite.flip_h = true
-		bs_atk_collider.position.x = -89.75
-		skill1_collider.position.x = -36
+		bs_atk_collider.position.x = -BASIC_ATK_COLLIDER_POSITION_X
+		skill1_collider.position.x = -SKILL1_COLLIDER_POSITION_X
 		skill1_effect.flip_h = true
 	else:
 		sprite.flip_h = false
-		bs_atk_collider.position.x = 4.25
-		skill1_collider.position.x = 36
+		bs_atk_collider.position.x = BASIC_ATK_COLLIDER_POSITION_X
+		skill1_collider.position.x = SKILL1_COLLIDER_POSITION_X
 		skill1_effect.flip_h = false
 
 func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, 10, 0.4, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, 11, 0.5, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc)
 		atk_anim_finished = true
 		combo_time.start()
 
@@ -345,7 +376,7 @@ func _on_sprite_2d_frame_changed():
 	if sprite.frame == 4 and sprite.animation == "base atk5":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, 13, 0.5, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
 		sprite.pause()
@@ -354,7 +385,7 @@ func _on_sprite_2d_frame_changed():
 
 func _on_effect_frame_changed():
 	if skill1_effect.frame % 2 == 0 and atk_state == Atk_States.SK1:
-		emit_signal("take_dmg", current_str, 20, 0.6, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, skill1_force, skill1_stun_time, current_pbc, current_efc)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
 		skill2_collider.set_deferred("disabled", false)
@@ -374,7 +405,7 @@ func ult_moving():
 		sprite.position.x += -0.10
 	else:
 		sprite.position.x += 0.10
-	if sprite.position.y == initial_y_position-270:
+	if sprite.position.y == initial_y_position-MAX_Y_POSITION:
 		sprite.frame += 1.5
 		ult_moving_mod = 9
 	if sprite.position.y == initial_y_position:
@@ -383,7 +414,7 @@ func ult_moving():
 
 #  -- set_idle mi permette di resettare il player allo stato di idle --  #
 func _on_set_idle():
-	axis = Vector2.ZERO
+	reset_axis()
 	
 	atk_state = Atk_States.IDLE
 	
@@ -414,7 +445,7 @@ func _on_set_idle():
 	is_evading = false
 	is_moving_ult = false
 	atk_anim_finished = true
-	sprite.position = Vector2(0,0)
+	sprite.position = Vector2.ZERO
 
 func _on_ult_time_timeout():
 	emit_signal("set_idle")
@@ -428,7 +459,7 @@ func _on_effect_animation_finished():
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.ULT:
-		$Ult_area/Ult_time.start()
+		ult_stop_timer.start()
 
 func _on_eva_time_timeout():
 	emit_signal("set_idle")
@@ -438,34 +469,35 @@ func _on_combo_time_timeout():
 
 'METODO CHE GESTISCE L\'EVASIONE IN BASE ALLA DIREZIONE PREMUTA'
 func evade():
+	velocity = Vector2.ZERO
 	self.set_collision_layer_value(1, false)
 	self.set_collision_layer_value(2,true)
 	self.set_collision_mask_value(1, false)
 	self.set_collision_mask_value(2, true)
 	if axis.x == 0 and axis.y < 0:
-		velocity.y += -35
+		velocity.y += -evade_amount
 	elif axis.x == 0 and axis.y > 0:
-		velocity.y += 35
+		velocity.y += evade_amount
 	elif axis.x < 0 and axis.y == 0:
-		velocity.x += -35
+		velocity.x += -evade_amount
 	elif axis.x > 0 and axis.y == 0:
-		velocity.x += 35
+		velocity.x += evade_amount
 	elif axis.x > 0 and axis.y < 0:
-		velocity.x += 35
-		velocity.y += -35
+		velocity.x += evade_amount
+		velocity.y += -evade_amount
 	elif axis.x > 0 and axis.y > 0:
-		velocity.x += 35
-		velocity.y += 35
+		velocity.x += evade_amount
+		velocity.y += evade_amount
 	elif axis.x < 0 and axis.y > 0:
-		velocity.x += -35
-		velocity.y += 35
+		velocity.x += -evade_amount
+		velocity.y += evade_amount
 	elif axis.x < 0 and axis.y < 0:
-		velocity.x += -35
-		velocity.y += -35
+		velocity.x += -evade_amount
+		velocity.y += -evade_amount
 	elif sprite.flip_h:
-		velocity.x += -35
+		velocity.x += -evade_amount
 	else:
-		velocity.x += 35
+		velocity.x += evade_amount
 	move_and_slide()
 
 ' -- DIGEST SEGNALI NEMICI -- '

@@ -17,19 +17,23 @@ func _ready():
 
 func _on_round_changed():
 	round_count += 1
-	if round_count == 5:
+	if round_count == 5 and QuestManager.quests[2].status == QuestStatus.of_type.started:
 		QuestManager.quests[2].reach_goal_quest()
+		QuestManager.quests[2].complete_quest()
 	round_displayer.text = "Ondata: " + str(round_count)
 
 func _on_boss_set_healthbar(vit):
 	if vit <= 0:
 		if get_parent().get_parent().player.char_name == "Nathan":
 			emit_signal("got_grabbed", false)
+		boss.set_idle()
 		boss.dying = true
 		boss.update_atk_timer.stop()
 		boss.set_idle_timer.stop()
 		boss.stun_timer.stop()
 		animation_player.play("delete_boss_bar")
+		if QuestManager.quests[3].status == QuestStatus.of_type.started:
+			QuestManager.quests[3].reach_goal_quest()
 	if vit > max_health:
 			vit = max_health
 	healthbar.value = vit

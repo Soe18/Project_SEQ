@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 200
+@export var default_vit : int = 70
 var current_vit = default_vit
 @export var default_str : int = 110
 var current_str = default_str
@@ -277,7 +277,6 @@ func set_health_bar():
 			dying = true
 			sprite.play("dying")
 			current_vit = 1
-			body_collider.process_mode = Node.PROCESS_MODE_DISABLED
 			soul_delay_timer.start()
 	elif current_vit > default_vit:
 			current_vit = default_vit
@@ -328,6 +327,7 @@ func set_idle():
 			parring = false
 			sprite.play("idle")
 		basic_atk_effect.play("idle")
+		body_collider.set_deferred("disabled", false)
 
 func _on_basic_atk_area_body_entered(body):
 	if body == player:
@@ -397,7 +397,6 @@ func init_knockback(amount, time, sender):
 		knockback_force = amount
 		knockback_sender = sender
 		
-		stun_timer.process_mode = Node.PROCESS_MODE_DISABLED
 		self.add_child(knockback_timer_node.instantiate(), true)
 		var timer_node = get_child(get_child_count()-1)
 		timer_node.wait_time = time
@@ -410,7 +409,6 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
-	stun_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

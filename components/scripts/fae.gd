@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 80
+@export var default_vit : int = 60
 var current_vit = default_vit
 @export var default_str : int = 60
 var current_str = default_str
@@ -97,7 +97,7 @@ func _physics_process(_delta):
 	elif grabbed:
 		is_grabbed()
 	elif player_entered and moving:
-		if player:
+		if is_instance_valid(player):
 			chase_player()
 			if choosed_atk == Possible_Attacks.MAGIC_DART and magic_dart_cooldown.is_stopped() and not flee_activated:
 				sprite.play("launch_dart")
@@ -113,7 +113,7 @@ func _physics_process(_delta):
 				moving = false
 				heal_cooldown.start()
 	elif not player_entered and moving:
-		if player:
+		if is_instance_valid(player):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
@@ -143,7 +143,7 @@ func flip(distance_to_player):
 	
 
 func chase_player():
-	if player or flee_activated:
+	if is_instance_valid(player) or flee_activated:
 		if not flee_activated:
 			navigation_agent.target_position = player.global_position
 		
@@ -237,7 +237,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 				sprite.play("damaged")
 
 func _on_sprite_2d_animation_finished() -> void:
-	if stun_timer.is_stopped():
+	if sprite.animation != "damaged":
 		set_idle()
 
 func _on_sprite_2d_frame_changed() -> void:
@@ -288,7 +288,7 @@ func _on_flee_delay_timeout() -> void:
 	flee_cooldown.start()
 
 func _on_navigation_agent_2d_target_reached(timeout = false) -> void:
-	if player:
+	if is_instance_valid(player):
 		if navigation_agent.target_position != player.global_position or timeout:
 			flee_activated = false
 			flee_timeout_timer.stop()
@@ -407,6 +407,8 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if not stun_timer.is_stopped():
+		set_idle()
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:
@@ -418,7 +420,7 @@ func _on_area_of_detection_body_exited(body):
 
 # DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
 func set_idle():
-	if (not knockbacked and not grabbed) or not flee_activated:
+	if (not knockbacked and not grabbed):
 		moving = true
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")

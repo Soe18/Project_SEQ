@@ -30,10 +30,10 @@ animations = [{
 radius = 7.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7nfri"]
-radius = 10.0
 height = 20.0
 
 [node name="Enchantment_dart_projectile" type="CharacterBody2D"]
+process_mode = 1
 collision_layer = 2
 collision_mask = 3
 motion_mode = 1

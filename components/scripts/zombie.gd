@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 150
+@export var default_vit : int = 50
 var current_vit = default_vit
 @export var default_str : int = 125
 var current_str = default_str
@@ -16,9 +16,9 @@ var current_efc = default_efc
 @export var damage_node : PackedScene
 @export var knockback_timer_node : PackedScene
 
-var var_velocity = 2
 var is_in_atk_range = false
 var moving = true
+
 var grabbed = false
 var grab_position
 var knockbacked = false
@@ -27,6 +27,11 @@ var knockback_sender
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc)
 signal got_grabbed(is_grabbed)
+
+var BODY_COLLIDER_POSITION_X
+var BODY_COLLIDER_ROTATION
+var BITE_EFFECT_X
+var BITE_COLLIDER_POSITION_X
 
 var target_position
 var player
@@ -46,13 +51,13 @@ var sprinting = false
 @onready var navigation_agent = $NavigationAgent2D
 
 @onready var sprite = $Sprite2D
+
 @onready var bite_effect = $Bite_Area/Effect
 @onready var bite_collider = $Bite_Area/Collider
 @onready var stun_timer = $Stun
 
 @onready var body_collider = $Body_collider
 
-@onready var sprint_area = $Sprint_Area
 @onready var sprint_collider = $Sprint_Area/Collider
 
 @onready var sprint_charge_time = $Charge_Time
@@ -82,6 +87,10 @@ var player_in_atk_range = false
 func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
+	BODY_COLLIDER_POSITION_X = body_collider.position.x
+	BODY_COLLIDER_ROTATION = body_collider.rotation_degrees
+	BITE_EFFECT_X = bite_effect.position.x
+	BITE_COLLIDER_POSITION_X = bite_effect.position.x
 	sprite.play("idle")
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -125,25 +134,20 @@ func _physics_process(_delta):
 
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		bite_effect.position = Vector2(-49, 12)
-		bite_effect.flip_h = false
-		body_collider.position = Vector2(19, 16)
+		body_collider.position.x = BODY_COLLIDER_POSITION_X
+		body_collider.rotation_degrees = -BODY_COLLIDER_ROTATION
 		sprite.flip_h = true
-		bite_collider.position = Vector2(-42, 16)
-		body_collider.rotation_degrees = -11
-		body_collider.position.x = 7
-		if grabbed:
-			sprite.rotation_degrees = -90;
+		bite_effect.position.x = -BITE_EFFECT_X
+		bite_effect.flip_h = false
+		bite_collider.position.x = -BITE_COLLIDER_POSITION_X
+		
 	elif distance_to_player.x > 0:
-		bite_effect.position = Vector2(49, 12)
-		bite_effect.flip_h = true
-		body_collider.position = Vector2(-6, 16)
+		body_collider.position.x = -BODY_COLLIDER_POSITION_X
+		body_collider.rotation_degrees = BODY_COLLIDER_ROTATION
 		sprite.flip_h = false
-		bite_collider.position = Vector2(42, 16)
-		body_collider.rotation_degrees = 11
-		body_collider.position.x = -7
-		if grabbed:
-			sprite.rotation_degrees = 90;
+		bite_effect.position.x = BITE_EFFECT_X
+		bite_effect.flip_h = true
+		bite_collider.position.x = BITE_COLLIDER_POSITION_X
 
 func chase_player():
 	if player:
@@ -229,7 +233,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 		set_health_bar()
 		if sprinting and dmg >= 25:
 			sprinting = false
-			sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
+			sprint_collider.set_deferred("disabled", true)
 			sprite.play("damaged")
 		if stun_sec > 0:
 			moving = false
@@ -277,7 +281,7 @@ func is_grabbed():
 
 func _on_stun_timeout():
 	choosed_atk = Possible_Attacks.IDLE
-	sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
+	sprint_collider.set_deferred("disabled", true)
 	set_idle()
 
 'DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
@@ -304,7 +308,7 @@ func set_idle():
 		moving = true
 		sprinting = false
 		choosed_atk = Possible_Attacks.IDLE
-		sprint_area.process_mode = Node.PROCESS_MODE_DISABLED
+		sprint_collider.set_deferred("disabled", true)
 		sprint_charge_time.stop()
 		sprite.play("idle")
 
@@ -362,7 +366,7 @@ func _on_sprint_time_timeout() -> void:
 func _on_charge_time_timeout():
 	if stun_timer.is_stopped():
 		sprinting = true
-		sprint_area.process_mode = Node.PROCESS_MODE_INHERIT
+		sprint_collider.set_deferred("disabled", false)
 		sprint_time.start(sprint_duration)
 
 func _on_update_atk_timeout():
@@ -393,6 +397,8 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

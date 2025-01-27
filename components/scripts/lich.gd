@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 var boss_name = "Kreegakaleet lu Gosata'ahm"
 
-@export var default_vit : int = 1000
+@export var default_vit : int = 1500
 var current_vit = default_vit
 @export var default_str : int = 190
 var current_str = default_str
@@ -532,6 +532,8 @@ func apply_knockback(sender):
 
 func _on_knockback_reset_timeout():
 	knockbacked = false
+	if stun_timer.is_stopped():
+		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):
 	if (is_in_atk_range and !grabbed) or time_duration == 0 or ally_sender:

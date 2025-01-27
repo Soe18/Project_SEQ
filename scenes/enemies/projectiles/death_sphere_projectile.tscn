@@ -178,6 +178,7 @@ radius = 25.2211
 radius = 105.262
 
 [node name="DeathSphereProjectile" type="CharacterBody2D"]
+process_mode = 1
 z_index = 3
 scale = Vector2(2.3, 2.3)
 collision_layer = 2

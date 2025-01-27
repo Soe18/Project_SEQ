@@ -4,7 +4,7 @@ var player
 var selected_character
 var paused = false
 var connected = false
-var boss_defeted_count = 0
+var boss_defeted_count = 2
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 
@@ -16,12 +16,8 @@ var active_enemy_container : Node2D
 @onready var game_over_container = gui.find_child("GameOver_container")
 # contenitore della gui del combattimento
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
-# music player che contiene la ost
+# music player che contiene le ost
 @onready var ost_player = $Ost_player
-# music player che contiene la ost di pausa
-@onready var pause_ost_player = $Pause_ost_player
-# music player che contiene la ost di game over
-@onready var game_over_ost = $CanvasLayer/GUI/GameOver_container/GameOver_song
 # contenitore della gui di pausa
 @onready var pause_gui = $CanvasLayer/Pause_GUI
 # riferimento all'animation player della pause gui
@@ -29,17 +25,33 @@ var active_enemy_container : Node2D
 # variabile che contiene la gui specifica per quel player
 var player_gui
 
-var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn"]
-var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn"]
+var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn", "res://scenes/tilemaps/forest_tile_map.tscn"]
+var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn", "res://scenes/miscellaneous/forest_enemy_container.tscn"]
 
 var portal
 
 func _ready():
+	var temp : Array
+	for i in tilesets.size():
+		temp.append(i)
+	
+	#temp.shuffle()
+	
+	var new_tileset_order : Array
+	var new_container_order : Array
+	
+	for i in temp:
+		new_tileset_order.append(tilesets[i])
+		new_container_order.append(enemy_containers[i])
+	
+	tilesets = new_tileset_order
+	enemy_containers = new_container_order
+	
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
-	add_child(load(tilesets[0]).instantiate(),true)
+	add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
 	active_tileset = get_child(get_child_count(true)-1)
 	
-	add_child(load(enemy_containers[0]).instantiate(),true)
+	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
 	active_enemy_container = get_child(get_child_count(true)-1)
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
@@ -174,21 +186,6 @@ func connect_player_projectile(projectile):
 		if "Enemy" in current_node.name: 
 			projectile.take_dmg.connect(current_node._on_player_take_dmg)
 			projectile.inflict_knockback.connect(current_node.init_knockback)
-	
-
-# Penso che questa funzione sia inutile ora :/
-# Meglio toglierla in futuro per evitare comportamenti improvvisi
-func pause_game(get_paused):
-	if get_paused: # se il player mette in pausa
-		get_tree().paused = true # metto in pausa l'albero
-		ost_player.stream_paused = true # metto in pausa l'ost_player
-		pause_ost_player.play(0) # faccio partire da capo l'ost della pausa
-		pause_gui.visible = true # mostro il menu di pausa
-	else: # se il player vuole togliere la pausa
-		get_tree().paused = false # tolgo la pausa dell'albero
-		pause_ost_player.stop() # fermo completamente l'ost della pausa
-		ost_player.stream_paused = false # faccio riprendere l'ost
-		pause_gui.visible = false # nascondo il menu di pausa
 
 func calculate_dmg(str, atk_str, tem, pbc, efc):
 	var crit = false
@@ -205,8 +202,7 @@ func calculate_dmg(str, atk_str, tem, pbc, efc):
 
 # DIGEST DEL SEGNALE DELLA PLAYER_GUI CHE NOTIFICA QUANDO GLI HP SCENDONO A 0
 func _on_player_death():
-	ost_player.stop() # stoppo la musica
-	game_over_ost.play() # faccio partire l'ost di game over
+	ost_player.get_stream_playback().switch_to_clip_by_name(&"game_over")
 	gui.visible = true # la GUI diventa visibile
 	game_over_container.visible = true # rendo visibile il game over
 	player_gui.visible = false # nascondo la gui del player
@@ -245,6 +241,8 @@ func _on_boss_defeted():
 	add_child(load("res://scenes/miscellaneous/travel_portal.tscn").instantiate(),true)
 	# assegno alla variabile portal l'ultimo child della lista, cioè il nodo appena istanziato
 	portal = get_child(get_child_count()-1)
+	# metto il portale dove è spawnato il boss
+	portal.global_position = active_enemy_container.boss_spawner.global_position
 	# assegno il paramentro player del portale al layer attivo
 	portal.player = player
 	# collego il segnale del portale allo scene manager per cambiare stage
