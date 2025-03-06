@@ -1,4 +1,4 @@
-[gd_scene load_steps=182 format=3 uid="uid://b3nwx0erq4kqx"]
+[gd_scene load_steps=181 format=3 uid="uid://b3nwx0erq4kqx"]
 
 [ext_resource type="Script" path="res://components/scripts/jack.gd" id="1_4tu1l"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_wfp2a"]
@@ -67,8 +67,6 @@ _data = {
 "RESET": SubResource("Animation_ghs21"),
 "shake_ammo": SubResource("Animation_hfyxq")
 }
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_lpx2l"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lguq2"]
 atlas = ExtResource("6_p2m4j")
@@ -1287,7 +1285,6 @@ libraries = {
 position = Vector2(1.11111, -55.5556)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
-material = SubResource("CanvasItemMaterial_lpx2l")
 scale = Vector2(1.2, 1.2)
 sprite_frames = SubResource("SpriteFrames_dte57")
 animation = &"p_idle"

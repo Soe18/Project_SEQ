@@ -8,6 +8,7 @@ var first_enter = true
 var lich_str
 var lich_pbc
 var lich_efc
+@onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
 @onready var sprite = $Sprite2D
 
@@ -15,7 +16,7 @@ var lich_efc
 
 @onready var collision = $Area_to_impact/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 
 func _ready():
 	sprite.play("effect")
@@ -41,7 +42,7 @@ func go_to_player():
 func _on_area_to_impact_body_entered(body):
 	if body == player:
 		impact()
-		emit_signal("take_dmg",lich_str, 8, 0.5, lich_pbc, lich_efc)
+		emit_signal("take_dmg",lich_str, 8, 0.5, lich_pbc, lich_efc, atk_type)
 
 func _on_sprite_2d_animation_finished():
 	queue_free()

@@ -1,6 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://cymi8puqyx10m"]
 
-[ext_resource type="Script" path="res://components/scripts/Witchcraft_Projectile.gd" id="1_gjp6w"]
+[ext_resource type="Script" path="res://components/scripts/witchcraft_projectile.gd" id="1_gjp6w"]
 [ext_resource type="Texture2D" uid="uid://pjhe0wnau24a" path="res://components/sprites/enemies/lich/lich_witchcraft_effect.png" id="2_kd70y"]
 [ext_resource type="Texture2D" uid="uid://bkcg36ttdeanw" path="res://components/sprites/enemies/lich/lich_explosions_effect.png" id="3_ql0cg"]
 

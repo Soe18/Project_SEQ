@@ -2,6 +2,8 @@ extends Node
 # To call game_manager, please use:
 # get_tree().get_first_node_in_group("gm")
 
+enum Attack_Types {PHYSICAL, PROJECTILE}
+
 func _ready():
 	# Depends on starting scene
 	Menu.game_status = Menu.GAME_STATUSES.unopenable

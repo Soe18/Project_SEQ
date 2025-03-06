@@ -38,7 +38,7 @@ movie_writer/disable_vsync=true
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg")
 
 [filesystem]
 
@@ -48,6 +48,12 @@ import/fbx/enabled=false
 [global_group]
 
 gm="Here should be placed only GameManager"
+
+[importer_defaults]
+
+animation_library={
+"animation/fps": 60.0
+}
 
 [input]
 

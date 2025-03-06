@@ -28,10 +28,14 @@ var attacking = false
 
 @export var punch_force = 25
 @export var punch_stun_time = 2.0
-@export var earthquake_force = 2.5
+@onready var punch_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+@export var earthquake_force = 2.5
+@onready var earthquake_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
+
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal got_grabbed(is_grabbed)
+signal shake_camera(shake, strenght)
 
 var player_position
 var target_position
@@ -203,13 +207,15 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed:
-		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-		var dmg = dmg_crit[0]
-		show_hitmarker("-" + str(dmg), dmg_crit[1])
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+		var dmg = dmg_info[0]
+		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
 		set_health_bar()
+		if dmg > 0:
+			emit_signal("shake_camera", true, dmg_info[2])
 		if (dmg >= 25 or dmg <= 0) and stun_sec > 0:
 			punch_effect.play("idle")
 			sprite.position = Vector2.ZERO
@@ -345,14 +351,14 @@ func punch():
 
 func _on_effect_animation_finished():
 	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc, punch_type)
 		set_idle()
 	if earthquake_effect.animation == "effect":
 		set_idle()
 
 func _on_effect_frame_changed():
 	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, earthquake_force, 0, 0, 0)
+		emit_signal("take_dmg", current_str, earthquake_force, 0, 0, 0, earthquake_type)
 		if player.current_des == player.default_des:
 			player.current_des /= 2.5
 			player.status_sprite.play("debuff")

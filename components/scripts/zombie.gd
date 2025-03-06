@@ -25,8 +25,9 @@ var knockbacked = false
 var knockback_force = 0
 var knockback_sender
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal got_grabbed(is_grabbed)
+signal shake_camera(shake, strenght)
 
 var BODY_COLLIDER_POSITION_X
 var BODY_COLLIDER_ROTATION
@@ -43,10 +44,13 @@ var sprinting = false
 
 @export var bite_force = 5
 @export var bite_stun_time = 0.5
+@onready var bite_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
+
 @export var sprint_force = 10
 @export var sprint_stun_time = 0.3
 @export var sprint_multiplyer = 5
 @export var sprint_duration = 6.0
+@onready var sprint_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @onready var navigation_agent = $NavigationAgent2D
 
@@ -224,13 +228,15 @@ func _on_player_is_in_atk_range(is_in, body):
 		#imposto il tempo di stun con il parametro passato
 		#faccio partire il timer dello stun
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed:
-		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-		var dmg = dmg_crit[0]
-		show_hitmarker("-" + str(dmg), dmg_crit[1])
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+		var dmg = dmg_info[0]
+		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
 		set_health_bar()
+		if dmg > 0:
+			emit_signal("shake_camera", true, dmg_info[2])
 		if sprinting and dmg >= 25:
 			sprinting = false
 			sprint_collider.set_deferred("disabled", true)
@@ -331,7 +337,7 @@ func _on_bite_area_body_exited(body):
 func _on_sprint_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
-		emit_signal("take_dmg", current_str, sprint_force, sprint_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, sprint_force, sprint_stun_time, current_pbc, current_efc, sprint_type)
 		sprint_time.start(0.5)
 		update_atk_timer.start(0.5)
 
@@ -341,10 +347,9 @@ func _on_sprint_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and bite_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg",current_str, bite_force, bite_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg",current_str, bite_force, bite_stun_time, current_pbc, current_efc, bite_type)
 		bite_cooldown.start()
-	bite_effect.play("idle")
-	sprite.play("idle")
+	set_idle()
 
 func bite():
 	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not sprinting:

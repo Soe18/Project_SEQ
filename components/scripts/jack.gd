@@ -26,6 +26,7 @@ signal set_health_bar(current_vit)
 signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal inflict_knockback(amount, time, sender)
+signal shake_camera(shake, strenght)
 
 signal launched_flashbang()
 
@@ -61,6 +62,7 @@ var gun_knockback_flag
 var gun_stun_time
 var max_bullet_count
 var gun_bullet_count
+@onready var flashbang_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 var changing_gun = false
 
@@ -277,7 +279,7 @@ func atk_handler():
 func _on_flashbang_area_body_entered(body: Node2D) -> void:
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", 0, 0, 4, 0, 0)
+		emit_signal("take_dmg", 0, 0, 4, 0, 0, null)
 		emit_signal("inflict_knockback", 900, 0.2, self.global_position)
 
 func _on_flashbang_area_body_exited(body: Node2D) -> void:
@@ -334,6 +336,7 @@ func _on_sprite_2d_frame_changed():
 		gun_handler()
 	if "flashbang" in sprite.animation and sprite.frame == 4:
 		emit_signal("launched_flashbang")
+		emit_signal("shake_camera", true, 20)
 		flashbang_collider.set_deferred("disabled", false)
 
 func _on_effect_frame_changed():
@@ -462,12 +465,14 @@ func _on_ulti_duration_timeout() -> void:
 
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	var dmg_crit = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-	var dmg = dmg_crit[0]
-	show_hitmarker("-" + str(dmg), dmg_crit[1])
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+	var dmg = dmg_info[0]
+	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
+	if dmg_info[2] > 0:
+		emit_signal("shake_camera", true, dmg_info[2])
 	if stun_sec > 0 and not "flashbang" in sprite.animation:
 		shooting_delay_timer.stop()
 		emit_signal("set_idle")

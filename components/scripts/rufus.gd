@@ -24,12 +24,13 @@ enum Move_Keys {UP, DOWN, LEFT, RIGHT}
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal inflict_knockback(amount, time, sender)
+signal shake_camera(shake, strenght)
 
 @export var ACCELERATION : float = 10000.0
 @export var FRICTION : float = 7000.0
@@ -64,11 +65,16 @@ var ult_moving_mod
 
 @export var basic_atk_force = 10
 @export var basic_stun_time = 0.4
+@onready var basic_atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @export var evade_amount = 1000
+@export var evade_force = 10
+@export var evade_stun_time = 2.1
+@onready var evade_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @export var skill1_force = 20
 @export var skill1_stun_time = 0.6
+@onready var skill1_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @export var skill2_force = 23
 @export var skill2_stun_time = 1.4
@@ -77,11 +83,13 @@ var ult_moving_mod
 @export var skill2_duration = 10
 @export var skill2_knockback_force = 600
 @export var skill2_knockback_duration = 0.2
+@onready var skill2_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @export var ult_force = 80
 @export var ult_stun_time = 6
 @export var ult_knockback_force = 900
 @export var ult_knockback_duration = 0.3
+@onready var ult_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @onready var sprite = $Sprite2D
 
@@ -279,7 +287,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, 10, 2.1, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, evade_force, evade_stun_time, current_pbc, current_efc, evade_type)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -296,7 +304,7 @@ func _on_skill_1_area_body_exited(body):
 func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type)
 		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
 		emit_signal("inflict_knockback", skill2_knockback_force, skill2_knockback_duration, self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
@@ -308,7 +316,7 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type)
 		emit_signal("inflict_knockback", ult_knockback_force, ult_knockback_duration, self.global_position)
 
 func _on_ult_area_body_exited(body):
@@ -336,28 +344,28 @@ func _on_sprite_2d_animation_finished():
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
 		atk_anim_finished = true
 		combo_time.start()
 
 	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
 		atk_anim_finished = true
 		combo_time.start()
 
@@ -376,7 +384,7 @@ func _on_sprite_2d_frame_changed():
 	if sprite.frame == 4 and sprite.animation == "base atk5":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
 		sprite.pause()
@@ -385,7 +393,7 @@ func _on_sprite_2d_frame_changed():
 
 func _on_effect_frame_changed():
 	if skill1_effect.frame % 2 == 0 and atk_state == Atk_States.SK1:
-		emit_signal("take_dmg", current_str, skill1_force, skill1_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, skill1_force, skill1_stun_time, current_pbc, current_efc, skill1_type)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
 		skill2_collider.set_deferred("disabled", false)
@@ -501,12 +509,14 @@ func evade():
 	move_and_slide()
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
-	var dmg_crit = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-	var dmg = dmg_crit[0]
-	show_hitmarker("-" + str(dmg), dmg_crit[1])
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+	var dmg = dmg_info[0]
+	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
+	if dmg_info[2] > 0:
+		emit_signal("shake_camera", true, dmg_info[2])
 	if stun_sec > 0:
 		emit_signal("set_idle")
 		sprite.play("damaged")

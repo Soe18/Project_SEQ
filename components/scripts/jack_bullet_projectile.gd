@@ -6,6 +6,7 @@ var bullet_force
 var gun_stun_time = 0.3
 var knockback_flag
 var direction
+@onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
 var queue : Array
 var MAX_LENGHT : int = 10
@@ -18,7 +19,7 @@ var MAX_LENGHT : int = 10
 
 @onready var collision = $Area_to_impact/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal inflict_knockback(amount, time, sender)
 
 func _ready():
@@ -42,7 +43,7 @@ func _on_area_to_impact_body_entered(body):
 	if body != player and "Enemy" in body.name:
 		body.is_in_atk_range = true
 		if player:
-			emit_signal("take_dmg",player.default_str, bullet_str, gun_stun_time, player.current_pbc, player.current_efc)
+			emit_signal("take_dmg", player.default_str, bullet_str, gun_stun_time, player.current_pbc, player.current_efc, atk_type)
 			if knockback_flag:
 				emit_signal("inflict_knockback", 600, 0.1, self.global_position)
 		body.is_in_atk_range = false

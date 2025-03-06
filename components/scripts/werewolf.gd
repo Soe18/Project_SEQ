@@ -30,15 +30,18 @@ var agility_multiplyer = 50
 
 @export var claw_force = 3.2
 @export var claw_stun_time = 0.2
+@onready var claw_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
+
 @export var howl_amount = 50
 @export var howl_duration = 15
 @export var howl_changed_stat = "str"
 
 var second_time_claw = true
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal got_grabbed(is_grabbed)
 signal change_stats(stat, amount, time_duration, ally_sender)
+signal shake_camera(shake, strenght)
 
 var target_position
 var player
@@ -229,17 +232,19 @@ func _on_player_is_in_atk_range(is_in, body):
 #		faccio partire il timer dello stun
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 	if is_in_atk_range and not grabbed and not knockbacked:
-		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-		var dmg = dmg_crit[0]
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		var dmg = dmg_info[0]
 		
 		var rng = randi_range(0, 100)
 		if agility_cooldown.is_stopped() and rng <= agility_percentage:
 			agility()
 		
 		if not agility_activated or dmg <= 0:
-			show_hitmarker("-" + str(dmg), dmg_crit[1])
+			show_hitmarker("-" + str(dmg), dmg_info[1])
 			current_vit -= dmg
 			set_health_bar()
+			if dmg > 0:
+				emit_signal("shake_camera", true, dmg_info[2])
 			if stun_sec > 0:
 				moving = false
 				howl_charge_time.stop()
@@ -332,7 +337,7 @@ func _on_sprite_2d_animation_finished() -> void:
 
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "claws" and (sprite.frame == 1 or sprite.frame == 4):
-		emit_signal("take_dmg", current_str, claw_force, claw_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, claw_force, claw_stun_time, current_pbc, current_efc, claw_type)
 
 func _on_area_of_detection_body_entered(body):
 	if body == player:

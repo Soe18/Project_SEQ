@@ -8,6 +8,7 @@ var first_enter = true
 var fae_str
 var fae_pbc
 var fae_efc
+@onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
 var enchantment_force = 9
 var enchantment_stun_time = 5.0
@@ -18,7 +19,7 @@ var enchantment_velocity_multiplyer = 500
 
 @onready var time_to_live = $Time_to_live
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 
 func _ready():
 	sprite.play("effect")
@@ -43,7 +44,7 @@ func go_to_player():
 
 func _on_area_to_impact_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",fae_str, enchantment_force, enchantment_stun_time, fae_pbc, fae_efc)
+		emit_signal("take_dmg",fae_str, enchantment_force, enchantment_stun_time, fae_pbc, fae_efc, atk_type)
 		queue_free()
 
 func _on_time_to_live_timeout():

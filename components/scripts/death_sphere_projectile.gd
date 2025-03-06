@@ -6,6 +6,7 @@ var origin : Vector2
 var lich_str
 var lich_pbc
 var lich_efc
+@onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
 @onready var sprite = $Sprite2D
 
@@ -13,7 +14,7 @@ var lich_efc
 
 @onready var area_of_effect = $Area2D/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 
 '
 effect y = -18.5
@@ -46,7 +47,7 @@ func _on_area_to_impact_body_entered(body):
 
 func _on_area_2d_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",lich_str, 25, 2, lich_pbc, lich_efc)
+		emit_signal("take_dmg",lich_str, 25, 2, lich_pbc, lich_efc, atk_type)
 
 func _on_sprite_2d_animation_finished():
 	if sprite.animation == "spawn":

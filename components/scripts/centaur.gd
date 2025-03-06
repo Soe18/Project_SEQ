@@ -24,11 +24,12 @@ var knockbacked = false
 var knockback_force = 0
 var knockback_sender
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal got_grabbed(is_grabbed)
 signal grab_player(has_grabbed, grab_position_marker, sender)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal inflict_knockback(amount, time, sender)
+signal shake_camera(shake, strenght)
 
 var target_position
 var player
@@ -231,13 +232,15 @@ func _on_player_is_in_atk_range(is_in, body):
 #		impedisco al nodo di muoversi mentre viene attaccato
 #		imposto il tempo di stun con il parametro passato
 #		faccio partire il timer dello stun
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed:
-		var dmg_crit = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-		var dmg = dmg_crit[0]
-		show_hitmarker("-" + str(dmg), dmg_crit[1])
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+		var dmg = dmg_info[0]
+		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
 		set_health_bar()
+		if dmg > 0:
+			emit_signal("shake_camera", true, dmg_info[2])
 		if sprinting and dmg >= 25:
 			sprinting = false
 		elif stun_sec > 0:

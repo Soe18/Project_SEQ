@@ -4,6 +4,7 @@ var lich_str
 var lich_pbc
 var lich_efc
 var player
+@onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @onready var sprite = $Sprite2D
 
@@ -16,7 +17,7 @@ func _ready():
 
 func _on_area_of_effect_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",lich_str, 17, 3, lich_pbc, lich_efc)
+		emit_signal("take_dmg",lich_str, 17, 3, lich_pbc, lich_efc, atk_type)
 
 func _on_sprite_2d_animation_finished():
 	queue_free()

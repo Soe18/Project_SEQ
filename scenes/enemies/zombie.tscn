@@ -499,7 +499,7 @@ position = Vector2(0, -64)
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(0.139583, 0.139583)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"idle"
+animation = &"damaged"
 autoplay = "idle"
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]

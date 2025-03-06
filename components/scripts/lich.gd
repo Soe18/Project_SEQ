@@ -34,9 +34,10 @@ var knockback_sender
 var spawning = true # variabile a true finché non finisce l'animazione di spawning, altrimenti false
 var dying = false # variabile a false finché il boss è in vita, poi a true per l'animazione di death
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg_info(str, atk_str, sec_stun, pbc, efc)
 signal set_health_bar(vit)
 signal got_grabbed(is_grabbed)
+signal shake_camera(shake, strenght)
 
 var player
 
@@ -209,11 +210,11 @@ func _on_player_is_in_atk_range(is_in, body):
 	else:
 		is_in_atk_range = false
 
-'DIGEST DEL SEGNALE DEL PLAYER "take_dmg"
+'DIGEST DEL SEGNALE DEL PLAYER "take_dmg_info"
 {
 	PARAMETRI
 	int atk_state: DEPRECATO
-	int dmg: quantità del danno inflitto
+	int dmg_info: quantità del danno inflitto
 	float sec: tempo dello stun
 }
 	se il nodo è in range e non è grabbato
@@ -224,13 +225,13 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
-			var dmg = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
-			current_vit -= dmg[0]
+			var dmg_info = get_parent().get_parent().calculate_dmg_info(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+			current_vit -= dmg_info[0]
 			emit_signal("set_health_bar", current_vit)
-			show_hitmarker("-" + str(dmg[0]), dmg[1])
+			show_hitmarker("-" + str(dmg_info[0]), dmg_info[1])
 			
 			# sto stronzo ha uno stun_reduction, cioè diminuisce i secondi di stun
 			stun_sec -= 0.5
@@ -238,8 +239,11 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
 			if stun_sec < 0:
 				stun_sec = 0 # semplicemente li riporta a 0
 			
+			if dmg_info > 0:
+				emit_signal("shake_camera", true, dmg_info[2])
+			
 			# se ha secondi di stun e se il danno è maggiore uguale a 15 allora lo sente effettivamente
-			if (dmg[0] >= 15 or dmg[0] <= 0) and stun_sec > 0: # ha pure l'armor sta merda
+			if (dmg_info[0] >= 15 or dmg_info[0] <= 0) and stun_sec > 0: # ha pure l'armor sta merda
 				moving = false
 				stun_timer.wait_time = stun_sec
 				stun_timer.start()
@@ -320,7 +324,7 @@ func launch_witchcraft():
 	witchcraft_projectile.lich_str = current_str
 	witchcraft_projectile.lich_pbc = current_pbc
 	witchcraft_projectile.lich_efc = current_efc
-	witchcraft_projectile.take_dmg.connect(player._on_enemy_take_dmg)
+	witchcraft_projectile.take_dmg_info.connect(player._on_enemy_take_dmg_info)
 	witchcraft_projectile.look_at(player.global_position)
 	witchcraft_projectile.reparent(get_parent())
 
@@ -339,7 +343,7 @@ func launch_death_sphere():
 	death_sphere_projectile.lich_str = current_str
 	death_sphere_projectile.lich_pbc = current_pbc
 	death_sphere_projectile.lich_efc = current_efc
-	death_sphere_projectile.take_dmg.connect(player._on_enemy_take_dmg)
+	death_sphere_projectile.take_dmg_info.connect(player._on_enemy_take_dmg_info)
 
 # METODO CHE FA PARTIRE IL PRIMO ROUND DI ESPLOSIONI
 func explosions():
@@ -352,7 +356,7 @@ func explosions():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
 			instantiated_explosion.reparent(get_parent())
 	second_round_timer.start() # faccio partire il timer per il secondo round
 	explosions_cooldown.start() # faccio partire il cooldown
@@ -369,7 +373,7 @@ func _on_second_round_timer_timeout():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
 			instantiated_explosion.reparent(get_parent())
 	third_round_timer.start() # faccio partire il timer per il terzo round
 
@@ -384,7 +388,7 @@ func _on_third_round_timer_timeout():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
+			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
 			instantiated_explosion.reparent(get_parent())
 	reset_explosions.start() # faccio partire il timer per resettare le esplosioni
 
@@ -565,7 +569,7 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
 
-func show_hitmarker(dmg, crit):
+func show_hitmarker(dmg_info, crit):
 	var hitmarker = damage_node.instantiate()
 	hitmarker.position = hitmarker_spawnpoint.global_position
 	
@@ -575,7 +579,7 @@ func show_hitmarker(dmg, crit):
 						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
 						0.75)
 	
-	hitmarker.get_child(0).text = dmg
+	hitmarker.get_child(0).text = dmg_info
 	if crit:
 		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
 	get_tree().current_scene.add_child(hitmarker)

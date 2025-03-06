@@ -120,7 +120,7 @@ func activate_markers():
 				out = true # seleziono il percorso
 		
 		add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
-		#add_child(load(possible_enemies[4]).instantiate(),true) # debug
+		#add_child(load(possible_enemies[0]).instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 

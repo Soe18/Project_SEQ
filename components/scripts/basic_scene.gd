@@ -1,12 +1,16 @@
 extends Node2D
 
 var player
+var camera
 var selected_character
 var paused = false
 var connected = false
-var boss_defeted_count = 2
+var boss_defeted_count = 3
 var active_tileset : Node2D
 var active_enemy_container : Node2D
+@onready var Attack_Types = get_tree().get_first_node_in_group("gm").Attack_Types
+
+signal shake_camera(is_shaking, strenght)
 
 # il nodo canvaslayer serve per fissare la gui allo schermo
 @onready var canvas_layer = find_child("CanvasLayer") 
@@ -25,8 +29,10 @@ var active_enemy_container : Node2D
 # variabile che contiene la gui specifica per quel player
 var player_gui
 
-var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn", "res://scenes/tilemaps/forest_tile_map.tscn"]
-var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn", "res://scenes/miscellaneous/forest_enemy_container.tscn"]
+@onready var shake_duration_timer = $Shake_duration
+
+var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn", "res://scenes/tilemaps/forest_tile_map.tscn", "res://scenes/tilemaps/deep_forest_tile_map.tscn"]
+var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn", "res://scenes/miscellaneous/forest_enemy_container.tscn", "res://scenes/miscellaneous/deep_forest_enemy_container.tscn"]
 
 var portal
 
@@ -100,24 +106,27 @@ func _on_gui_select_character(char):
 	player.scale = Vector2(1.0, 1.0)
 	
 	# creo la telecamera
-	var camera = Camera2D.new()
+	camera = Camera2D.new()
 	
 	# impostazioni per la telecamera
 	camera.zoom = Vector2(1.7,1.7)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 3
+	camera.set_script(load("res://components/scripts/Camera2D.gd"))
+	camera.shake_duration_timer = shake_duration_timer
+	player.shake_camera.connect(camera._on_player_shake_camera)
+	shake_camera.connect(camera._on_player_shake_camera)
+	#player.shake_camera.connect(camera._on_player_shake_camera)
 	
 	# debug: zoom diminuito
 	#camera.zoom = Vector2(0.5,0.5)
 	
 	# condizione per collegare lo script della telecamera
 	if char == "nathan":
-		camera.set_script(load("res://components/scripts/Camera2D.gd"))
 		player.scale = Vector2(1.4, 1.4)
-		player.add_child(camera,true) # aggiungo la camera al player
-		player.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
+		player.add_child(camera, true) # aggiungo la camera al player
 	else:
-		player.add_child(camera,true) # aggiungo la camera al player
+		player.add_child(camera, true) # aggiungo la camera al player
 	activate_player_GUI() # funzione per attivare le GUI
 	connect_enemies_with_player() # connetto i nemici e il player
 	gui.visible = false
@@ -144,6 +153,7 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			player.take_dmg.connect(current_node._on_player_take_dmg)
 			# segnale tra nemici e player per infliggere danno
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
+			current_node.shake_camera.connect(player.find_child("Camera2D", true, false)._on_player_shake_camera)
 			
 			# se il player ha scelto nathan
 			if player.char_name == "Nathan": # connetto il segnale della grab
@@ -187,8 +197,9 @@ func connect_player_projectile(projectile):
 			projectile.take_dmg.connect(current_node._on_player_take_dmg)
 			projectile.inflict_knockback.connect(current_node.init_knockback)
 
-func calculate_dmg(str, atk_str, tem, pbc, efc):
+func calculate_dmg(str, atk_str, tem, pbc, efc, type):
 	var crit = false
+	var shake_amount = 0
 	if tem <= 0:
 		tem = 1
 	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA DELL'ATTACCO) / TEMPRA_BERSAGLIO
@@ -198,7 +209,12 @@ func calculate_dmg(str, atk_str, tem, pbc, efc):
 		# aumento il danno in base all'efficienza del colpo critico (es. 15 * 1.5 = 15 + 7.5 = 22.5 = 23)
 		dmg = round(dmg * efc)
 		crit = true
-	return [dmg, crit]
+	
+	if type == Attack_Types.PHYSICAL:
+		shake_amount = dmg / 10
+		if shake_amount <= 0:
+			shake_amount = 1
+	return [dmg, crit, shake_amount]
 
 # DIGEST DEL SEGNALE DELLA PLAYER_GUI CHE NOTIFICA QUANDO GLI HP SCENDONO A 0
 func _on_player_death():
@@ -271,3 +287,6 @@ func _on_change_stage():
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
 	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)
 	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)
+
+func _on_shake_duration_timeout() -> void:
+	emit_signal("shake_camera", false, 0)

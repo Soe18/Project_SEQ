@@ -4,6 +4,7 @@
 
 [node name="Enemy_container" type="Node2D"]
 process_mode = 1
+y_sort_enabled = true
 script = ExtResource("1_xtmke")
 
 [node name="Round_cooldown" type="Timer" parent="."]
@@ -11,30 +12,30 @@ wait_time = 4.0
 one_shot = true
 
 [node name="Spawnpoint" type="Marker2D" parent="."]
-position = Vector2(609.5, 86.5)
+position = Vector2(-1110, -916)
 
 [node name="Spawnpoint2" type="Marker2D" parent="."]
-position = Vector2(184, -31.5)
+position = Vector2(-1128, -250)
 
 [node name="Spawnpoint3" type="Marker2D" parent="."]
-position = Vector2(494, 357)
+position = Vector2(901, 368)
 
 [node name="Spawnpoint4" type="Marker2D" parent="."]
-position = Vector2(-170.5, 93)
+position = Vector2(-637, 28)
 
 [node name="Spawnpoint5" type="Marker2D" parent="."]
-position = Vector2(-149.5, 249)
+position = Vector2(-840, 639)
 
 [node name="Spawnpoint6" type="Marker2D" parent="."]
-position = Vector2(134.5, 357)
+position = Vector2(476, -821)
 
 [node name="Spawnpoint7" type="Marker2D" parent="."]
-position = Vector2(-79.5, -64)
+position = Vector2(379, 595)
 
 [node name="Spawnpoint8" type="Marker2D" parent="."]
-position = Vector2(351.5, 92)
+position = Vector2(482, 199)
 
 [node name="Boss_Spawner" type="Marker2D" parent="."]
-position = Vector2(155, 79.5)
+position = Vector2(-111, -110)
 
 [connection signal="timeout" from="Round_cooldown" to="." method="_on_round_cooldown_timeout"]
