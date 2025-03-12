@@ -46,11 +46,13 @@ var first_enter = true
 
 @export var halberd_force = 10
 @export var halberd_stun_time = 2
+@onready var halberd_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 @export var sprint_duration = 5
 @export var sprint_force = 17
 @export var sprint_multiplyer = 800
 @export var sprint_knockback_force = 2000
 @export var sprint_knockback_time = 1
+@onready var sprint_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 @export var temperance_changed_stat = "tem"
 @export var temperance_amount = 60
 @export var temperance_duration = 20
@@ -84,6 +86,7 @@ var first_enter = true
 
 @onready var grab_position_marker = $Grab_position
 @onready var animation_player = $AnimationPlayer
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var halberd_cooldown = $Halberd_cooldown
 @onready var sprint_cooldown = $Sprint_cooldown
@@ -240,6 +243,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		current_vit -= dmg
 		set_health_bar()
 		if dmg > 0:
+			hit_flash_player.stop()
+			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
 		if sprinting and dmg >= 25:
 			sprinting = false
@@ -327,10 +332,10 @@ func _on_sprite_2d_animation_finished() -> void:
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "grab" and sprite.frame == 5:
 		emit_signal("grab_player", false, null, null)
-		emit_signal("take_dmg", current_str, sprint_force, 0, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, sprint_force, 0, current_pbc, current_efc, sprint_type)
 		emit_signal("inflict_knockback", 600, 0.3, self.global_position)
 	if sprite.animation == "halberd" and (sprite.frame == 4 or sprite.frame == 8) and player_in_atk_range:
-		emit_signal("take_dmg", current_str, halberd_force, halberd_stun_time, current_pbc, current_efc)
+		emit_signal("take_dmg", current_str, halberd_force, halberd_stun_time, current_pbc, current_efc, halberd_type)
 	if sprite.animation == "temperance" and sprite.frame == 2:
 		_on_change_stats(temperance_changed_stat, temperance_amount, temperance_duration, true)
 

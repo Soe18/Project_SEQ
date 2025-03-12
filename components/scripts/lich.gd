@@ -34,7 +34,7 @@ var knockback_sender
 var spawning = true # variabile a true finché non finisce l'animazione di spawning, altrimenti false
 var dying = false # variabile a false finché il boss è in vita, poi a true per l'animazione di death
 
-signal take_dmg_info(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal set_health_bar(vit)
 signal got_grabbed(is_grabbed)
 signal shake_camera(shake, strenght)
@@ -70,6 +70,7 @@ var choosed_atk
 @onready var evocation_cooldown = $Evocation_Cooldown
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var status_sprite = $Status_alert_sprite
 
@@ -228,7 +229,7 @@ func _on_player_is_in_atk_range(is_in, body):
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
-			var dmg_info = get_parent().get_parent().calculate_dmg_info(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+			var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
 			current_vit -= dmg_info[0]
 			emit_signal("set_health_bar", current_vit)
 			show_hitmarker("-" + str(dmg_info[0]), dmg_info[1])
@@ -239,7 +240,9 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 			if stun_sec < 0:
 				stun_sec = 0 # semplicemente li riporta a 0
 			
-			if dmg_info > 0:
+			if dmg_info[0] > 0:
+				hit_flash_player.stop()
+				hit_flash_player.play("hit_flash")
 				emit_signal("shake_camera", true, dmg_info[2])
 			
 			# se ha secondi di stun e se il danno è maggiore uguale a 15 allora lo sente effettivamente
@@ -267,7 +270,7 @@ func _on_stun_timeout():
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
 
 func set_idle():
-	if not knockbacked:
+	if not knockbacked and not dying:
 		moving = true
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")
@@ -324,7 +327,7 @@ func launch_witchcraft():
 	witchcraft_projectile.lich_str = current_str
 	witchcraft_projectile.lich_pbc = current_pbc
 	witchcraft_projectile.lich_efc = current_efc
-	witchcraft_projectile.take_dmg_info.connect(player._on_enemy_take_dmg_info)
+	witchcraft_projectile.take_dmg.connect(player._on_enemy_take_dmg)
 	witchcraft_projectile.look_at(player.global_position)
 	witchcraft_projectile.reparent(get_parent())
 
@@ -343,7 +346,7 @@ func launch_death_sphere():
 	death_sphere_projectile.lich_str = current_str
 	death_sphere_projectile.lich_pbc = current_pbc
 	death_sphere_projectile.lich_efc = current_efc
-	death_sphere_projectile.take_dmg_info.connect(player._on_enemy_take_dmg_info)
+	death_sphere_projectile.take_dmg.connect(player._on_enemy_take_dmg)
 
 # METODO CHE FA PARTIRE IL PRIMO ROUND DI ESPLOSIONI
 func explosions():
@@ -356,7 +359,7 @@ func explosions():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
 			instantiated_explosion.reparent(get_parent())
 	second_round_timer.start() # faccio partire il timer per il secondo round
 	explosions_cooldown.start() # faccio partire il cooldown
@@ -373,7 +376,7 @@ func _on_second_round_timer_timeout():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
 			instantiated_explosion.reparent(get_parent())
 	third_round_timer.start() # faccio partire il timer per il terzo round
 
@@ -388,7 +391,7 @@ func _on_third_round_timer_timeout():
 			instantiated_explosion.lich_str = current_str
 			instantiated_explosion.lich_pbc = current_pbc
 			instantiated_explosion.lich_efc = current_efc
-			instantiated_explosion.take_dmg_info.connect(player._on_enemy_take_dmg_info)
+			instantiated_explosion.take_dmg.connect(player._on_enemy_take_dmg)
 			instantiated_explosion.reparent(get_parent())
 	reset_explosions.start() # faccio partire il timer per resettare le esplosioni
 

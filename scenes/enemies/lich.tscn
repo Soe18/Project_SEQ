@@ -1,4 +1,4 @@
-[gd_scene load_steps=125 format=3 uid="uid://dtvpbgg4jjwyw"]
+[gd_scene load_steps=130 format=3 uid="uid://dtvpbgg4jjwyw"]
 
 [ext_resource type="Script" path="res://components/scripts/lich.gd" id="1_ic8pi"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_ob30n"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://cumid71vq62yx" path="res://scenes/enemies/projectiles/lich_explosions.tscn" id="5_jup8x"]
 [ext_resource type="Texture2D" uid="uid://cwcate3hnggm2" path="res://components/sprites/enemies/lich/lich_death_sphere.png" id="5_yl4ui"]
 [ext_resource type="Texture2D" uid="uid://dk8p7lgwt0xxp" path="res://components/sprites/enemies/lich/lich_evocation.png" id="6_xfrwy"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="7_0wifp"]
 [ext_resource type="Texture2D" uid="uid://dnrypqhdaeaxa" path="res://components/sprites/enemies/lich/lich_explosions.png" id="7_47psw"]
 [ext_resource type="Texture2D" uid="uid://biqmbnmpa1vxs" path="res://components/sprites/GUI/status_alert/buff_animation.png" id="8_fk50x"]
 [ext_resource type="Texture2D" uid="uid://h4vypvic6reh" path="res://components/sprites/enemies/lich/lich_idle.png" id="8_p76cc"]
@@ -18,6 +19,12 @@
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="10_c8vvr"]
 [ext_resource type="Texture2D" uid="uid://bsx83468jlb0k" path="res://components/sprites/enemies/lich/lich_spawn.png" id="10_djcvq"]
 [ext_resource type="Texture2D" uid="uid://b1kyqljnw3k1s" path="res://components/sprites/enemies/lich/lich_witchcraft.png" id="11_rhajy"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_41dip"]
+resource_local_to_scene = true
+shader = ExtResource("7_0wifp")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_d3qed"]
 atlas = ExtResource("3_52rpl")
@@ -835,6 +842,44 @@ height = 188.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_kwgoo"]
 radius = 8011.0
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="LichBossEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -853,6 +898,7 @@ position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
+material = SubResource("ShaderMaterial_41dip")
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"witchcraft"
@@ -1016,6 +1062,12 @@ one_shot = true
 [node name="Evocation_Cooldown" type="Timer" parent="."]
 wait_time = 40.0
 one_shot = true
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
+autoplay = "RESET"
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]

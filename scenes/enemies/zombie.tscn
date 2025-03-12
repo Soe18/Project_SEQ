@@ -1,6 +1,7 @@
-[gd_scene load_steps=74 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=80 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="1_p876d"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_otfb6"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_80k0x"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="3_msf8r"]
@@ -12,6 +13,17 @@
 [ext_resource type="Texture2D" uid="uid://cixwjw2tvf78u" path="res://components/sprites/GUI/status_alert/debuff_animation.png" id="9_t5myk"]
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="10_h8ytb"]
 [ext_resource type="Texture2D" uid="uid://cpontr05v0kat" path="res://components/sprites/default_atk.png" id="11_hpvul"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l2j2q"]
+shader = ExtResource("1_p876d")
+shader_parameter/flash_color = null
+shader_parameter/flash_value = null
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wops7"]
+resource_local_to_scene = true
+shader = ExtResource("1_p876d")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_p6vvj"]
 atlas = ExtResource("3_msf8r")
@@ -122,7 +134,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"damaged",
-"speed": 3.0
+"speed": 5.0
 }, {
 "frames": [],
 "loop": true,
@@ -482,9 +494,48 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fhhjd"]
 size = Vector2(96, 137.5)
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="ZombieEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+material = SubResource("ShaderMaterial_l2j2q")
 motion_mode = 1
 wall_min_slide_angle = 0.0
 safe_margin = 1.0
@@ -496,11 +547,14 @@ knockback_timer_node = ExtResource("3_80k0x")
 position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_wops7")
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(0.139583, 0.139583)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"damaged"
 autoplay = "idle"
+frame = 2
+frame_progress = 1.0
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
 z_index = 1
@@ -526,8 +580,6 @@ offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
 
 [node name="HealthBar" type="ProgressBar" parent="Control"]
-z_index = 2
-y_sort_enabled = true
 layout_mode = 0
 offset_left = -50.0
 offset_top = -60.0
@@ -606,6 +658,11 @@ avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20
 max_speed = 1703.04
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
 
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]

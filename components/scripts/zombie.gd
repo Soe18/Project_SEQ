@@ -74,6 +74,7 @@ var sprinting = false
 @onready var area_of_detection = $Area_of_detection
 
 @onready var status_sprite = $Status_alert_sprite
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var update_atk_timer = $Update_Atk
 
@@ -236,6 +237,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		current_vit -= dmg
 		set_health_bar()
 		if dmg > 0:
+			hit_flash_player.stop()
+			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
 		if sprinting and dmg >= 25:
 			sprinting = false

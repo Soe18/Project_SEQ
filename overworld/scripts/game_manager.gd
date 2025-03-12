@@ -8,7 +8,7 @@ func _ready():
 	# Depends on starting scene
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_pressed("pause") and Menu.game_status != Menu.GAME_STATUSES.unopenable:
 		Menu.pause_game()
 
@@ -24,6 +24,7 @@ func load_dungeon():
 
 func load_map():
 	Menu.game_status = Menu.GAME_STATUSES.overworld
+	get_child(0).ost_player.stop()
 	var selected_character # attributo da passare
 	add_child(load("res://overworld/scenes/maps/default_map.tscn").instantiate())
 	if get_child(0).selected_character: # se l'attributo che devo passare è presente

@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://ddy0votrhsoys"]
+[gd_scene load_steps=13 format=3 uid="uid://ddy0votrhsoys"]
 
 [ext_resource type="Script" path="res://overworld/scripts/players/player_wander.gd" id="1_30747"]
 [ext_resource type="Texture2D" uid="uid://d0sp863w364p2" path="res://components/sprites/rufus/Rufus_idle.png" id="1_mxkhv"]
 [ext_resource type="Texture2D" uid="uid://g2nafuf0dsep" path="res://components/sprites/rufus/Rufus_running.png" id="2_uwi0t"]
+[ext_resource type="PackedScene" uid="uid://cgh08a7f4c8kq" path="res://scenes/miscellaneous/main_camera.tscn" id="4_vwy70"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aodrr"]
 atlas = ExtResource("1_mxkhv")
@@ -76,10 +77,7 @@ autoplay = "idle"
 offset = Vector2(0, -300)
 metadata/_edit_group_ = true
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.6, 1.6)
-position_smoothing_enabled = true
-position_smoothing_speed = 3.0
+[node name="Main_camera" parent="." instance=ExtResource("4_vwy70")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1, -1)

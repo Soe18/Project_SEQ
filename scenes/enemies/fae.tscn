@@ -1,4 +1,4 @@
-[gd_scene load_steps=68 format=3 uid="uid://dlv5xy3f7qvmt"]
+[gd_scene load_steps=73 format=3 uid="uid://dlv5xy3f7qvmt"]
 
 [ext_resource type="Script" path="res://components/scripts/fae.gd" id="1_4p6sl"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_5kx2b"]
@@ -10,10 +10,17 @@
 [ext_resource type="Texture2D" uid="uid://biqmbnmpa1vxs" path="res://components/sprites/GUI/status_alert/buff_animation.png" id="5_ugwkk"]
 [ext_resource type="Texture2D" uid="uid://dg0w8hqiqnmr1" path="res://components/sprites/enemies/fae/fae_idle.png" id="5_x4mc4"]
 [ext_resource type="Texture2D" uid="uid://c8p0lhwkai63t" path="res://components/sprites/enemies/fae/fae_heal.png" id="6_6ydg4"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="6_mhkqy"]
 [ext_resource type="Texture2D" uid="uid://yj001hpf0hy8" path="res://components/sprites/enemies/fae/fae_running.png" id="6_q6t8n"]
 [ext_resource type="Texture2D" uid="uid://cixwjw2tvf78u" path="res://components/sprites/GUI/status_alert/debuff_animation.png" id="6_qixfm"]
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="7_x3kmy"]
 [ext_resource type="Texture2D" uid="uid://bu8oocyxh4ghd" path="res://components/sprites/enemies/fae/fae_magic_dard.png" id="8_olsqf"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ml2dn"]
+resource_local_to_scene = true
+shader = ExtResource("6_mhkqy")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ny0h4"]
 atlas = ExtResource("4_gm88b")
@@ -436,6 +443,44 @@ bg_color = Color(1, 0, 0.0352941, 1)
 [sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
 radius = 1116.03
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="FaeEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -452,6 +497,7 @@ enchantment_projectile_node = ExtResource("5_ls43h")
 position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_ml2dn")
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_7kgit")
@@ -554,6 +600,12 @@ simplify_path = true
 avoidance_enabled = true
 max_neighbors = 20
 max_speed = 1703.04
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
+autoplay = "RESET"
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]

@@ -49,9 +49,9 @@ var knockback_sender
 var atk_anim_finished = true
 
 var Guns = {
-	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_"},
-	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_"},
-	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 45, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_"}
+	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_" , "shake_strenght" : 2},
+	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_" , "shake_strenght" : 3},
+	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 45, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_" , "shake_strenght" : 20}
 }
 
 var gun_prefix
@@ -62,6 +62,7 @@ var gun_knockback_flag
 var gun_stun_time
 var max_bullet_count
 var gun_bullet_count
+var gun_shake_strenght
 @onready var flashbang_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 var changing_gun = false
@@ -100,6 +101,7 @@ var SHOTGUN_ROUNDS_COUNT = 6
 @onready var ulti_duration_timer = $Ulti_duration
 
 @onready var status_sprite = $Status_alert_sprite
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var animation_player = $Control/AnimationPlayer
 
@@ -115,6 +117,8 @@ var SHOTGUN_ROUNDS_COUNT = 6
 		esegue il metodo di movimento della skill1'
 
 @warning_ignore("unused_parameter")
+@warning_ignore("unused_signal")
+
 func _ready():
 	emit_signal("set_health_bar", default_vit)
 	skill2_cooldown.wait_time = SKILL2_WAIT_TIME
@@ -394,6 +398,7 @@ func gun_handler(param = "shoot"):
 		gun_stun_time = Guns[param]["stun_time"]
 		max_bullet_count = Guns[param]["bullet_count"]
 		gun_bullet_count = max_bullet_count
+		gun_shake_strenght = Guns[param]["shake_strenght"]
 		set_bullet_count_label()
 
 func shoot(shotgun = false):
@@ -411,6 +416,7 @@ func shoot(shotgun = false):
 		instantiated_bullet.bullet_force = randf_range(gun_force/3,gun_force)
 	else:
 		instantiated_bullet.bullet_force = gun_force
+	emit_signal("shake_camera", true, gun_shake_strenght)
 	instantiated_bullet.knockback_flag = gun_knockback_flag
 	instantiated_bullet.gun_stun_time = gun_stun_time
 	get_parent().connect_player_projectile(instantiated_bullet)
@@ -471,7 +477,9 @@ func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	if dmg_info[2] > 0:
+	if dmg > 0:
+		hit_flash_player.stop()
+		hit_flash_player.play("hit_flash")
 		emit_signal("shake_camera", true, dmg_info[2])
 	if stun_sec > 0 and not "flashbang" in sprite.animation:
 		shooting_delay_timer.stop()

@@ -3,7 +3,8 @@ extends Node2D
 var markers = [] # array che contiene tutti i marker della scena
 var active_markers = [] # array che si popola allo spawnare dei nemici
 # array contenente i percorsi dei nemici
-var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn","res://scenes/enemies/centaur.tscn"]
+var possible_enemies = [preload("res://scenes/enemies/zombie.tscn"),preload("res://scenes/enemies/skeleton.tscn"),preload("res://scenes/enemies/giant.tscn"),preload("res://scenes/enemies/werewolf.tscn"),preload("res://scenes/enemies/fae.tscn"),preload("res://scenes/enemies/centaur.tscn")]
+#var possible_enemies = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn","res://scenes/enemies/werewolf.tscn","res://scenes/enemies/fae.tscn","res://scenes/enemies/centaur.tscn"]
 # [0] = Zombie
 # [1] = Scheletro
 # [2] = Gigante
@@ -26,6 +27,8 @@ var portal_spawned = false # flag che determina se il portale è spawnato
 
 @onready var time_between_rounds = $Round_cooldown
 @onready var boss_spawner = $Boss_Spawner
+
+@warning_ignore("unused_signal")
 
 func _ready():
 	# popolo l'array con tutti gli spawnpoint
@@ -114,13 +117,13 @@ func activate_markers():
 		while not out: # finché la sentinella è falsa
 			enemy_scene = possible_enemies.pick_random() # prendo un nemico casuale dalla pool
 			# se l'ondata è minore di 5 E il nemico selezionato è il gigante
-			if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[3] or enemy_scene == possible_enemies[4] or enemy_scene == possible_enemies[5]): 
-				out = false # non esco e ne seleziono un altro
-			else: # altrimenti
-				out = true # seleziono il percorso
+			#if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[3] or enemy_scene == possible_enemies[4] or enemy_scene == possible_enemies[5]): 
+			#	out = false # non esco e ne seleziono un altro
+			#else: # altrimenti
+			out = true # seleziono il percorso
 		
-		add_child(load(enemy_scene).instantiate(),true) # insanzio come nodo figlio il nemico
-		#add_child(load(possible_enemies[0]).instantiate(),true) # debug
+		#add_child(enemy_scene.instantiate(),true) # insanzio come nodo figlio il nemico
+		add_child(possible_enemies[2].instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 

@@ -53,5 +53,5 @@ func flip_sprite(flip):
 	else:
 		sprite.flip_h = false
 
-func _on_dungeon_body_entered(body):
+func _on_dungeon_body_entered(_body):
 	get_tree().get_first_node_in_group("gm").load_dungeon()

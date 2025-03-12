@@ -71,6 +71,7 @@ var choosed_atk
 @onready var status_sprite = $Status_alert_sprite
 
 @onready var update_atk_timer = $Update_Atk
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var claws_cooldown = $Claws_cooldown
 @onready var howl_cooldown = $Howl_cooldown
@@ -230,16 +231,19 @@ func _on_player_is_in_atk_range(is_in, body):
 #		impedisco al nodo di muoversi mentre viene attaccato
 #		imposto il tempo di stun con il parametro passato
 #		faccio partire il timer dello stun
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and not grabbed and not knockbacked:
-		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc)
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
 		var dmg = dmg_info[0]
 		
 		var rng = randi_range(0, 100)
 		if agility_cooldown.is_stopped() and rng <= agility_percentage:
 			agility()
 		
-		if not agility_activated or dmg <= 0:
+		if not agility_activated:
+			if dmg > 0:
+				hit_flash_player.stop()
+				hit_flash_player.play("hit_flash")
 			show_hitmarker("-" + str(dmg), dmg_info[1])
 			current_vit -= dmg
 			set_health_bar()

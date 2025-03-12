@@ -1,6 +1,7 @@
-[gd_scene load_steps=77 format=3 uid="uid://c1ncws1k51fhp"]
+[gd_scene load_steps=82 format=3 uid="uid://c1ncws1k51fhp"]
 
 [ext_resource type="Script" path="res://components/scripts/werewolf.gd" id="1_0js6q"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="1_6jmst"]
 [ext_resource type="Texture2D" uid="uid://delv83r1fqak3" path="res://components/sprites/enemies/werewolf/werewolf_agility.png" id="2_k7yej"]
 [ext_resource type="Texture2D" uid="uid://bkhbwy7odynup" path="res://components/sprites/enemies/werewolf/werewolf_idle.png" id="2_lqm2o"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_v6w1f"]
@@ -13,6 +14,12 @@
 [ext_resource type="Texture2D" uid="uid://cixwjw2tvf78u" path="res://components/sprites/GUI/status_alert/debuff_animation.png" id="9_qn5lc"]
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="10_sktsb"]
 [ext_resource type="Texture2D" uid="uid://clbfrld6cw3up" path="res://components/sprites/enemies/werewolf/werewolf_howl_effect.png" id="12_2n06l"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qlgbd"]
+resource_local_to_scene = true
+shader = ExtResource("1_6jmst")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gsvdf"]
 atlas = ExtResource("2_k7yej")
@@ -536,6 +543,44 @@ radius = 1116.03
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vnrqd"]
 size = Vector2(40.5, 115)
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="WerewolfEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -549,6 +594,7 @@ knockback_timer_node = ExtResource("3_pca1s")
 position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_qlgbd")
 position = Vector2(0, -2)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
@@ -582,8 +628,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="HealthBar" type="ProgressBar" parent="Control"]
-z_index = 2
-y_sort_enabled = true
 layout_mode = 0
 offset_left = -49.0
 offset_top = -63.0
@@ -654,6 +698,12 @@ avoidance_enabled = true
 radius = 30.0
 max_neighbors = 20
 max_speed = 1703.04
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
+autoplay = "RESET"
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]

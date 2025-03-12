@@ -22,10 +22,12 @@ var MAX_LENGHT : int = 10
 signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal inflict_knockback(amount, time, sender)
 
+@warning_ignore("unused_signal")
+
 func _ready():
 	sprite.play("effect")
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	queue.push_front(self.position)
 	
 	if queue.size() > MAX_LENGHT:

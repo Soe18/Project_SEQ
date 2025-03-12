@@ -64,6 +64,8 @@ var choosed_atk
 @onready var heal_cooldown = $Heal_cooldown
 @onready var flee_cooldown = $Flee_cooldown
 
+@onready var hit_flash_player = $Hit_flash_player
+
 @export var magic_dart_projectile_node : PackedScene
 @export var enchantment_projectile_node : PackedScene
 
@@ -219,6 +221,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		current_vit -= dmg
 		set_health_bar()
 		if dmg > 0:
+			hit_flash_player.stop()
+			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
 		if stun_sec > 0 and not flee_activated:
 			if flee_cooldown.is_stopped():

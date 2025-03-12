@@ -8,11 +8,13 @@ var player_in_area_to_change_char = false
 @onready var dungeon_entrance = $Dungeon
 @onready var player_spawnpoint = $Marker2D
 
-@onready var ost_player = $AudioStreamPlayer
+@onready var ost_player = $Ost_player
 
 @onready var leone_first_dialogue_bubble = $Change_char/MarginContainer
 @onready var leone_second_dialogue_bubble = $Change_char/MarginContainer2
 @onready var bubble_showing_time = $Change_char/Timer
+
+@warning_ignore("shadowed_global_identifier")
 
 func _ready():
 	Menu.game_status = Menu.GAME_STATUSES.unopenable

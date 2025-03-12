@@ -41,7 +41,7 @@ var player_position
 var target_position
 var player
 
-enum Possible_Attacks {IDLE, PUNCH, EARTHQUAKE, GIGAGRAB}
+enum Possible_Attacks {IDLE, PUNCH, EARTHQUAKE}
 var choosed_atk
 
 @onready var sprite = $Sprite2D
@@ -61,6 +61,7 @@ var choosed_atk
 @onready var healthbar = $HealthBar
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var punch_cooldown = $Punch_Cooldown
 @onready var earthquake_cooldown = $Earthquake_Cooldown
@@ -215,6 +216,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		current_vit -= dmg
 		set_health_bar()
 		if dmg > 0:
+			hit_flash_player.stop()
+			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
 		if (dmg >= 25 or dmg <= 0) and stun_sec > 0:
 			punch_effect.play("idle")
@@ -334,6 +337,8 @@ func _on_sprite_2d_frame_changed():
 			earthquake_effect.play("effect")
 		else:
 			earthquake_effect.play("effect")
+	if sprite.animation == "punch" and sprite.frame == 8 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
+		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc, punch_type)
 
 # FUNZIONE PER L'ATTACCO PUGNO
 func punch():
@@ -350,9 +355,8 @@ func punch():
 		punch_collider.set_deferred("disabled", false)
 
 func _on_effect_animation_finished():
-	if punch_effect.animation == "effect" and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc, punch_type)
-		set_idle()
+	if punch_effect.animation == "effect":
+		punch_effect.play("idle")
 	if earthquake_effect.animation == "effect":
 		set_idle()
 

@@ -63,6 +63,7 @@ var choosed_atk
 @onready var status_sprite = $Status_alert_sprite
 
 @onready var update_atk_timer = $Update_Atk
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var slash_cooldown = $Basic_atk_Cooldown
 @onready var patty_cooldown = $Parry_Cooldown
@@ -209,9 +210,11 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed and not parring:
 		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
 		var dmg = dmg_info[0]
-		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
-		if dmg > 0:
+		if dmg > 0 and not dying:
+			hit_flash_player.stop()
+			hit_flash_player.play("hit_flash")
+			show_hitmarker("-" + str(dmg), dmg_info[1])
 			emit_signal("shake_camera", true, dmg_info[2])
 		if stun_sec > 0 and not (dying or soul_out):
 			moving = false
@@ -279,7 +282,6 @@ func set_health_bar():
 			set_idle()
 			dying = true
 			sprite.play("dying")
-			current_vit = 1
 			soul_delay_timer.start()
 	elif current_vit > default_vit:
 			current_vit = default_vit

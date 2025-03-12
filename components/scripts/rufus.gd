@@ -119,6 +119,7 @@ var ult_moving_mod
 @onready var combo_time = $Combo_time
 
 @onready var status_sprite = $Status_alert_sprite
+@onready var hit_flash_player = $Hit_flash_player
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
@@ -163,7 +164,7 @@ func move(delta):
 	if axis == Vector2.ZERO:
 		apply_friction(FRICTION * delta)
 	else:
-		sprite.play("Running")
+		sprite.play("running")
 		apply_movement(axis * ACCELERATION * delta)
 		if axis.x < 0:
 			flip_sprite(true)
@@ -199,7 +200,7 @@ func reset_axis():
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "Running") and atk_anim_finished:
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished:
 		can_move = false
 		bs_atk_collider.disabled = false
 		atk_anim_finished = false
@@ -231,7 +232,7 @@ func atk_handler():
 		combo_time.stop()
 		sprite.play("base atk5")
 	
-	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "Running") and skill1_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "running") and skill1_cooldown.is_stopped():
 		skill1_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK1
@@ -240,16 +241,17 @@ func atk_handler():
 		skill1_effect.play("effect")
 		reset_axis()
 	
-	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "Running") and eva_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "running") and eva_cooldown.is_stopped():
+		#if not knockbacked and stun_timer.is_stopped() and ult_stop_timer.is_stopped():
 		eva_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.EVA
 		eva_duration_timer.start()
-		sprite.play("Eva")
+		sprite.play("eva")
 		eva_collider.disabled = false
 		is_evading = true
 	
-	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "Running") and skill2_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "running") and skill2_cooldown.is_stopped():
 		skill2_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK2
@@ -257,7 +259,7 @@ func atk_handler():
 		skill2_effect.play("effect")
 		reset_axis()
 
-	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "Running") and ulti_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "running") and ulti_cooldown.is_stopped():
 		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
@@ -265,7 +267,7 @@ func atk_handler():
 		ult_moving_mod = -9
 		reset_axis()
 
-	elif sprite.animation != "idle" or sprite.animation != "Running":
+	elif sprite.animation != "idle" or sprite.animation != "running":
 		pass
 
 
@@ -515,7 +517,9 @@ func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
-	if dmg_info[2] > 0:
+	if dmg > 0:
+		hit_flash_player.stop()
+		hit_flash_player.play("hit_flash")
 		emit_signal("shake_camera", true, dmg_info[2])
 	if stun_sec > 0:
 		emit_signal("set_idle")

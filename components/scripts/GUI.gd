@@ -2,8 +2,10 @@ extends Control
 
 signal select_character(char)
 
-@onready var rufus_button = $Chara_selector_container/GridContainer/Select_rufus
-@onready var jack_button = $Chara_selector_container/GridContainer/Select_jack
+@onready var rufus_button = self.get_child(0).get_child(0).find_child("Select_rufus")
+@onready var jack_button = self.get_child(0).get_child(0).find_child("Select_jack")
+
+@warning_ignore("unused_signal")
 
 func _ready():
 	# non best solution lo so però è la più semplice e veloce

@@ -1,10 +1,11 @@
-[gd_scene load_steps=92 format=3 uid="uid://dbw1in01yk45v"]
+[gd_scene load_steps=97 format=3 uid="uid://dbw1in01yk45v"]
 
 [ext_resource type="Script" path="res://components/scripts/giant.gd" id="1_t850f"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_w0xeh"]
 [ext_resource type="Texture2D" uid="uid://bese26q4y7aob" path="res://components/sprites/enemies/giant/giant_damaged.png" id="2_ywefj"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_6i6ig"]
 [ext_resource type="Texture2D" uid="uid://6geg8uhgs2nf" path="res://components/sprites/enemies/giant/giant_earthquake.png" id="3_7ybuo"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="4_1h7bm"]
 [ext_resource type="Texture2D" uid="uid://giovoho8320j" path="res://components/sprites/enemies/giant/giant_idle.png" id="4_sulq3"]
 [ext_resource type="Texture2D" uid="uid://ddi3d0ttnx3bh" path="res://components/sprites/enemies/giant/giant_punch.png" id="5_6e14y"]
 [ext_resource type="Texture2D" uid="uid://c4lwn8v072d0w" path="res://components/sprites/enemies/giant/gigant_running.png" id="6_0gd1w"]
@@ -13,6 +14,12 @@
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="9_wa2wr"]
 [ext_resource type="Texture2D" uid="uid://clg8yub6nrgy2" path="res://components/sprites/enemies/giant/gigant_punch_effect.png" id="10_16wu7"]
 [ext_resource type="Texture2D" uid="uid://b3fidqnkebbr8" path="res://components/sprites/enemies/giant/gigant_earthquake_effect.png" id="11_rel8w"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kb1pu"]
+resource_local_to_scene = true
+shader = ExtResource("4_1h7bm")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bfdp6"]
 atlas = ExtResource("2_ywefj")
@@ -228,8 +235,20 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_e53qq")
 }, {
-"duration": 1.0,
+"duration": 3.0,
 "texture": SubResource("AtlasTexture_e53qq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7s407")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_apn3s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rk73p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qhddv")
 }],
 "loop": false,
 "name": &"punch",
@@ -656,6 +675,44 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="GiantEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -671,6 +728,7 @@ position = Vector2(12.2302, -78.3885)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "sposta di 40 px lo sprite"
+material = SubResource("ShaderMaterial_kb1pu")
 scale = Vector2(0.287, 0.287)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
@@ -779,6 +837,12 @@ avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20
 max_speed = 1703.04
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
+autoplay = "RESET"
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]

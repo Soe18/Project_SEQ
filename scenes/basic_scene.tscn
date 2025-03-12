@@ -195,10 +195,5 @@ libraries = {
 }
 autoplay = "popup_paused"
 
-[node name="Shake_duration" type="Timer" parent="."]
-wait_time = 0.3
-one_shot = true
-
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Exit" to="CanvasLayer/GUI" method="_on_exit_pressed"]
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry" to="CanvasLayer/GUI" method="_on_retry_pressed"]
-[connection signal="timeout" from="Shake_duration" to="." method="_on_shake_duration_timeout"]

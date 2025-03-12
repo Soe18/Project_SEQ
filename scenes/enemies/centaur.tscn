@@ -1,4 +1,4 @@
-[gd_scene load_steps=101 format=3 uid="uid://dyovs1oxci81l"]
+[gd_scene load_steps=106 format=3 uid="uid://dyovs1oxci81l"]
 
 [ext_resource type="Script" path="res://components/scripts/centaur.gd" id="1_skvmw"]
 [ext_resource type="Texture2D" uid="uid://br8u4kbrbjw0w" path="res://components/sprites/enemies/centaur/centaur_sprint.png" id="2_76l67"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c44e65g0wl4in" path="res://components/sprites/enemies/centaur/centaur_charging_sprint.png" id="2_ojs73"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_6yik6"]
 [ext_resource type="Texture2D" uid="uid://bine04cavl5rq" path="res://components/sprites/enemies/centaur/centaur_damaged.png" id="3_u6ypf"]
+[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="4_3hom0"]
 [ext_resource type="Texture2D" uid="uid://b6ekcuf2oaho8" path="res://components/sprites/enemies/centaur/centaur_grab.png" id="4_7vlxd"]
 [ext_resource type="Texture2D" uid="uid://gfeupkil7mnk" path="res://components/sprites/enemies/centaur/centaur_halberd.png" id="4_rgwm1"]
 [ext_resource type="Texture2D" uid="uid://biqmbnmpa1vxs" path="res://components/sprites/GUI/status_alert/buff_animation.png" id="5_4b13y"]
@@ -14,6 +15,12 @@
 [ext_resource type="Texture2D" uid="uid://cixwjw2tvf78u" path="res://components/sprites/GUI/status_alert/debuff_animation.png" id="6_n8r5g"]
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="7_ljgkj"]
 [ext_resource type="Texture2D" uid="uid://cyv0ql8yce78d" path="res://components/sprites/enemies/centaur/centaur_temperance.png" id="9_cck52"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ojuu6"]
+resource_local_to_scene = true
+shader = ExtResource("4_3hom0")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ay8xl"]
 atlas = ExtResource("2_ojs73")
@@ -709,6 +716,44 @@ _data = {
 "marker_movement_flip": SubResource("Animation_lk5xw")
 }
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+"RESET": SubResource("Animation_6bd6i"),
+"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="CentaurEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -723,6 +768,7 @@ position = Vector2(0, -117)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 y_sort_enabled = true
+material = SubResource("ShaderMaterial_ojuu6")
 position = Vector2(0, -53)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
@@ -848,6 +894,12 @@ libraries = {
 "": SubResource("AnimationLibrary_opk0d")
 }
 playback_auto_capture = false
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_50jq1")
+}
+autoplay = "RESET"
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]

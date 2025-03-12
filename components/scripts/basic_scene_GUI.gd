@@ -12,6 +12,8 @@ var max_health
 
 var boss
 
+@warning_ignore("shadowed_variable")
+
 func _ready():
 	round_displayer.text = "Ondata: " + str(round_count)
 
