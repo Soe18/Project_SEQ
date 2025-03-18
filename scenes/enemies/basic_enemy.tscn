@@ -1,6 +1,6 @@
 [gd_scene load_steps=55 format=3 uid="uid://c0u64aqhwalw0"]
 
-[ext_resource type="Script" path="res://components/scripts/basic_enemy.gd" id="1_ng2l6"]
+[ext_resource type="Script" uid="uid://o5x6loxiguaw" path="res://components/scripts/basic_enemy.gd" id="1_ng2l6"]
 [ext_resource type="Texture2D" uid="uid://c3ns4y7uooyhj" path="res://components/sprites/enemies/zombie/zombie_damaged.png" id="2_5gwux"]
 [ext_resource type="Texture2D" uid="uid://bcyd76jo5todo" path="res://components/sprites/enemies/zombie/zombie_idle.png" id="3_5vjnj"]
 [ext_resource type="Texture2D" uid="uid://bknhqekfp2qwy" path="res://components/sprites/enemies/zombie/zombie_running.png" id="4_s66o8"]

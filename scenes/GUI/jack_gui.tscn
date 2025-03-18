@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://dtvto0tm3572g"]
 
-[ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_sbc0r"]
+[ext_resource type="Script" uid="uid://b684s5vme014f" path="res://components/scripts/player_gui.gd" id="1_sbc0r"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_0n4u8"]
 [ext_resource type="Texture2D" uid="uid://qa3t1ulvjv5f" path="res://components/sprites/GUI/player_GUI/jack/Skill1_GUI_jack.png" id="3_nlart"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="4_0xiyi"]
@@ -50,8 +50,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hqk6k"]
 _data = {
-"RESET": SubResource("Animation_gea2b"),
-"flashbang": SubResource("Animation_ujtmg")
+&"RESET": SubResource("Animation_gea2b"),
+&"flashbang": SubResource("Animation_ujtmg")
 }
 
 [node name="Jack_GUI" type="Control"]

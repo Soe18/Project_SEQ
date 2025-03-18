@@ -117,13 +117,13 @@ func activate_markers():
 		while not out: # finché la sentinella è falsa
 			enemy_scene = possible_enemies.pick_random() # prendo un nemico casuale dalla pool
 			# se l'ondata è minore di 5 E il nemico selezionato è il gigante
-			#if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[3] or enemy_scene == possible_enemies[4] or enemy_scene == possible_enemies[5]): 
+			#if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[4] or enemy_scene == possible_enemies[5]): 
 			#	out = false # non esco e ne seleziono un altro
 			#else: # altrimenti
 			out = true # seleziono il percorso
 		
-		#add_child(enemy_scene.instantiate(),true) # insanzio come nodo figlio il nemico
-		add_child(possible_enemies[2].instantiate(),true) # debug
+		add_child(enemy_scene.instantiate(),true) # insanzio come nodo figlio il nemico
+		#add_child(possible_enemies[0].instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 

@@ -25,7 +25,7 @@ func _ready():
 	sprite.play("effect")
 	origin = global_position
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if sprite.animation == "effect":
 		go_to_player()
 

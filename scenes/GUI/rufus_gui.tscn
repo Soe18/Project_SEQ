@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://c8q6cs7u1xl10"]
 
-[ext_resource type="Script" path="res://components/scripts/player_gui.gd" id="1_4qgcb"]
+[ext_resource type="Script" uid="uid://b684s5vme014f" path="res://components/scripts/player_gui.gd" id="1_4qgcb"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_dq3dk"]
 [ext_resource type="Texture2D" uid="uid://bh58pmpvmwckg" path="res://components/sprites/GUI/player_GUI/Skill_GUI_bg.png" id="2_rdasp"]
 [ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="3_2maji"]

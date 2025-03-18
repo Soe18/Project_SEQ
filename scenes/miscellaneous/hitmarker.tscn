@@ -73,8 +73,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_dsxfs"]
 _data = {
-"RESET": SubResource("Animation_klpug"),
-"popup": SubResource("Animation_cfidw")
+&"RESET": SubResource("Animation_klpug"),
+&"popup": SubResource("Animation_cfidw")
 }
 
 [node name="Hitmarker" type="Marker2D"]

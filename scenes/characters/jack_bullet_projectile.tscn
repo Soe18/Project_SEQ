@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://dxg3446h3vq6m"]
 
 [ext_resource type="Texture2D" uid="uid://o7djtvp46drv" path="res://components/sprites/jack/jack_bullet.png" id="1_g184h"]
-[ext_resource type="Script" path="res://components/scripts/jack_bullet_projectile.gd" id="1_qdk7g"]
+[ext_resource type="Script" uid="uid://cnpe0q1ushosu" path="res://components/scripts/jack_bullet_projectile.gd" id="1_qdk7g"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_1ubdb"]
 animations = [{

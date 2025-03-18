@@ -4,7 +4,7 @@ var player
 var selected_character
 var paused = false
 var connected = false
-var boss_defeted_count = 0
+var boss_defeted_count = 3
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 @onready var Attack_Types = get_tree().get_first_node_in_group("gm").Attack_Types
@@ -25,6 +25,8 @@ var active_enemy_container : Node2D
 @onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
 # variabile che contiene la gui specifica per quel player
 var player_gui
+
+var camera_follower = "res://scenes/miscellaneous/camera_follower.tscn"
 
 @onready var shake_duration_timer = $Shake_duration
 
@@ -76,6 +78,13 @@ func _process(_delta):
 		## It reloads the dungeon, just for debuggin, this is ok :D
 		#get_tree().get_first_node_in_group("gm").load_dungeon()
 	
+	if Input.is_action_just_pressed("base_atk"):
+		for i in range(10):
+			var atk = randi_range(30, 999)
+			var skill_atk = randi_range(30, 999)
+			var tem = randi_range(30, 999)
+			print("atk: "+str(atk)+", skill atk: "+str(skill_atk)+", tem: "+str(tem)+" =  "+str(self.calculate_dmg(atk, skill_atk, tem, 0, 1, null)))
+	
 	if player != null:
 		if not active_enemy_container.fighting:
 			connected = false
@@ -106,8 +115,11 @@ func _on_gui_select_character(char):
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1.0, 1.0)
 	
+	add_child(load(camera_follower).instantiate())
+	get_child(get_child_count()-1).player = player
+	player.camera = get_child(get_child_count()-1).camera
 	# impostazioni per la telecamera
-	player.shake_camera.connect(player.find_child("Main_camera", true, false)._on_player_shake_camera)
+	player.shake_camera.connect(player.camera._on_player_shake_camera)
 	
 	# debug: zoom diminuito
 	#camera.zoom = Vector2(0.5,0.5)
@@ -141,7 +153,7 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			player.take_dmg.connect(current_node._on_player_take_dmg)
 			# segnale tra nemici e player per infliggere danno
 			current_node.take_dmg.connect(player._on_enemy_take_dmg)
-			current_node.shake_camera.connect(player.find_child("Main_camera", true, false)._on_player_shake_camera)
+			current_node.shake_camera.connect(player.camera._on_player_shake_camera)
 			
 			# se il player ha scelto nathan
 			if player.char_name == "Nathan": # connetto il segnale della grab
@@ -188,10 +200,11 @@ func connect_player_projectile(projectile):
 func calculate_dmg(str, atk_str, tem, pbc, efc, type):
 	var crit = false
 	var shake_amount = 0
+	var dmg : int
 	if tem <= 0:
 		tem = 1
 	# applico la formula del danno: (FORZA_ATTACCANTE * FORZA DELL'ATTACCO) / TEMPRA_BERSAGLIO
-	var dmg = round((str * atk_str) / tem)
+	dmg = round((str * atk_str) / tem)
 	var rng = randi_range(0, 100) # genero un numero casuale tra 0 e 100
 	if pbc > rng: # se la probabilità brutto colpo è più alta del numero generato (esempio: 30 > 20)
 		# aumento il danno in base all'efficienza del colpo critico (es. 15 * 1.5 = 15 + 7.5 = 22.5 = 23)

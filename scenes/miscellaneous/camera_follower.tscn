@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://jj6lowmv2hcr"]
+
+[ext_resource type="Script" uid="uid://jgp1s7710pkd" path="res://components/scripts/camera_follow.gd" id="1_s07rb"]
+[ext_resource type="PackedScene" uid="uid://cgh08a7f4c8kq" path="res://scenes/miscellaneous/main_camera.tscn" id="2_a6x6a"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_s07rb"]
+radius = 144.0
+height = 538.0
+
+[node name="Camera_follower" type="CharacterBody2D"]
+process_mode = 1
+collision_layer = 128
+collision_mask = 128
+collision_priority = 0.001
+motion_mode = 1
+wall_min_slide_angle = 0.0
+script = ExtResource("1_s07rb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = -1.5708
+shape = SubResource("CapsuleShape2D_s07rb")
+
+[node name="Main_camera" parent="." instance=ExtResource("2_a6x6a")]
+process_callback = 0
+position_smoothing_enabled = false

@@ -1,10 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://d3fr55lfdcvjp"]
+[gd_scene load_steps=10 format=3 uid="uid://d3fr55lfdcvjp"]
 
-[ext_resource type="Script" path="res://components/scripts/basic_scene.gd" id="1_ohmap"]
+[ext_resource type="Script" uid="uid://rjp2dejwnqkq" path="res://components/scripts/basic_scene.gd" id="1_ohmap"]
 [ext_resource type="PackedScene" uid="uid://bm7culrlwfwta" path="res://scenes/GUI/basic_scene_GUI.tscn" id="2_87orx"]
 [ext_resource type="AudioStream" uid="uid://du211hk4tj5vr" path="res://components/ost/The Legend of Zelda - Song of Storms  Windmill Hut 【Intense Symphonic Metal Cover】.mp3" id="2_drw8v"]
 [ext_resource type="AudioStream" uid="uid://dyaiglfa8wxco" path="res://components/ost/Beginning of the Journey - The Legend of Zelda A Link to the Past.mp3" id="3_a80dm"]
-[ext_resource type="Script" path="res://components/scripts/GUI.gd" id="3_pywgm"]
+[ext_resource type="Script" uid="uid://kd3qaonjbde6" path="res://components/scripts/GUI.gd" id="3_pywgm"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="4_ai68a"]
 
 [sub_resource type="AudioStreamInteractive" id="AudioStreamInteractive_elj82"]
@@ -17,7 +17,7 @@ clip_1/stream = ExtResource("3_a80dm")
 clip_1/auto_advance = 0
 _transitions = {
 Vector2i(-1, -1): {
-"fade_beats": 1,
+"fade_beats": 1.0,
 "fade_mode": 0,
 "from_time": 0,
 "to_time": 1
@@ -28,47 +28,6 @@ Vector2i(-1, -1): {
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jrxli"]
 bg_color = Color(0.431373, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4wxl"]
-bg_color = Color(7.21961e-07, 0, 0.393424, 1)
-
-[sub_resource type="Animation" id="Animation_0ca1l"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Paused_label:self_modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_gcbbq"]
-resource_name = "popup_paused"
-length = 2.0
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Paused_label:self_modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1, 2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_eph05"]
-_data = {
-"RESET": SubResource("Animation_0ca1l"),
-"popup_paused": SubResource("Animation_gcbbq")
-}
 
 [node name="Scene_manager" type="Node2D"]
 process_mode = 3
@@ -151,49 +110,6 @@ focus_neighbor_right = NodePath("../Exit")
 theme_override_fonts/font = ExtResource("4_ai68a")
 theme_override_font_sizes/font_size = 44
 text = "Riprova"
-
-[node name="Pause_GUI" type="Control" parent="CanvasLayer"]
-process_mode = 2
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/Pause_GUI"]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -56.0
-offset_bottom = 56.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_5w7gn")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Pause_GUI/PanelContainer"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Paused_label" type="Label" parent="CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-size_flags_vertical = 1
-theme_override_fonts/font = ExtResource("4_ai68a")
-theme_override_font_sizes/font_size = 48
-theme_override_styles/normal = SubResource("StyleBoxFlat_f4wxl")
-text = "PAUSED"
-horizontal_alignment = 1
-justification_flags = 3
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer"]
-libraries = {
-"": SubResource("AnimationLibrary_eph05")
-}
-autoplay = "popup_paused"
 
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Exit" to="CanvasLayer/GUI" method="_on_exit_pressed"]
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry" to="CanvasLayer/GUI" method="_on_retry_pressed"]

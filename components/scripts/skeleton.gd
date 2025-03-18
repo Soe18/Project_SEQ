@@ -29,7 +29,7 @@ var parring = false
 var dying = false
 var soul_out = false
 
-@export var slice_force = 5
+@export var slice_force = 15
 @export var slice_stun_time = 0.5
 @onready var slice_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 

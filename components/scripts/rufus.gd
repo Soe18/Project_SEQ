@@ -92,6 +92,7 @@ var ult_moving_mod
 @onready var ult_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @onready var sprite = $Sprite2D
+@onready var camera
 
 @onready var bs_atk_collider = $Basic_atk_Area/Atk_collider
 
@@ -343,35 +344,24 @@ func flip_sprite(flip):
 		skill1_effect.flip_h = false
 
 func _on_sprite_2d_animation_finished():
+
 	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk1":
-		bs_atk_collider.set_deferred("disabled", true)
-		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+		atk_anim_finished = true
+		combo_time.start()
+	
+	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
 		atk_anim_finished = true
 		combo_time.start()
 
-	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk2":
-		bs_atk_collider.set_deferred("disabled", true)
-		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
+		atk_anim_finished = true
+		combo_time.start()
+	
+	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
 		atk_anim_finished = true
 		combo_time.start()
 
-	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk3":
-		bs_atk_collider.set_deferred("disabled", true)
-		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
-		atk_anim_finished = true
-		combo_time.start()
-
-	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk4":
-		bs_atk_collider.set_deferred("disabled", true)
-		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
-		atk_anim_finished = true
-		combo_time.start()
-
-	elif atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk5":
+	if atk_state == Atk_States.BASE_ATK and sprite.animation == "base atk5":
 		emit_signal("set_idle")
 
 	elif atk_state == Atk_States.ULT and sprite.animation == "charging_ult":
@@ -383,7 +373,27 @@ func _on_sprite_2d_animation_finished():
 		ult_effect.play("effect")
 
 func _on_sprite_2d_frame_changed():
-	if sprite.frame == 4 and sprite.animation == "base atk5":
+	if sprite.frame == 2 and sprite.animation == "base atk1":
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+	
+	elif sprite.frame == 2 and sprite.animation == "base atk2":
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+	
+	elif sprite.frame == 1 and sprite.animation == "base atk3":
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+	
+	elif sprite.frame == 1 and sprite.animation == "base atk4":
+		bs_atk_collider.set_deferred("disabled", true)
+		bs_atk_collider.set_deferred("disabled", false)
+		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
+	
+	elif sprite.frame == 4 and sprite.animation == "base atk5":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
 		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)

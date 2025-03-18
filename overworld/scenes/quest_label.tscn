@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b672pbqxqtbcx"]
 
-[ext_resource type="Script" path="res://overworld/scripts/quest/quest_label.gd" id="1_x5j2l"]
+[ext_resource type="Script" uid="uid://wvg7ivh2jtdg" path="res://overworld/scripts/quest/quest_label.gd" id="1_x5j2l"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_eh1aa"]
 
 [node name="QuestLabel" type="GridContainer"]

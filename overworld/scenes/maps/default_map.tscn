@@ -1,15 +1,15 @@
 [gd_scene load_steps=24 format=4 uid="uid://rcyq8rr7fln"]
 
-[ext_resource type="Script" path="res://overworld/scripts/default_map.gd" id="1_h6qan"]
-[ext_resource type="Script" path="res://components/scripts/GUI.gd" id="2_4pch2"]
+[ext_resource type="Script" uid="uid://ceru4651r2jn3" path="res://overworld/scripts/default_map.gd" id="1_h6qan"]
+[ext_resource type="Script" uid="uid://kd3qaonjbde6" path="res://components/scripts/GUI.gd" id="2_4pch2"]
 [ext_resource type="Texture2D" uid="uid://1myxeqojf4he" path="res://components/sprites/decorative.png" id="2_rc0b2"]
 [ext_resource type="Texture2D" uid="uid://cs5jopxmileup" path="res://components/sprites/mainlevbuild.png" id="2_rmwxr"]
-[ext_resource type="Script" path="res://overworld/scripts/environment/UnlockMission.gd" id="4_4pjy5"]
-[ext_resource type="Script" path="res://overworld/scripts/environment/StartMission.gd" id="5_4h3bc"]
+[ext_resource type="Script" uid="uid://w8kuuqb2iqqr" path="res://overworld/scripts/environment/UnlockMission.gd" id="4_4pjy5"]
+[ext_resource type="Script" uid="uid://pube78x1yre6" path="res://overworld/scripts/environment/StartMission.gd" id="5_4h3bc"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="5_tbkfv"]
-[ext_resource type="Script" path="res://overworld/scripts/environment/CompleteMission.gd" id="6_0rdy5"]
+[ext_resource type="Script" uid="uid://cwbypw8swxeex" path="res://overworld/scripts/environment/CompleteMission.gd" id="6_0rdy5"]
 [ext_resource type="AudioStream" uid="uid://i1r1vakwfjhr" path="res://components/ost/The Legend of Zelda A Link to the Past – Hyrule Field Main Theme (Restored CD version).mp3" id="6_qup0a"]
-[ext_resource type="Script" path="res://overworld/scripts/environment/FinishMission.gd" id="7_q2l54"]
+[ext_resource type="Script" uid="uid://yg3p54cbdkgh" path="res://overworld/scripts/environment/FinishMission.gd" id="7_q2l54"]
 [ext_resource type="Texture2D" uid="uid://bwkgwudqgd7k" path="res://components/sprites/miscellaneous/leone_alato.png" id="10_b0pmh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j7tto"]
@@ -157,25 +157,25 @@ clip_0/stream = ExtResource("6_qup0a")
 clip_0/auto_advance = 0
 _transitions = {
 Vector2i(-1, -1): {
-"fade_beats": 1,
+"fade_beats": 1.0,
 "fade_mode": 4,
 "from_time": 0,
 "to_time": 0
 },
 Vector2i(-1, 0): {
-"fade_beats": 1,
+"fade_beats": 1.0,
 "fade_mode": 4,
 "from_time": 0,
 "to_time": 0
 },
 Vector2i(0, -1): {
-"fade_beats": 1,
+"fade_beats": 1.0,
 "fade_mode": 4,
 "from_time": 0,
 "to_time": 0
 },
 Vector2i(0, 0): {
-"fade_beats": 1,
+"fade_beats": 1.0,
 "fade_mode": 4,
 "from_time": 0,
 "to_time": 0

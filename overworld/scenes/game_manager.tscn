@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c4807qupf2063"]
 
-[ext_resource type="Script" path="res://overworld/scripts/game_manager.gd" id="1_a5b2e"]
+[ext_resource type="Script" uid="uid://5vw2wvnwf4lu" path="res://overworld/scripts/game_manager.gd" id="1_a5b2e"]
 [ext_resource type="PackedScene" uid="uid://rcyq8rr7fln" path="res://overworld/scenes/maps/default_map.tscn" id="2_fdxyn"]
 
 [node name="GameManager" type="Node" groups=["gm"]]

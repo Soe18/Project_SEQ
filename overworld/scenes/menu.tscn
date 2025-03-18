@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://dt7qg2616qjyl"]
 
-[ext_resource type="Script" path="res://overworld/scripts/menu.gd" id="1_icg54"]
+[ext_resource type="Script" uid="uid://dgh5qhcfqa1jo" path="res://overworld/scripts/menu.gd" id="1_icg54"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_0a4l1"]
-[ext_resource type="Script" path="res://overworld/scripts/quest/quest_display.gd" id="2_y0x1b"]
+[ext_resource type="Script" uid="uid://cv23vaapnar7j" path="res://overworld/scripts/quest/quest_display.gd" id="2_y0x1b"]
 [ext_resource type="AudioStream" uid="uid://d2sm6ac0hf26v" path="res://components/ost/Duck Game OST - Pause.mp3" id="4_8g00m"]
 
 [node name="Menu" type="CanvasLayer"]

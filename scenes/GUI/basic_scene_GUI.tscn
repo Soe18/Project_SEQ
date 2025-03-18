@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://bm7culrlwfwta"]
 
-[ext_resource type="Script" path="res://components/scripts/basic_scene_GUI.gd" id="1_356s4"]
+[ext_resource type="Script" uid="uid://dsyog30icigva" path="res://components/scripts/basic_scene_GUI.gd" id="1_356s4"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="2_j012h"]
 
 [sub_resource type="Animation" id="Animation_lwmpw"]
@@ -208,9 +208,9 @@ tracks/5/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_23alx"]
 _data = {
-"RESET": SubResource("Animation_lwmpw"),
-"delete_boss_bar": SubResource("Animation_bcnjk"),
-"spawn_boss_bar": SubResource("Animation_rdl4w")
+&"RESET": SubResource("Animation_lwmpw"),
+&"delete_boss_bar": SubResource("Animation_bcnjk"),
+&"spawn_boss_bar": SubResource("Animation_rdl4w")
 }
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_60f8n"]

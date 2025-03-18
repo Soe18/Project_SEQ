@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b7n1loel0j7p0"]
 
-[ext_resource type="Script" path="res://components/scripts/gray_enemy_container.gd" id="1_if688"]
+[ext_resource type="Script" uid="uid://b6ky75s4yqxlb" path="res://components/scripts/gray_enemy_container.gd" id="1_if688"]
 
 [node name="Enemy_container" type="Node2D"]
 process_mode = 1

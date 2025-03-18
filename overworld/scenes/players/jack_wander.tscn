@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://cywythfims3hi"]
 
-[ext_resource type="Script" path="res://overworld/scripts/players/player_wander.gd" id="1_fr2sc"]
+[ext_resource type="Script" uid="uid://dfk2yp0hnpbvp" path="res://overworld/scripts/players/player_wander.gd" id="1_fr2sc"]
 [ext_resource type="Texture2D" uid="uid://ctcf43dptrdq1" path="res://components/sprites/jack/pistol/jack_idle.png" id="2_6yi8o"]
 [ext_resource type="Texture2D" uid="uid://btjg1uvmks8gk" path="res://components/sprites/jack/pistol/jack_running_p.png" id="3_6tv0s"]
 [ext_resource type="PackedScene" uid="uid://cgh08a7f4c8kq" path="res://scenes/miscellaneous/main_camera.tscn" id="4_mw1e4"]

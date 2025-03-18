@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var default_vit : int = 120
+@export var default_vit : int = 180
 var current_vit = default_vit
 @export var default_str : int = 180
 var current_str = default_str
@@ -70,6 +70,11 @@ var choosed_atk
 
 @onready var update_atk_timer = $Update_Atk
 
+var PUNCH_COLLIDER_POSITION_X
+var PUNCH_EFFECT_POSITION_X
+var BODY_COLLIDER_POSITION_X
+var BODY_COLLIDER_ROTATION
+
 var player_entered = true
 var player_in_atk_range = false
 
@@ -83,6 +88,10 @@ func _ready():
 	set_health_bar()
 	sprite.play("idle")
 	update_atk_timer.wait_time = randf_range(3, 5.8)
+	PUNCH_COLLIDER_POSITION_X = punch_collider.position.x
+	PUNCH_EFFECT_POSITION_X = punch_effect.position.x
+	BODY_COLLIDER_POSITION_X = body_collider.position.x
+	BODY_COLLIDER_ROTATION = body_collider.rotation_degrees
 
 #METODO CHE VIENE PROCESSATO PER FRAME
 	#controlla se il player è entrato in area e si può muovere
@@ -125,20 +134,20 @@ func _physics_process(_delta):
 
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
-		punch_collider.position.x = -62.95
-		punch_effect.position.x = -59
+		punch_collider.position.x = -PUNCH_COLLIDER_POSITION_X
+		punch_effect.position.x = -PUNCH_EFFECT_POSITION_X
 		punch_effect.flip_h = true
 		sprite.flip_h = true
-		body_collider.rotation_degrees = -16.5
+		body_collider.rotation_degrees = -BODY_COLLIDER_ROTATION
 		body_collider.position.x = -6.835
 		if grabbed:
 			sprite.rotation_degrees = -90;
 	elif distance_to_player.x > 0:
-		punch_collider.position.x = 62.95
-		punch_effect.position.x = 59
+		punch_collider.position.x = PUNCH_COLLIDER_POSITION_X
+		punch_effect.position.x = PUNCH_EFFECT_POSITION_X
 		punch_effect.flip_h = false
 		sprite.flip_h = false
-		body_collider.rotation_degrees = 16.5
+		body_collider.rotation_degrees = BODY_COLLIDER_ROTATION
 		body_collider.position.x = 11.151
 		if grabbed:
 			sprite.rotation_degrees = 90;

@@ -1,11 +1,11 @@
 [gd_scene load_steps=91 format=3 uid="uid://dc4r0c3q4h1vo"]
 
-[ext_resource type="Script" path="res://components/scripts/skeleton.gd" id="1_ug4iq"]
+[ext_resource type="Script" uid="uid://phhqwdl271xg" path="res://components/scripts/skeleton.gd" id="1_ug4iq"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_64tus"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_lkymh"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_s0ujm"]
 [ext_resource type="Texture2D" uid="uid://5sc13wn7j33m" path="res://components/sprites/enemies/skeleton/skeleton_damaged.png" id="3_spfhf"]
-[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="4_gqfqc"]
+[ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="4_gqfqc"]
 [ext_resource type="Texture2D" uid="uid://c12bybbikpkaw" path="res://components/sprites/enemies/skeleton/skeleton_dying.png" id="4_pey7m"]
 [ext_resource type="Texture2D" uid="uid://bsk3u3mw8jwhn" path="res://components/sprites/enemies/skeleton/skeleton_idle.png" id="5_hg8k2"]
 [ext_resource type="Texture2D" uid="uid://cev2rer2h8s10" path="res://components/sprites/enemies/skeleton/skeleton_parry.png" id="6_mhwow"]
@@ -21,7 +21,7 @@
 resource_local_to_scene = true
 shader = ExtResource("4_gqfqc")
 shader_parameter/flash_color = Color(1, 1, 1, 1)
-shader_parameter/flash_value = null
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xk3h6"]
 atlas = ExtResource("2_lkymh")
@@ -602,8 +602,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
 _data = {
-"RESET": SubResource("Animation_6bd6i"),
-"hit_flash": SubResource("Animation_mo7si")
+&"RESET": SubResource("Animation_6bd6i"),
+&"hit_flash": SubResource("Animation_mo7si")
 }
 
 [node name="SkeletonEnemy" type="CharacterBody2D"]

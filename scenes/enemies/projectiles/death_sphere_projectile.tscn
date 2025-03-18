@@ -1,7 +1,7 @@
 [gd_scene load_steps=29 format=3 uid="uid://dvlviqq51kj4u"]
 
 [ext_resource type="Texture2D" uid="uid://0ft7s0ykasst" path="res://components/sprites/enemies/lich/lich_death_sphere_effect.png" id="1_bl10w"]
-[ext_resource type="Script" path="res://components/scripts/death_sphere_projectile.gd" id="1_fvn85"]
+[ext_resource type="Script" uid="uid://0eb0ax8f8nv8" path="res://components/scripts/death_sphere_projectile.gd" id="1_fvn85"]
 [ext_resource type="Texture2D" uid="uid://bkcg36ttdeanw" path="res://components/sprites/enemies/lich/lich_explosions_effect.png" id="2_kswj7"]
 [ext_resource type="Texture2D" uid="uid://bbvbfyd8d8w00" path="res://components/sprites/enemies/lich/lich_death_sphere_effect_spawn.png" id="2_lj2bq"]
 

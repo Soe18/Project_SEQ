@@ -1,6 +1,6 @@
 [gd_scene load_steps=113 format=3 uid="uid://e6lbvx4r5aqc"]
 
-[ext_resource type="Script" path="res://components/scripts/nathan.gd" id="1_arpgr"]
+[ext_resource type="Script" uid="uid://de7jh3afh1qdt" path="res://components/scripts/nathan.gd" id="1_arpgr"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_eetp7"]
 [ext_resource type="Texture2D" uid="uid://cmb3fpdibbfxt" path="res://components/sprites/nathan/nathan_eva.png" id="2_vy16t"]
 [ext_resource type="Texture2D" uid="uid://dce2go3tqkpm1" path="res://components/sprites/nathan/nathan_running.png" id="3_x7f85"]

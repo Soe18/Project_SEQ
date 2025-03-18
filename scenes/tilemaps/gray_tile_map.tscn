@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=4 uid="uid://bhsei62gvosxv"]
+[gd_scene load_steps=56 format=4 uid="uid://bhsei62gvosxv"]
 
 [ext_resource type="Texture2D" uid="uid://cs5jopxmileup" path="res://components/sprites/mainlevbuild.png" id="1_uhrny"]
 [ext_resource type="Texture2D" uid="uid://1myxeqojf4he" path="res://components/sprites/decorative.png" id="2_42pd3"]
@@ -351,15 +351,21 @@ texture = ExtResource("1_uhrny")
 29:2/0 = 0
 31:2/0 = 0
 31:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-7, -6, -7, -8, 7, -8, 7, -6, 8, -6, 8, 8, -8, 8, -8, -6)
+31:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 32:2/0 = 0
 32:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 1, -8, 1, -6, 8, -6, 8, 4, 1, 4, 1, 8, -8, 8)
+32:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 33:2/0 = 0
 33:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -6, -8, 8, 8, 8, 8, -6)
+33:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 34:2/0 = 0
 34:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -6, -8, 8, 8, 8, 8, -6)
+34:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 35:2/0 = 0
 35:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -6, -1, -6, -1, -8, 8, -8, 8, 8, -1, 8, -1, 4, -8, 4)
+35:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 36:2/0 = 0
+36:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 37:2/0 = 0
 38:2/0 = 0
 40:2/0 = 0
@@ -391,11 +397,13 @@ texture = ExtResource("1_uhrny")
 29:3/0 = 0
 31:3/0 = 0
 31:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -8, 8, 8, 8, 8, -8)
+31:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 32:3/0 = 0
 33:3/0 = 0
 34:3/0 = 0
 35:3/0 = 0
 36:3/0 = 0
+36:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 37:3/0 = 0
 38:3/0 = 0
 40:3/0 = 0
@@ -435,11 +443,13 @@ texture = ExtResource("1_uhrny")
 29:4/0 = 0
 31:4/0 = 0
 31:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+31:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 32:4/0 = 0
 33:4/0 = 0
 34:4/0 = 0
 35:4/0 = 0
 36:4/0 = 0
+36:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 37:4/0 = 0
 38:4/0 = 0
 40:4/0 = 0
@@ -483,11 +493,13 @@ texture = ExtResource("1_uhrny")
 29:5/0 = 0
 31:5/0 = 0
 31:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+31:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 32:5/0 = 0
 33:5/0 = 0
 34:5/0 = 0
 35:5/0 = 0
 36:5/0 = 0
+36:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 37:5/0 = 0
 38:5/0 = 0
 40:5/0 = 0
@@ -534,15 +546,21 @@ texture = ExtResource("1_uhrny")
 29:6/0 = 0
 31:6/0 = 0
 31:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+31:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 32:6/0 = 0
 32:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 1, 8, 1, 8, -8, -8, -8)
+32:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 33:6/0 = 0
 33:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -8, 1, 8, 1, 8, -8)
+33:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 34:6/0 = 0
 34:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 1, -8, 1)
+34:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 35:6/0 = 0
 35:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 1, -8, 1)
+35:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 36:6/0 = 0
+36:6/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 37:6/0 = 0
 38:6/0 = 0
 45:6/0 = 0
@@ -1715,18 +1733,14 @@ texture = ExtResource("2_42pd3")
 [sub_resource type="TileSet" id="TileSet_5xdkc"]
 physics_layer_0/collision_layer = 3
 physics_layer_0/collision_mask = 3
+physics_layer_1/collision_layer = 128
+physics_layer_1/collision_mask = 128
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
 navigation_layer_0/layers = 1
 sources/1 = SubResource("TileSetAtlasSource_x50h8")
 sources/2 = SubResource("TileSetAtlasSource_gwla5")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8axfy"]
-size = Vector2(272.063, 720.623)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_oqdol"]
-size = Vector2(1616.09, 127.654)
 
 [node name="BaseTileMap" type="Node2D"]
 process_mode = 1
@@ -1758,25 +1772,3 @@ y_sort_enabled = true
 use_parent_material = true
 tile_map_data = PackedByteArray("AAAvAAEAAgAJAAcAAAAwAAIAAgAJAAcAAAAtAAQAAgAJAAcAAAAuAAMAAgAJAAcAAAAwAAUAAgAJAAcAAAAvAAQAAgAJAAcAAAAJABEAAgAAAAEAAAAMABUAAgAAAAEAAAAMAA0AAgAAAAEAAAARAA0AAgAAAAEAAAARABUAAgAAAAEAAAAUABEAAgAAAAEAAAAlABIAAgAAAAwAAAAlABgAAgAAAAgAAAAlAB4AAgAAAAwAAAAuABIAAgAAAAYAAAAuABgAAgAAAAQAAAAuAB4AAgAAAA4AAAA2ABIAAgAAAAoAAAA2ABgAAgAAAAgAAAA2AB4AAgAAAAoAAAA=")
 tile_set = SubResource("TileSet_5xdkc")
-
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(-216.199, 247.522)
-scale = Vector2(0.999999, 0.999999)
-shape = SubResource("RectangleShape2D_8axfy")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(1127.95, 247.522)
-scale = Vector2(0.999999, 0.999999)
-shape = SubResource("RectangleShape2D_8axfy")
-
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(455.933, 671.779)
-scale = Vector2(0.999999, 0.999999)
-shape = SubResource("RectangleShape2D_oqdol")
-
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(456.051, -176.616)
-scale = Vector2(0.999999, 0.999999)
-shape = SubResource("RectangleShape2D_oqdol")

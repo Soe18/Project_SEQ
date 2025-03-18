@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://k16gx2h5mdtf"]
 
 [ext_resource type="Texture2D" uid="uid://cwc4bkei6e5j1" path="res://components/sprites/miscellaneous/portal.png" id="1_nscay"]
-[ext_resource type="Script" path="res://components/scripts/travel_portal.gd" id="2_1l3dw"]
+[ext_resource type="Script" uid="uid://cwnprons5g85y" path="res://components/scripts/travel_portal.gd" id="2_1l3dw"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_vtqdm"]
 atlas = ExtResource("1_nscay")
@@ -82,8 +82,8 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_kuacn"]
 _data = {
-"RESET": SubResource("Animation_wbyem"),
-"travel": SubResource("Animation_bevsh")
+&"RESET": SubResource("Animation_wbyem"),
+&"travel": SubResource("Animation_bevsh")
 }
 
 [node name="Portal" type="AnimatedSprite2D"]

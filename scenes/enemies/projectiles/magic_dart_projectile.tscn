@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://uy8eytrdfgkh"]
 
-[ext_resource type="Script" path="res://components/scripts/magic_dart_projectile.gd" id="1_xjhbr"]
+[ext_resource type="Script" uid="uid://dcjq3qju584vw" path="res://components/scripts/magic_dart_projectile.gd" id="1_xjhbr"]
 [ext_resource type="Texture2D" uid="uid://dpxldhsvbrmwh" path="res://components/sprites/enemies/fae/fae_magic_dard_projectile.png" id="2_fnoec"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bvpuc"]

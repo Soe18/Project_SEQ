@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://cwfowg3q2rf8t"]
 
-[ext_resource type="Script" path="res://overworld/scripts/quest/quest.gd" id="1_ex7v2"]
+[ext_resource type="Script" uid="uid://cxoajg2snndaq" path="res://overworld/scripts/quest/quest.gd" id="1_ex7v2"]
 
 [resource]
 script = ExtResource("1_ex7v2")

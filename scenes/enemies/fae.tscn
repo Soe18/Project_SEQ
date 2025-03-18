@@ -1,6 +1,6 @@
 [gd_scene load_steps=73 format=3 uid="uid://dlv5xy3f7qvmt"]
 
-[ext_resource type="Script" path="res://components/scripts/fae.gd" id="1_4p6sl"]
+[ext_resource type="Script" uid="uid://dq1jg0a0tecit" path="res://components/scripts/fae.gd" id="1_4p6sl"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_5kx2b"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_2ibfk"]
 [ext_resource type="Texture2D" uid="uid://cy8ryt31bnfjr" path="res://components/sprites/enemies/fae/fae_charging_heal.png" id="4_gm88b"]
@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://biqmbnmpa1vxs" path="res://components/sprites/GUI/status_alert/buff_animation.png" id="5_ugwkk"]
 [ext_resource type="Texture2D" uid="uid://dg0w8hqiqnmr1" path="res://components/sprites/enemies/fae/fae_idle.png" id="5_x4mc4"]
 [ext_resource type="Texture2D" uid="uid://c8p0lhwkai63t" path="res://components/sprites/enemies/fae/fae_heal.png" id="6_6ydg4"]
-[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="6_mhkqy"]
+[ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="6_mhkqy"]
 [ext_resource type="Texture2D" uid="uid://yj001hpf0hy8" path="res://components/sprites/enemies/fae/fae_running.png" id="6_q6t8n"]
 [ext_resource type="Texture2D" uid="uid://cixwjw2tvf78u" path="res://components/sprites/GUI/status_alert/debuff_animation.png" id="6_qixfm"]
 [ext_resource type="Texture2D" uid="uid://da0dj4l15d4d5" path="res://components/sprites/GUI/status_alert/recover_animation.png" id="7_x3kmy"]
@@ -20,7 +20,7 @@
 resource_local_to_scene = true
 shader = ExtResource("6_mhkqy")
 shader_parameter/flash_color = Color(1, 1, 1, 1)
-shader_parameter/flash_value = null
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ny0h4"]
 atlas = ExtResource("4_gm88b")
@@ -477,8 +477,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
 _data = {
-"RESET": SubResource("Animation_6bd6i"),
-"hit_flash": SubResource("Animation_mo7si")
+&"RESET": SubResource("Animation_6bd6i"),
+&"hit_flash": SubResource("Animation_mo7si")
 }
 
 [node name="FaeEnemy" type="CharacterBody2D"]

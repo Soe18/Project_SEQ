@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://bcsnkyl6md51i"]
 
-[ext_resource type="Script" path="res://components/scripts/enchantment_projectile.gd" id="1_tncp7"]
+[ext_resource type="Script" uid="uid://dbkp3pts3rwp7" path="res://components/scripts/enchantment_projectile.gd" id="1_tncp7"]
 [ext_resource type="Texture2D" uid="uid://bl0aj070oadal" path="res://components/sprites/enemies/fae/fae_enchantment_projectile.png" id="2_m7cc0"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4s87d"]

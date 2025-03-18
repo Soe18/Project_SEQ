@@ -1,7 +1,7 @@
 [gd_scene load_steps=82 format=3 uid="uid://c1ncws1k51fhp"]
 
-[ext_resource type="Script" path="res://components/scripts/werewolf.gd" id="1_0js6q"]
-[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="1_6jmst"]
+[ext_resource type="Script" uid="uid://bhpitipl544nw" path="res://components/scripts/werewolf.gd" id="1_0js6q"]
+[ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="1_6jmst"]
 [ext_resource type="Texture2D" uid="uid://delv83r1fqak3" path="res://components/sprites/enemies/werewolf/werewolf_agility.png" id="2_k7yej"]
 [ext_resource type="Texture2D" uid="uid://bkhbwy7odynup" path="res://components/sprites/enemies/werewolf/werewolf_idle.png" id="2_lqm2o"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_v6w1f"]
@@ -19,7 +19,7 @@
 resource_local_to_scene = true
 shader = ExtResource("1_6jmst")
 shader_parameter/flash_color = Color(1, 1, 1, 1)
-shader_parameter/flash_value = null
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gsvdf"]
 atlas = ExtResource("2_k7yej")
@@ -577,8 +577,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
 _data = {
-"RESET": SubResource("Animation_6bd6i"),
-"hit_flash": SubResource("Animation_mo7si")
+&"RESET": SubResource("Animation_6bd6i"),
+&"hit_flash": SubResource("Animation_mo7si")
 }
 
 [node name="WerewolfEnemy" type="CharacterBody2D"]

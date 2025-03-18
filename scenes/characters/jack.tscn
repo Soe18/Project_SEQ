@@ -1,6 +1,6 @@
-[gd_scene load_steps=182 format=3 uid="uid://b3nwx0erq4kqx"]
+[gd_scene load_steps=187 format=3 uid="uid://b3nwx0erq4kqx"]
 
-[ext_resource type="Script" path="res://components/scripts/jack.gd" id="1_4tu1l"]
+[ext_resource type="Script" uid="uid://bkmqji7j35m0b" path="res://components/scripts/jack.gd" id="1_4tu1l"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_wfp2a"]
 [ext_resource type="Texture2D" uid="uid://o1s5vs53dc4a" path="res://components/sprites/jack/pistol/jack_damaged_p.png" id="3_84yut"]
 [ext_resource type="PackedScene" uid="uid://dxg3446h3vq6m" path="res://scenes/characters/jack_bullet_projectile.tscn" id="3_wfqrd"]
@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://qud1xkse31d0" path="res://components/sprites/jack/assault/jack_damaged_as.png" id="8_b3qeh"]
 [ext_resource type="Texture2D" uid="uid://dvnwhqmbty7l8" path="res://components/sprites/jack/pistol/jack_flashbang_p.png" id="8_cjjla"]
 [ext_resource type="Texture2D" uid="uid://ceo426fi7fola" path="res://components/sprites/jack/assault/jack_flashbang_as.png" id="9_82o66"]
+[ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="9_vakt5"]
 [ext_resource type="Texture2D" uid="uid://dyy88jjv1m7uy" path="res://components/sprites/jack/pistol/jack_p_running_reload.png" id="10_2n7ii"]
 [ext_resource type="Texture2D" uid="uid://d273e52sk4big" path="res://components/sprites/jack/assault/jack_idle_as.png" id="10_ei3rh"]
 [ext_resource type="Texture2D" uid="uid://ib2oxxketbvi" path="res://components/sprites/jack/assault/jack_running_as.png" id="11_5ay11"]
@@ -65,9 +66,15 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_f8tdj"]
 _data = {
-"RESET": SubResource("Animation_ghs21"),
-"shake_ammo": SubResource("Animation_hfyxq")
+&"RESET": SubResource("Animation_ghs21"),
+&"shake_ammo": SubResource("Animation_hfyxq")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7hw5y"]
+resource_local_to_scene = true
+shader = ExtResource("9_vakt5")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lguq2"]
 atlas = ExtResource("6_p2m4j")
@@ -1224,10 +1231,47 @@ height = 80.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_m12o2"]
 radius = 484.444
 
+[sub_resource type="Animation" id="Animation_6bd6i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_mo7si"]
+resource_name = "hit_flash"
+length = 0.8
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/flash_value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.21),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [null, 1.0, null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
+_data = {
+&"RESET": SubResource("Animation_6bd6i"),
+&"hit_flash": SubResource("Animation_mo7si")
+}
+
 [node name="CharacterBody2D" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
-scale = Vector2(0.9, 0.9)
 motion_mode = 1
 script = ExtResource("1_4tu1l")
 damage_node = ExtResource("2_wfp2a")
@@ -1285,13 +1329,14 @@ horizontal_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Control"]
 libraries = {
-"": SubResource("AnimationLibrary_f8tdj")
+&"": SubResource("AnimationLibrary_f8tdj")
 }
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(1.11111, -55.5556)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_7hw5y")
 scale = Vector2(1.2, 1.2)
 sprite_frames = SubResource("SpriteFrames_dte57")
 animation = &"p_idle"
@@ -1368,6 +1413,11 @@ one_shot = true
 
 [node name="Stun" type="Timer" parent="."]
 one_shot = true
+
+[node name="Hit_flash_player" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_50jq1")
+}
 
 [connection signal="get_healed" from="." to="." method="_on_get_healed"]
 [connection signal="set_idle" from="." to="." method="_on_set_idle"]

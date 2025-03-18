@@ -1,7 +1,7 @@
 [gd_scene load_steps=80 format=3 uid="uid://d2wge2miret0o"]
 
-[ext_resource type="Script" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
-[ext_resource type="Shader" path="res://components/shaders/hit_shader.gdshader" id="1_p876d"]
+[ext_resource type="Script" uid="uid://br8ws5a8se0ge" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
+[ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="1_p876d"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_otfb6"]
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_80k0x"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="3_msf8r"]
@@ -16,14 +16,14 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_l2j2q"]
 shader = ExtResource("1_p876d")
-shader_parameter/flash_color = null
-shader_parameter/flash_value = null
+shader_parameter/flash_color = Color(0, 0, 0, 1)
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wops7"]
 resource_local_to_scene = true
 shader = ExtResource("1_p876d")
 shader_parameter/flash_color = Color(1, 1, 1, 1)
-shader_parameter/flash_value = null
+shader_parameter/flash_value = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_p6vvj"]
 atlas = ExtResource("3_msf8r")
@@ -528,13 +528,13 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_50jq1"]
 _data = {
-"RESET": SubResource("Animation_6bd6i"),
-"hit_flash": SubResource("Animation_mo7si")
+&"RESET": SubResource("Animation_6bd6i"),
+&"hit_flash": SubResource("Animation_mo7si")
 }
 
 [node name="ZombieEnemy" type="CharacterBody2D"]
 process_mode = 1
-y_sort_enabled = true
+z_index = -1
 material = SubResource("ShaderMaterial_l2j2q")
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -654,14 +654,13 @@ target_desired_distance = 80.0
 path_max_distance = 10.0
 navigation_layers = 3
 path_postprocessing = 1
-avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20
 max_speed = 1703.04
 
 [node name="Hit_flash_player" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_50jq1")
+&"": SubResource("AnimationLibrary_50jq1")
 }
 
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
