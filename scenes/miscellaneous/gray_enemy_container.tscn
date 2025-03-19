@@ -41,7 +41,7 @@ position = Vector2(1024, 944)
 [node name="Spawnpoint10" type="Marker2D" parent="."]
 position = Vector2(480, 987)
 
-[node name="Boss_Spawner" type="Marker2D" parent="."]
+[node name="Boss_spawner" type="Marker2D" parent="."]
 position = Vector2(919, 494)
 
 [connection signal="timeout" from="Round_cooldown" to="." method="_on_round_cooldown_timeout"]

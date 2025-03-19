@@ -534,7 +534,6 @@ _data = {
 
 [node name="ZombieEnemy" type="CharacterBody2D"]
 process_mode = 1
-z_index = -1
 material = SubResource("ShaderMaterial_l2j2q")
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -547,6 +546,7 @@ knockback_timer_node = ExtResource("3_80k0x")
 position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+y_sort_enabled = true
 material = SubResource("ShaderMaterial_wops7")
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(0.139583, 0.139583)

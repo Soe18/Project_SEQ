@@ -716,7 +716,6 @@ _data = {
 [node name="GiantEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
-scale = Vector2(1.39, 1.39)
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_t850f")
@@ -724,14 +723,14 @@ damage_node = ExtResource("2_w0xeh")
 knockback_timer_node = ExtResource("3_6i6ig")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
-position = Vector2(12.2302, -99.2518)
+position = Vector2(11.1259, -72.1908)
+scale = Vector2(1.43977, 1.43977)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "sposta di 40 px lo sprite"
 y_sort_enabled = true
 material = SubResource("ShaderMaterial_kb1pu")
-position = Vector2(0, -20.8633)
-scale = Vector2(0.287, 0.287)
+scale = Vector2(0.413215, 0.413215)
 sprite_frames = SubResource("SpriteFrames_7kgit")
 animation = &"idle"
 autoplay = "idle"
@@ -739,15 +738,16 @@ autoplay = "idle"
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
 z_index = 1
 y_sort_enabled = true
-position = Vector2(7.91367, 7.91371)
-scale = Vector2(0.08941, 0.08941)
+position = Vector2(0, 34.975)
+scale = Vector2(0.12873, 0.12873)
 sprite_frames = SubResource("SpriteFrames_0017p")
 animation = &"idle"
 autoplay = "idle"
 
 [node name="Body_collider" type="CollisionShape2D" parent="."]
-position = Vector2(5.7554, 13.6691)
+position = Vector2(11, 59)
 rotation = 1.5708
+scale = Vector2(1.43977, 1.43977)
 shape = SubResource("CapsuleShape2D_wmmft")
 debug_color = Color(1, 1, 0, 0.0666667)
 
@@ -758,10 +758,10 @@ one_shot = true
 [node name="HealthBar" type="ProgressBar" parent="."]
 z_index = 10
 y_sort_enabled = true
-offset_left = -66.7914
-offset_top = -95.4388
-offset_right = 88.2086
-offset_bottom = -74.4388
+offset_left = -65.0
+offset_top = -109.0
+offset_right = 90.0
+offset_bottom = -88.0
 theme_override_styles/background = SubResource("StyleBoxFlat_f8pc5")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fre0b")
 max_value = 150.0
@@ -773,7 +773,8 @@ wait_time = 0.365
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
-position = Vector2(0, -20.8633)
+position = Vector2(-1.10432, 6.19769)
+scale = Vector2(1.43977, 1.43977)
 collision_mask = 3
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
@@ -782,7 +783,8 @@ shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0, 0.6, 0.701961, 0.0352941)
 
 [node name="Punch_Area" type="Area2D" parent="."]
-position = Vector2(0, -20.8633)
+position = Vector2(-1.10432, 6.19769)
+scale = Vector2(1.43977, 1.43977)
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Punch_Area"]
 position = Vector2(62.9497, 13)
@@ -795,11 +797,12 @@ debug_color = Color(0.592157, 0.854902, 0.105882, 0.0352941)
 position = Vector2(59, -5)
 scale = Vector2(0.279167, 0.279167)
 sprite_frames = SubResource("SpriteFrames_rxp4i")
-animation = &"idle"
+animation = &"effect"
 autoplay = "idle"
 
 [node name="Earthquake_Area" type="Area2D" parent="."]
-position = Vector2(0, -20.8633)
+position = Vector2(-1.10432, 6.19769)
+scale = Vector2(1.43977, 1.43977)
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Earthquake_Area"]
 position = Vector2(0.719425, -6.47482)

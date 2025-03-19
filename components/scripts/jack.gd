@@ -79,6 +79,7 @@ var SHOTGUN_ROUNDS_COUNT = 6
 @export var knockback_timer_node : PackedScene
 
 @onready var sprite = $Sprite2D
+@onready var camera
 
 @onready var bullets_spawnpoint = $Bullets_spawnpoint
 @onready var control_node = $Control

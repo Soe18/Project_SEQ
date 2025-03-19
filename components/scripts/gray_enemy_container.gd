@@ -26,7 +26,7 @@ var boss_spawned = false # flag che determina se il boss è spawnato
 var portal_spawned = false # flag che determina se il portale è spawnato
 
 @onready var time_between_rounds = $Round_cooldown
-@onready var boss_spawner = $Boss_Spawner
+@onready var boss_spawner = $Boss_spawner
 
 @warning_ignore("unused_signal")
 

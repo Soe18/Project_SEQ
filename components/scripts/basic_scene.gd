@@ -28,8 +28,6 @@ var player_gui
 
 var camera_follower = "res://scenes/miscellaneous/camera_follower.tscn"
 
-@onready var shake_duration_timer = $Shake_duration
-
 var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn", "res://scenes/tilemaps/forest_tile_map.tscn", "res://scenes/tilemaps/deep_forest_tile_map.tscn"]
 var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn", "res://scenes/miscellaneous/forest_enemy_container.tscn", "res://scenes/miscellaneous/deep_forest_enemy_container.tscn"]
 
@@ -282,6 +280,9 @@ func _on_change_stage():
 	# istanzio un nuovo nodo enemy_container e assegno quest'ultimo alla variabile enemy_container attivo
 	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
 	active_enemy_container = get_child(get_child_count(true)-1)
+	
+	player.global_position = active_enemy_container.boss_spawner.global_position
+	portal.global_position = active_enemy_container.boss_spawner.global_position
 	
 	# collego tutti i segnali del container ai rispettivi digest
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)

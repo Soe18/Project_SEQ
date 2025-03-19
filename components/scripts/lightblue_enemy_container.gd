@@ -31,7 +31,7 @@ var boss_spawned = false
 var portal_spawned = false
 
 @onready var time_between_rounds = $Round_cooldown
-@onready var boss_spawner = $Boss_Spawner
+@onready var boss_spawner = $Boss_spawner
 
 func _ready():
 	for i in get_children():

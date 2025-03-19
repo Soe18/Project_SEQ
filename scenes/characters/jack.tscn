@@ -1,4 +1,4 @@
-[gd_scene load_steps=187 format=3 uid="uid://b3nwx0erq4kqx"]
+[gd_scene load_steps=186 format=3 uid="uid://b3nwx0erq4kqx"]
 
 [ext_resource type="Script" uid="uid://bkmqji7j35m0b" path="res://components/scripts/jack.gd" id="1_4tu1l"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_wfp2a"]
@@ -11,7 +11,6 @@
 [ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="5_it00f"]
 [ext_resource type="Texture2D" uid="uid://n5eeephddexo" path="res://components/sprites/jack/pistol/jack_shooting_p.png" id="5_ltcqf"]
 [ext_resource type="Texture2D" uid="uid://btjg1uvmks8gk" path="res://components/sprites/jack/pistol/jack_running_p.png" id="5_pnxoj"]
-[ext_resource type="PackedScene" uid="uid://cgh08a7f4c8kq" path="res://scenes/miscellaneous/main_camera.tscn" id="6_1cy8b"]
 [ext_resource type="Texture2D" uid="uid://iiwhblervbq4" path="res://components/sprites/jack/pistol/jack_change_p.png" id="6_ovxgh"]
 [ext_resource type="Texture2D" uid="uid://b5n73bxvsflih" path="res://components/sprites/jack/assault/jack_change_as.png" id="6_p2m4j"]
 [ext_resource type="Texture2D" uid="uid://dswl0wwmaj82o" path="res://components/sprites/jack/assault/jack_shooting_as.png" id="7_4fjpq"]
@@ -1278,8 +1277,6 @@ damage_node = ExtResource("2_wfp2a")
 bullet_scene = ExtResource("3_wfqrd")
 change_stats_timer_node = ExtResource("4_bxdqx")
 knockback_timer_node = ExtResource("5_it00f")
-
-[node name="Main_camera" parent="." instance=ExtResource("6_1cy8b")]
 
 [node name="Control" type="Control" parent="."]
 z_index = 11
