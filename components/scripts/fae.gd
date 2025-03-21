@@ -105,15 +105,18 @@ func _physics_process(_delta):
 			if choosed_atk == Possible_Attacks.MAGIC_DART and magic_dart_cooldown.is_stopped() and not flee_activated:
 				sprite.play("launch_dart")
 				moving = false
+				flee_timeout_timer.start()
 				magic_dart_cooldown.start()
 			if choosed_atk == Possible_Attacks.ENCHANTMENT and enchantment_cooldown.is_stopped() and not flee_activated:
-				sprite.play("launch_dart", 0.75)
+				sprite.play("launch_dart", 0.40)
 				moving = false
+				flee_timeout_timer.start()
 				enchantment_cooldown.start()
 			if choosed_atk == Possible_Attacks.HEAL and heal_cooldown.is_stopped() and not flee_activated:
 				sprite.play("charging_heal")
 				heal_charge_time.start()
 				moving = false
+				flee_timeout_timer.start()
 				heal_cooldown.start()
 	elif not player_entered and moving:
 		if is_instance_valid(player):
@@ -307,7 +310,7 @@ func _on_navigation_agent_2d_target_reached(timeout = false) -> void:
 			set_idle()
 
 func _on_flee_timeout_timeout() -> void:
-	_on_navigation_agent_2d_target_reached(true)
+	set_idle()
 
 func _on_heal_charge_time_timeout() -> void:
 	sprite.play("heal")
@@ -430,6 +433,8 @@ func set_idle():
 		moving = true
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")
+		heal_charge_time.stop()
+		flee_timeout_timer.stop()
 		update_atk_timer.start()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):

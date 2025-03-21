@@ -9,11 +9,16 @@ var fae_str
 var fae_pbc
 var fae_efc
 
+var queue : Array
+var MAX_LENGHT : int = 10
+
 var magic_dart_force = 10
 var magic_dart_stun_force = 0.8
 @onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
 var magic_dart_velocity_multiplyer = 800
+
+@onready var trail = $Line2D
 
 @onready var sprite = $Sprite2D
 
@@ -38,7 +43,17 @@ func go_to_player():
 	
 	if global_position.distance_to(origin) >= player_position.distance_to(origin):
 		direction = first_direction
-		
+	
+	queue.push_front(self.position)
+	
+	if queue.size() > MAX_LENGHT:
+		queue.pop_back()
+	
+	trail.clear_points()
+	
+	for point in queue:
+		trail.add_point(point)
+	
 	velocity = direction * magic_dart_velocity_multiplyer
 	move_and_slide()
 

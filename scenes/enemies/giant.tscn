@@ -758,10 +758,10 @@ one_shot = true
 [node name="HealthBar" type="ProgressBar" parent="."]
 z_index = 10
 y_sort_enabled = true
-offset_left = -65.0
-offset_top = -109.0
-offset_right = 90.0
-offset_bottom = -88.0
+offset_left = -98.0
+offset_top = -90.0
+offset_right = 122.0
+offset_bottom = -80.0
 theme_override_styles/background = SubResource("StyleBoxFlat_f8pc5")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fre0b")
 max_value = 150.0
@@ -787,6 +787,7 @@ position = Vector2(-1.10432, 6.19769)
 scale = Vector2(1.43977, 1.43977)
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Punch_Area"]
+visible = false
 position = Vector2(62.9497, 13)
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_cwyod")
@@ -805,6 +806,7 @@ position = Vector2(-1.10432, 6.19769)
 scale = Vector2(1.43977, 1.43977)
 
 [node name="Skill_collider" type="CollisionShape2D" parent="Earthquake_Area"]
+visible = false
 position = Vector2(0.719425, -6.47482)
 shape = SubResource("CircleShape2D_cc5nt")
 disabled = true

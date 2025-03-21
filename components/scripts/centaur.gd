@@ -62,6 +62,7 @@ var first_enter = true
 @onready var sprite = $Sprite2D
 
 @onready var stun_timer = $Stun
+@onready var safe_timer = $Safe_timer
 
 @onready var body_collider = $Body_collider
 @onready var upper_body_collider = $Body_collider_upper
@@ -95,30 +96,32 @@ var first_enter = true
 var player_entered = true
 var player_in_atk_range = false
 
-#METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
-#	setta la vita attuale a quella massima
-#	imposta il valore massimo della barra della salute al massimo
-#	setta la barra della salute
+'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
+	setta la vita attuale a quella massima
+	imposta il valore massimo della barra della salute al massimo
+	setta la barra della salute'
+
 func _ready():
 	healthbar.max_value = default_vit
 	set_health_bar()
 	sprite.play("idle")
 	set_idle()
 
-#METODO CHE VIENE PROCESSATO PER FRAME
-#	controlla se il player è entrato in area e si può muovere
-#		allora si muove
-#	altrimenti se il player NON è entrato in area e si può muovere
-#		allora comincia a vagare
-#	controlla se è grabbato
-#		allora fa partire il metodo grab()
+'METODO CHE VIENE PROCESSATO PER FRAME
+	controlla se il player è entrato in area e si può muovere
+		allora si muove
+	altrimenti se il player NON è entrato in area e si può muovere
+		allora comincia a vagare
+	controlla se è grabbato
+		allora fa partire il metodo grab()'
+
 func _physics_process(_delta):
 	if knockbacked:
 		apply_knockback(knockback_sender)
 	elif sprinting:
 		sprint_to_target()
 		if sprint_duration_timer.time_left == sprint_duration/2:
-			sprint_reset_collider.set_deferred("disabled", true)
+			sprint_reset_collider.set_deferred("disabled", false)
 	elif player_entered and moving:
 		chase_player()
 		if choosed_atk == Possible_Attacks.HALBERD and halberd_cooldown.is_stopped():
@@ -141,11 +144,12 @@ func _physics_process(_delta):
 	elif grabbed:
 		is_grabbed()
 
-#METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
-#	salvo la posizione attuale del player
-#	creo il vettore che punta al player, facendo la posizione del player - la posizione attuale e infine normalizzo il vettore
-#	se il nodo è distante dal player di almeno 12 unità
-#		muovo il nodo verso il player con la velocità di 3
+'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
+	salvo la posizione attuale del player
+	creo il vettore che punta al player, facendo la posizione del player - la posizione attuale e infine normalizzo il vettore
+	se il nodo è distante dal player di almeno 12 unità
+		muovo il nodo verso il player con la velocità di 3'
+
 func flip(distance_to_player):
 	if distance_to_player.x < 0:
 		sprite.flip_h = true
@@ -181,7 +185,7 @@ func chase_player():
 		flip(player_position)
 
 func sprint_to_target():
-	if player != null:
+	if is_instance_valid(player):
 		var direction = global_position.direction_to(target_location)
 		
 		if first_enter:
@@ -205,16 +209,17 @@ func choose_atk():
 	
 	#choosed_atk = Possible_Attacks.SPRINT
 
-#DIGEST DEL SEGNALE DEL PLAYER "is_in_atk_range"
-#{
-#	PARAMETRI
-#	boolean is_in: identifica se il nodo è entrato oppure è uscito
-#	Node body: identifica il nodo che è entrato o uscito
-#}
-#	se il segnale che manda al nodo è di entrata nell'area e il nodo è questo
-#		allora il nodo è dentro l'area del player
-#	altrimenti
-#		non è in range
+'DIGEST DEL SEGNALE DEL PLAYER \"is_in_atk_range\"
+{
+	PARAMETRI
+	boolean is_in: identifica se il nodo è entrato oppure è uscito
+	Node body: identifica il nodo che è entrato o uscito
+}
+	se il segnale che manda al nodo è di entrata nell\'area e il nodo è questo
+		allora il nodo è dentro l\'area del player
+	altrimenti
+		non è in range'
+
 func _on_player_is_in_atk_range(is_in, body):
 	if is_in and body == self and not is_in_atk_range:
 		is_in_atk_range = true
@@ -252,6 +257,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 			moving = false
 			stun_timer.wait_time = stun_sec
 			stun_timer.start()
+			safe_timer.start()
 			sprite.play("damaged")
 
 #DIGEST DEL SENGALE DEL PLAYER "grab"
@@ -342,6 +348,7 @@ func _on_sprite_2d_frame_changed() -> void:
 func halberd():
 	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting and player_in_atk_range:
 		moving = false
+		safe_timer.start()
 		sprite.play("halberd")
 		update_atk_timer.stop()
 	halberd_cooldown.start()
@@ -350,6 +357,7 @@ func sprint():
 	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting:
 		sprite.play("charging_sprint")
 		moving = false
+		safe_timer.start()
 		first_enter = true
 		update_atk_timer.stop()
 	sprint_cooldown.start()
@@ -358,6 +366,7 @@ func temperance():
 	if stun_timer.is_stopped() and not grabbed and not sprinting:
 		sprite.play("temperance")
 		moving = false
+		safe_timer.start()
 		update_atk_timer.stop()
 	temperance_cooldown.start()
 
@@ -414,7 +423,11 @@ func set_idle():
 		sprint_collider.set_deferred("disabled", true)
 		sprint_reset_collider.set_deferred("disabled", true)
 		sprint_duration_timer.stop()
+		safe_timer.stop()
 		update_atk_timer.start()
+
+func _on_safe_timer_timeout() -> void:
+	set_idle()
 
 #DIGEST DEL SEGNALE PROPRIO "set_health_bar", AGGIORNA LA BARRA DELLA SALUTE
 #	il valore della barra diventa uguale a quello della vita attuale
@@ -437,6 +450,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 func init_knockback(amount, time, sender):
 	if is_in_atk_range and not grabbed:
 		moving = false
+		safe_timer.start()
 		sprinting = false
 		knockbacked = true
 		knockback_force = amount

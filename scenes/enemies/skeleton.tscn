@@ -619,6 +619,7 @@ knockback_timer_node = ExtResource("3_s0ujm")
 position = Vector2(0, -59)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+y_sort_enabled = true
 material = SubResource("ShaderMaterial_b8fga")
 position = Vector2(7.15256e-07, 3)
 scale = Vector2(0.128125, 0.128125)
@@ -648,10 +649,10 @@ one_shot = true
 [node name="HealthBar" type="ProgressBar" parent="."]
 z_index = 10
 y_sort_enabled = true
-offset_left = -50.0
-offset_top = -57.0
-offset_right = 48.0
-offset_bottom = -38.0
+offset_left = -49.0
+offset_top = -50.0
+offset_right = 49.0
+offset_bottom = -40.0
 theme_override_styles/background = SubResource("StyleBoxFlat_x0p46")
 theme_override_styles/fill = SubResource("StyleBoxFlat_vdg0j")
 max_value = 150.0
@@ -724,7 +725,7 @@ max_speed = 1703.04
 
 [node name="Hit_flash_player" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_50jq1")
+&"": SubResource("AnimationLibrary_50jq1")
 }
 autoplay = "RESET"
 

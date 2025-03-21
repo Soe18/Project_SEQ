@@ -630,9 +630,9 @@ offset_bottom = 40.0
 [node name="HealthBar" type="ProgressBar" parent="Control"]
 layout_mode = 0
 offset_left = -49.0
-offset_top = -63.0
+offset_top = -50.0
 offset_right = 49.0
-offset_bottom = -48.0
+offset_bottom = -40.0
 theme_override_styles/background = SubResource("StyleBoxFlat_00dig")
 theme_override_styles/fill = SubResource("StyleBoxFlat_0rxx2")
 max_value = 150.0
@@ -701,7 +701,7 @@ max_speed = 1703.04
 
 [node name="Hit_flash_player" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_50jq1")
+&"": SubResource("AnimationLibrary_50jq1")
 }
 autoplay = "RESET"
 

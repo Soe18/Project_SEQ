@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bcsnkyl6md51i"]
+[gd_scene load_steps=9 format=3 uid="uid://bcsnkyl6md51i"]
 
 [ext_resource type="Script" uid="uid://dbkp3pts3rwp7" path="res://components/scripts/enchantment_projectile.gd" id="1_tncp7"]
 [ext_resource type="Texture2D" uid="uid://bl0aj070oadal" path="res://components/sprites/enemies/fae/fae_enchantment_projectile.png" id="2_m7cc0"]
@@ -26,6 +26,14 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="Curve" id="Curve_m6y42"]
+_data = [Vector2(0, 0.675), 0.0, -0.355263, 0, 0, Vector2(1, 0), -0.675, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_8vcln"]
+offsets = PackedFloat32Array(0, 0.446309)
+colors = PackedColorArray(1, 0, 0.443137, 1, 1, 0.406513, 0.998457, 1)
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_l4qwa"]
 radius = 7.0
 
@@ -45,6 +53,14 @@ scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_1ubdb")
 animation = &"effect"
 autoplay = "idle"
+
+[node name="Line2D" type="Line2D" parent="."]
+top_level = true
+width = 18.0
+width_curve = SubResource("Curve_m6y42")
+default_color = Color(1, 0, 0.443137, 1)
+gradient = SubResource("Gradient_8vcln")
+joint_mode = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false

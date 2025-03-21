@@ -1,7 +1,15 @@
-[gd_scene load_steps=8 format=3 uid="uid://uy8eytrdfgkh"]
+[gd_scene load_steps=10 format=3 uid="uid://uy8eytrdfgkh"]
 
 [ext_resource type="Script" uid="uid://dcjq3qju584vw" path="res://components/scripts/magic_dart_projectile.gd" id="1_xjhbr"]
 [ext_resource type="Texture2D" uid="uid://dpxldhsvbrmwh" path="res://components/sprites/enemies/fae/fae_magic_dard_projectile.png" id="2_fnoec"]
+
+[sub_resource type="Curve" id="Curve_lmldj"]
+_data = [Vector2(0, 0.675), 0.0, -0.355263, 0, 0, Vector2(1, 0), -0.675, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_epsic"]
+offsets = PackedFloat32Array(0.11745, 1)
+colors = PackedColorArray(0, 0.627451, 0.905882, 1, 0.513726, 1, 1, 1)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bvpuc"]
 atlas = ExtResource("2_fnoec")
@@ -46,6 +54,14 @@ collision_layer = 2
 collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_xjhbr")
+
+[node name="Line2D" type="Line2D" parent="."]
+top_level = true
+width = 18.0
+width_curve = SubResource("Curve_lmldj")
+default_color = Color(0, 0.627451, 0.905882, 1)
+gradient = SubResource("Gradient_epsic")
+joint_mode = 2
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1

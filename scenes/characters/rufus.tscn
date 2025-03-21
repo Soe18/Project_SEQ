@@ -1074,7 +1074,7 @@ position = Vector2(0, -53.3333)
 material = SubResource("ShaderMaterial_3ojpq")
 scale = Vector2(0.15, 0.15)
 sprite_frames = SubResource("SpriteFrames_dte57")
-animation = &"base atk1"
+animation = &"idle"
 autoplay = "idle"
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]

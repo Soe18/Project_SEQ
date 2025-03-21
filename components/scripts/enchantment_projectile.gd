@@ -10,12 +10,17 @@ var fae_pbc
 var fae_efc
 @onready var atk_type = get_tree().get_first_node_in_group("gm").Attack_Types.PROJECTILE
 
+var queue : Array
+var MAX_LENGHT : int = 20
+
 var enchantment_force = 9
 var enchantment_stun_time = 5.0
 
 var enchantment_velocity_multiplyer = 500
 
 @onready var sprite = $Sprite2D
+
+@onready var trail = $Line2D
 
 @onready var time_to_live = $Time_to_live
 
@@ -38,7 +43,17 @@ func go_to_player():
 	
 	if global_position.distance_to(origin) >= player_position.distance_to(origin):
 		direction = first_direction
-		
+	
+	queue.push_front(self.position)
+	
+	if queue.size() > MAX_LENGHT:
+		queue.pop_back()
+	
+	trail.clear_points()
+	
+	for point in queue:
+		trail.add_point(point)
+	
 	velocity = direction * enchantment_velocity_multiplyer
 	move_and_slide()
 

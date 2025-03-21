@@ -355,9 +355,9 @@ func punch():
 		punch_cooldown.start()
 		attacking = true
 		if sprite.flip_h:
-			sprite.position = Vector2(-45,0)
+			sprite.position = Vector2(-58,0)
 		else:
-			sprite.position = Vector2(45,0)
+			sprite.position = Vector2(58,0)
 		moving = false
 		sprite.play("punch")
 		punch_effect.play("effect")

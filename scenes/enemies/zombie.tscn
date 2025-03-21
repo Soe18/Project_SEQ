@@ -551,10 +551,8 @@ material = SubResource("ShaderMaterial_wops7")
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(0.139583, 0.139583)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"damaged"
+animation = &"idle"
 autoplay = "idle"
-frame = 2
-frame_progress = 1.0
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
 z_index = 1
@@ -580,11 +578,16 @@ offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
 
 [node name="HealthBar" type="ProgressBar" parent="Control"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.025
+anchor_top = 0.325
+anchor_right = 0.025
+anchor_bottom = 0.325
 offset_left = -50.0
 offset_top = -60.0
 offset_right = 48.0
-offset_bottom = -41.0
+offset_bottom = -50.0
 theme_override_styles/background = SubResource("StyleBoxFlat_00dig")
 theme_override_styles/fill = SubResource("StyleBoxFlat_0rxx2")
 max_value = 150.0
@@ -654,6 +657,7 @@ target_desired_distance = 80.0
 path_max_distance = 10.0
 navigation_layers = 3
 path_postprocessing = 1
+avoidance_enabled = true
 radius = 20.0
 max_neighbors = 20
 max_speed = 1703.04
