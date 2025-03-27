@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://phhqwdl271xg" path="res://components/scripts/skeleton.gd" id="1_ug4iq"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_64tus"]
 [ext_resource type="Texture2D" uid="uid://c7ypq8f8wdvlu" path="res://components/sprites/enemies/skeleton/skeleton_atk.png" id="2_lkymh"]
-[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_s0ujm"]
+[ext_resource type="PackedScene" uid="uid://b8m3imv5eplab" path="res://scenes/miscellaneous/knockback_controller.tscn" id="3_s01nw"]
 [ext_resource type="Texture2D" uid="uid://5sc13wn7j33m" path="res://components/sprites/enemies/skeleton/skeleton_damaged.png" id="3_spfhf"]
 [ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="4_gqfqc"]
 [ext_resource type="Texture2D" uid="uid://c12bybbikpkaw" path="res://components/sprites/enemies/skeleton/skeleton_dying.png" id="4_pey7m"]
@@ -613,7 +613,7 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_ug4iq")
 damage_node = ExtResource("2_64tus")
-knockback_timer_node = ExtResource("3_s0ujm")
+knockback_controller_node = ExtResource("3_s01nw")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(0, -59)
@@ -719,7 +719,7 @@ path_max_distance = 10.0
 navigation_layers = 3
 path_postprocessing = 1
 avoidance_enabled = true
-radius = 20.0
+radius = 30.0
 max_neighbors = 20
 max_speed = 1703.04
 

@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://br8u4kbrbjw0w" path="res://components/sprites/enemies/centaur/centaur_sprint.png" id="2_76l67"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_b2v3u"]
 [ext_resource type="Texture2D" uid="uid://c44e65g0wl4in" path="res://components/sprites/enemies/centaur/centaur_charging_sprint.png" id="2_ojs73"]
-[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_6yik6"]
+[ext_resource type="PackedScene" uid="uid://b8m3imv5eplab" path="res://scenes/miscellaneous/knockback_controller.tscn" id="3_sfo5h"]
 [ext_resource type="Texture2D" uid="uid://bine04cavl5rq" path="res://components/sprites/enemies/centaur/centaur_damaged.png" id="3_u6ypf"]
 [ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="4_3hom0"]
 [ext_resource type="Texture2D" uid="uid://b6ekcuf2oaho8" path="res://components/sprites/enemies/centaur/centaur_grab.png" id="4_7vlxd"]
@@ -761,7 +761,7 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_skvmw")
 damage_node = ExtResource("2_b2v3u")
-knockback_timer_node = ExtResource("3_6yik6")
+knockback_controller_node = ExtResource("3_sfo5h")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(0, -117)
@@ -886,7 +886,7 @@ navigation_layers = 3
 path_postprocessing = 1
 simplify_path = true
 avoidance_enabled = true
-radius = 20.0
+radius = 31.0
 max_neighbors = 20
 max_speed = 1703.04
 

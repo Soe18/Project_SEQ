@@ -14,21 +14,22 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
-@export var knockback_timer_node : PackedScene
+@export var knockback_controller_node : PackedScene
 
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
 var grab_position
+
 var knockbacked = false
-var knockback_force = 0
-var knockback_sender
+var knockback_target_point
+var knockback_force
 
 signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal got_grabbed(is_grabbed)
 signal grab_player(has_grabbed, grab_position_marker, sender)
 signal change_stats(stat, amount, time_duration, ally_sender)
-signal inflict_knockback(amount, time, sender)
+signal inflict_knockback(amount, force, sender)
 signal shake_camera(shake, strenght)
 
 var target_position
@@ -38,6 +39,7 @@ enum Possible_Attacks {IDLE, HALBERD, SPRINT, TEMPERANCE}
 var choosed_atk
 
 var sprinting = false
+var is_performing_grab = false
 
 var target_location
 var origin
@@ -50,8 +52,8 @@ var first_enter = true
 @export var sprint_duration = 5
 @export var sprint_force = 17
 @export var sprint_multiplyer = 800
-@export var sprint_knockback_force = 2000
-@export var sprint_knockback_time = 1
+@export var sprint_knockback_amount = 400
+@export var sprint_knockback_force = 9.2
 @onready var sprint_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 @export var temperance_changed_stat = "tem"
 @export var temperance_amount = 60
@@ -115,9 +117,11 @@ func _ready():
 	controlla se è grabbato
 		allora fa partire il metodo grab()'
 
-func _physics_process(_delta):
+func _physics_process(delta):
+	if not is_performing_grab and (animation_player.current_animation == "marker_movement" or animation_player.current_animation == "marker_movement_flip"):
+		emit_signal("grab_player", false, null, null)
 	if knockbacked:
-		apply_knockback(knockback_sender)
+		apply_knockback(delta)
 	elif sprinting:
 		sprint_to_target()
 		if sprint_duration_timer.time_left == sprint_duration/2:
@@ -254,6 +258,8 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		if sprinting and dmg >= 25:
 			sprinting = false
 		elif stun_sec > 0:
+			sprint_collider.set_deferred("disabled", true)
+			is_performing_grab = false
 			moving = false
 			stun_timer.wait_time = stun_sec
 			stun_timer.start()
@@ -337,13 +343,15 @@ func _on_sprite_2d_animation_finished() -> void:
 
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "grab" and sprite.frame == 5:
-		emit_signal("grab_player", false, null, null)
-		emit_signal("take_dmg", current_str, sprint_force, 0, current_pbc, current_efc, sprint_type)
-		emit_signal("inflict_knockback", 600, 0.3, self.global_position)
+		finish_grab()
 	if sprite.animation == "halberd" and (sprite.frame == 4 or sprite.frame == 8) and player_in_atk_range:
 		emit_signal("take_dmg", current_str, halberd_force, halberd_stun_time, current_pbc, current_efc, halberd_type)
 	if sprite.animation == "temperance" and sprite.frame == 2:
 		_on_change_stats(temperance_changed_stat, temperance_amount, temperance_duration, true)
+
+func _on_animation_player_animation_finished(anim_name: StringName) -> void:
+	is_performing_grab = false
+	emit_signal("grab_player", false, null, null)
 
 func halberd():
 	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting and player_in_atk_range:
@@ -361,6 +369,12 @@ func sprint():
 		first_enter = true
 		update_atk_timer.stop()
 	sprint_cooldown.start()
+
+func finish_grab() -> void:
+	emit_signal("grab_player", false, null, null)
+	is_performing_grab = false
+	emit_signal("take_dmg", current_str, sprint_force, 0, current_pbc, current_efc, sprint_type)
+	emit_signal("inflict_knockback", sprint_knockback_amount, sprint_knockback_force, self.global_position)
 
 func temperance():
 	if stun_timer.is_stopped() and not grabbed and not sprinting:
@@ -390,7 +404,7 @@ func _on_halberd_area_body_exited(body: Node2D) -> void:
 		player_in_atk_range = false
 
 func _on_sprint_area_body_entered(body: Node2D) -> void:
-	if body == player:
+	if body == player and sprinting:
 		sprint_collider.set_deferred("disabled", true)
 		sprint_reset_collider.set_deferred("disabled", true)
 		sprint_duration_timer.stop()
@@ -401,7 +415,8 @@ func _on_sprint_area_body_entered(body: Node2D) -> void:
 			animation_player.play("marker_movement")
 		sprite.play("grab")
 		emit_signal("grab_player", true, grab_position_marker, self)
-	elif body is TileMapLayer:
+		is_performing_grab = true
+	elif body is TileMapLayer and not is_performing_grab:
 		set_idle()
 
 func _on_reset_sprint_area_body_entered(body: Node2D) -> void:
@@ -416,6 +431,7 @@ func set_idle():
 	if not knockbacked:
 		moving = true
 		sprinting = false
+		is_performing_grab = false
 		choosed_atk = Possible_Attacks.IDLE
 		sprite.play("idle")
 		upper_body_collider.set_deferred("disabled", false)
@@ -447,26 +463,29 @@ func _on_update_atk_timeout():
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 
-func init_knockback(amount, time, sender):
+func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed:
 		moving = false
 		safe_timer.start()
 		sprinting = false
 		knockbacked = true
-		knockback_force = amount
-		knockback_sender = sender
 		
-		self.add_child(knockback_timer_node.instantiate(), true)
-		var timer_node = get_child(get_child_count()-1)
-		timer_node.wait_time = time
-		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
-		timer_node.start()
+		knockback_target_point = self.global_position + (sender.direction_to(self.global_position) * amount)
+		knockback_force = force
+		
+		self.add_child(knockback_controller_node.instantiate(), true)
+		var knockback_controller = get_child(-1)
+		knockback_controller.reparent(get_parent())
+		knockback_controller.target_point = knockback_target_point
+		knockback_controller.vel_multiplyer = force
+		knockback_controller.caller = self
+		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
-func apply_knockback(sender):
-	velocity = sender.direction_to(self.global_position) * knockback_force
+func apply_knockback(delta):
+	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 
-func _on_knockback_reset_timeout():
+func _on_knockback_reset():
 	knockbacked = false
 	if stun_timer.is_stopped():
 		set_idle()

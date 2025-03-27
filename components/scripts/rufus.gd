@@ -16,7 +16,7 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
-@export var knockback_timer_node : PackedScene
+@export var knockback_controller_node : PackedScene
 
 enum Moving_States {IDLE, RUNNING}
 enum Move_Keys {UP, DOWN, LEFT, RIGHT}
@@ -29,7 +29,7 @@ signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
 signal change_stats(stat, amount, time_duration, ally_sender)
-signal inflict_knockback(amount, time, sender)
+signal inflict_knockback(amount, force, sender)
 signal shake_camera(shake, strenght)
 
 @export var ACCELERATION : float = 10000.0
@@ -53,8 +53,8 @@ var grab_marker
 var grab_sender
 
 var knockbacked = false
+var knockback_target_point
 var knockback_force
-var knockback_sender
 
 var is_evading = false
 
@@ -81,14 +81,14 @@ var ult_moving_mod
 @export var skill2_changed_stat = "tem"
 @export var skill2_stat_amount = -25
 @export var skill2_duration = 10
-@export var skill2_knockback_force = 600
-@export var skill2_knockback_duration = 0.2
+@export var skill2_knockback_amount = 300
+@export var skill2_knockback_force = 7.2
 @onready var skill2_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @export var ult_force = 80
 @export var ult_stun_time = 6
-@export var ult_knockback_force = 900
-@export var ult_knockback_duration = 0.3
+@export var ult_knockback_amount = 450
+@export var ult_knockback_force = 8
 @onready var ult_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
 @onready var sprite = $Sprite2D
@@ -141,7 +141,7 @@ func _ready():
 
 func _physics_process(delta):
 	if knockbacked:
-		apply_knockback(knockback_sender)
+		apply_knockback(delta)
 	if grabbed:
 		is_grabbed()
 	if can_move:
@@ -309,7 +309,7 @@ func _on_skill_2_area_body_entered(body):
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type)
 		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
-		emit_signal("inflict_knockback", skill2_knockback_force, skill2_knockback_duration, self.global_position)
+		emit_signal("inflict_knockback", skill2_knockback_amount, skill2_knockback_force, self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
@@ -320,7 +320,7 @@ func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type)
-		emit_signal("inflict_knockback", ult_knockback_force, ult_knockback_duration, self.global_position)
+		emit_signal("inflict_knockback", ult_knockback_amount, ult_knockback_force, self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -582,25 +582,29 @@ func _on_get_healed(amount):
 	status_sprite.play("recover")
 	emit_signal("set_health_bar", current_vit)
 
-func init_knockback(amount, time, sender):
-	if is_in_atk_range and not grabbed:
+func init_knockback(amount, force, sender):
+	if not grabbed:
 		can_move = false
 		knockbacked = true
-		knockback_force = amount
-		knockback_sender = sender
+		
+		knockback_target_point = self.global_position + (sender.direction_to(self.global_position) * amount)
+		knockback_force = force
+		
 		sprite.play("damaged")
 		
-		self.add_child(knockback_timer_node.instantiate(), true)
-		var timer_node = get_child(get_child_count()-1)
-		timer_node.wait_time = time
-		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
-		timer_node.start()
+		self.add_child(knockback_controller_node.instantiate(), true)
+		var knockback_controller = get_child(-1)
+		knockback_controller.reparent(get_parent())
+		knockback_controller.target_point = knockback_target_point
+		knockback_controller.vel_multiplyer = force
+		knockback_controller.caller = self
+		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
-func apply_knockback(sender):
-	velocity = sender.direction_to(self.global_position) * knockback_force
+func apply_knockback(delta):
+	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 
-func _on_knockback_reset_timeout():
+func _on_knockback_reset():
 	knockbacked = false
 	combo_time.start()
 

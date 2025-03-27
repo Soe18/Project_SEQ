@@ -38,7 +38,7 @@ func _process(_delta):
 		eva_cooldown_time.value = player.eva_cooldown.time_left
 		ulti_cooldown_time.value = player.ulti_cooldown.time_left
 		
-	if player == null and alive:
+	if not is_instance_valid(player) and alive:
 		alive = false
 		emit_signal("player_death")
 

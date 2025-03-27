@@ -16,6 +16,9 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
+@export var knockback_controller_node : PackedScene
+@export var change_stats_timer_node : PackedScene
+@export var bullet_scene : PackedScene
 
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
@@ -43,8 +46,8 @@ var grab_marker
 var grab_sender
 
 var knockbacked = false
+var knockback_target_point
 var knockback_force
-var knockback_sender
 
 var atk_anim_finished = true
 
@@ -73,10 +76,6 @@ var ULTI_WAIT_TIME = 90
 var ULTI_DURATION = 20
 
 var SHOTGUN_ROUNDS_COUNT = 6
-
-@export var bullet_scene : PackedScene
-@export var change_stats_timer_node : PackedScene
-@export var knockback_timer_node : PackedScene
 
 @onready var sprite = $Sprite2D
 @onready var camera
@@ -131,7 +130,7 @@ func _ready():
 
 func _physics_process(delta):
 	if knockbacked:
-		apply_knockback(knockback_sender)
+		apply_knockback(delta)
 	if grabbed:
 		is_grabbed()
 	if can_move:
@@ -284,8 +283,8 @@ func atk_handler():
 func _on_flashbang_area_body_entered(body: Node2D) -> void:
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", 0, 0, 4, 0, 0, null)
-		emit_signal("inflict_knockback", 900, 0.2, self.global_position)
+		emit_signal("take_dmg", 0, 0, 4, 0, 0, flashbang_type)
+		emit_signal("inflict_knockback", 300, 5, self.global_position)
 
 func _on_flashbang_area_body_exited(body: Node2D) -> void:
 	emit_signal("is_in_atk_range", false, body)
@@ -446,6 +445,8 @@ func _on_set_idle():
 		self.set_collision_mask_value(1, true)
 		self.set_collision_mask_value(2, false)
 		
+		flashbang_collider.set_deferred("disabled", true)
+		
 		control_node.rotation_degrees = 0
 		control_node.position.y = -53
 		
@@ -494,6 +495,7 @@ func _on_enemy_grab(is_been_grabbed, grab_position_marker, sender):
 	if is_been_grabbed and not grabbed:
 		emit_signal("set_idle")
 		sprite.play(gun_prefix+"damaged")
+		
 		can_move = false
 		grabbed = true
 		
@@ -504,7 +506,6 @@ func _on_enemy_grab(is_been_grabbed, grab_position_marker, sender):
 		
 		grab_marker = grab_position_marker
 		grab_sender = sender
-		
 		
 		if not sender.sprite.flip_h:
 			flip_sprite(true)
@@ -539,25 +540,29 @@ func _on_get_healed(amount):
 	status_sprite.play("recover")
 	emit_signal("set_health_bar", current_vit)
 
-func init_knockback(amount, time, sender):
-	if is_in_atk_range and not grabbed:
+func init_knockback(amount, force, sender):
+	if not grabbed:
 		can_move = false
 		knockbacked = true
-		knockback_force = amount
-		knockback_sender = sender
+		
+		knockback_target_point = self.global_position + (sender.direction_to(self.global_position) * amount)
+		knockback_force = force
+		
 		sprite.play(gun_prefix+"damaged")
 		
-		self.add_child(knockback_timer_node.instantiate(), true)
-		var timer_node = get_child(get_child_count()-1)
-		timer_node.wait_time = time
-		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
-		timer_node.start()
+		self.add_child(knockback_controller_node.instantiate(), true)
+		var knockback_controller = get_child(-1)
+		knockback_controller.reparent(get_parent())
+		knockback_controller.target_point = knockback_target_point
+		knockback_controller.vel_multiplyer = force
+		knockback_controller.caller = self
+		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
-func apply_knockback(sender):
-	velocity = sender.direction_to(self.global_position) * knockback_force
+func apply_knockback(delta):
+	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 
-func _on_knockback_reset_timeout():
+func _on_knockback_reset():
 	knockbacked = false
 	reaction_timer.start()
 

@@ -13,7 +13,7 @@ var possible_enemies = [preload("res://scenes/enemies/zombie.tscn"),preload("res
 # [5] = Centauro
 
 # array che contiene il percorso del boss
-var boss_scene = "res://scenes/enemies/lich.tscn"
+var boss_scene = preload("res://scenes/enemies/lich.tscn")
 
 signal round_changed() # segnale che manda alla GUI per incrementare il counter
 signal heal_between_rounds(amount) # segnale che manda al player per curarlo
@@ -59,8 +59,10 @@ func _process(_delta):
 
 # DIGEST DEL TIMER CHE DETERMINA QUANDO DEVE PARTIRE UNA NUOVA ONDATA
 func _on_round_cooldown_timeout():
+	var player = get_parent().player
+	var heal_amount = round(player.default_vit / 4)
 	emit_signal("round_changed") # invio il segnale al round_gui per incremetare l'ondata
-	emit_signal("heal_between_rounds", 50) # invio il segnale al player per curarsi di una certa quantità
+	emit_signal("heal_between_rounds", heal_amount) # invio il segnale al player per curarsi di una certa quantità
 	fighting = true # di conseguenza i nemici spawneranno quindi combatto
 	if is_boss_round() and not boss_is_defeted: # se è il round del boss e il boss non è stato sconfitto
 		spawn_boss() # spawno il boss
@@ -116,21 +118,21 @@ func activate_markers():
 		var enemy_scene # dichiaro una variabile d'appoggio
 		while not out: # finché la sentinella è falsa
 			enemy_scene = possible_enemies.pick_random() # prendo un nemico casuale dalla pool
-			# se l'ondata è minore di 5 E il nemico selezionato è il gigante
+			# se l'ondata è minore di 5 non istanzio nemici forti
 			#if round_count < 5 and (enemy_scene == possible_enemies[2] or enemy_scene == possible_enemies[4] or enemy_scene == possible_enemies[5]): 
 			#	out = false # non esco e ne seleziono un altro
 			#else: # altrimenti
 			out = true # seleziono il percorso
 		
 		add_child(enemy_scene.instantiate(),true) # insanzio come nodo figlio il nemico
-		#add_child(possible_enemies[4].instantiate(),true) # debug
+		#add_child(possible_enemies[0].instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
 		get_child(get_child_count()-1).position = i.position 
 
 # METODO CHE SPAWNA IL BOSS
 func spawn_boss():
-	add_child(load(boss_scene).instantiate(),true) # instanzio come nodo figlio il boss
+	add_child(boss_scene.instantiate(),true) # instanzio come nodo figlio il boss
 	var active_boss = get_child(get_child_count()-1) # salvo il nodo del boss come variabile
 	active_boss.position = boss_spawner.position # metto la posizione del boss nel suo marker
 	# segnalo alla round_gui che il boss è spawnato e glielo passo

@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dwdxugimue8ex"]
-
-[ext_resource type="Script" uid="uid://qcp0s53p5cqv" path="res://components/scripts/knockback_duration_timer.gd" id="1_kgfaa"]
-
-[node name="Knockback_timer" type="Timer"]
-one_shot = true
-script = ExtResource("1_kgfaa")
-
-[connection signal="timeout" from="." to="." method="_on_timeout"]

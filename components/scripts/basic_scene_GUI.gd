@@ -19,7 +19,7 @@ func _ready():
 
 func _on_round_changed():
 	round_count += 1
-	if round_count == 5 and QuestManager.quests[2].status == QuestStatus.of_type.started:
+	if round_count == 6 and QuestManager.quests[2].status == QuestStatus.of_type.started:
 		QuestManager.quests[2].reach_goal_quest()
 		QuestManager.quests[2].complete_quest()
 	round_displayer.text = "Ondata: " + str(round_count)

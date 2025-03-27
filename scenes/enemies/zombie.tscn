@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://br8ws5a8se0ge" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
 [ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="1_p876d"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_otfb6"]
-[ext_resource type="PackedScene" uid="uid://dwdxugimue8ex" path="res://scenes/miscellaneous/knockback_timer.tscn" id="3_80k0x"]
 [ext_resource type="Texture2D" uid="uid://dcsagcmr7wx6a" path="res://components/sprites/enemies/zombie/zombie_attack.png" id="3_msf8r"]
 [ext_resource type="Texture2D" uid="uid://delgxc8luy00p" path="res://components/sprites/enemies/zombie/zombie_charging_sprint.png" id="4_0w33q"]
+[ext_resource type="PackedScene" uid="uid://b8m3imv5eplab" path="res://scenes/miscellaneous/knockback_controller.tscn" id="4_p8lyb"]
 [ext_resource type="Texture2D" uid="uid://c3ns4y7uooyhj" path="res://components/sprites/enemies/zombie/zombie_damaged.png" id="5_022jm"]
 [ext_resource type="Texture2D" uid="uid://bcyd76jo5todo" path="res://components/sprites/enemies/zombie/zombie_idle.png" id="6_kpcju"]
 [ext_resource type="Texture2D" uid="uid://bknhqekfp2qwy" path="res://components/sprites/enemies/zombie/zombie_running.png" id="7_so7q8"]
@@ -540,7 +540,7 @@ wall_min_slide_angle = 0.0
 safe_margin = 1.0
 script = ExtResource("1_4dl1i")
 damage_node = ExtResource("2_otfb6")
-knockback_timer_node = ExtResource("3_80k0x")
+knockback_controller_node = ExtResource("4_p8lyb")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]
 position = Vector2(0, -64)

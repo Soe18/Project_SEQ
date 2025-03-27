@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8m3imv5eplab"]
+
+[ext_resource type="Script" uid="uid://baprrfml2codi" path="res://components/scripts/knockback_controller.gd" id="1_arpny"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l2416"]
+
+[node name="Knockback_controller" type="CharacterBody2D"]
+script = ExtResource("1_arpny")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_l2416")
+disabled = true

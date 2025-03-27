@@ -14,15 +14,16 @@ var current_pbc = default_pbc
 var current_efc = default_efc
 
 @export var damage_node : PackedScene
-@export var knockback_timer_node : PackedScene
+@export var knockback_controller_node : PackedScene
 
 var is_in_atk_range = false
 var moving = true
 var grabbed = false
 var grab_position
+
 var knockbacked = false
-var knockback_force = 0
-var knockback_sender
+var knockback_target_point
+var knockback_force
 
 var agility_percentage = 20
 var agility_activated = false
@@ -101,9 +102,9 @@ func _ready():
 #	controlla se è grabbato
 #		allora fa partire il metodo grab()
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	if knockbacked:
-		apply_knockback(knockback_sender)
+		apply_knockback(delta)
 	elif grabbed:
 		is_grabbed()
 	elif player_entered and moving:
@@ -382,24 +383,27 @@ func _on_update_atk_timeout():
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 
-func init_knockback(amount, time, sender):
+func init_knockback(amount, force, sender):
 	if (is_in_atk_range and not grabbed and not agility_activated) or sender == self.global_position:
 		moving = false
 		knockbacked = true
-		knockback_force = amount
-		knockback_sender = sender
 		
-		self.add_child(knockback_timer_node.instantiate(), true)
-		var timer_node = get_child(get_child_count()-1)
-		timer_node.wait_time = time
-		timer_node.reset_knockback.connect(self._on_knockback_reset_timeout)
-		timer_node.start()
+		knockback_target_point = self.global_position + (sender.direction_to(self.global_position) * amount)
+		knockback_force = force
+		
+		self.add_child(knockback_controller_node.instantiate(), true)
+		var knockback_controller = get_child(-1)
+		knockback_controller.reparent(get_parent())
+		knockback_controller.target_point = knockback_target_point
+		knockback_controller.vel_multiplyer = force
+		knockback_controller.caller = self
+		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
-func apply_knockback(sender):
-	velocity = sender.direction_to(self.global_position) * knockback_force
+func apply_knockback(delta):
+	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 
-func _on_knockback_reset_timeout():
+func _on_knockback_reset():
 	knockbacked = false
 	if stun_timer.is_stopped():
 		set_idle()
