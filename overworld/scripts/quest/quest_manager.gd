@@ -1,16 +1,16 @@
 extends Node
 
 var quests : Dictionary = {
-	1 : preload("res://overworld/resources/a_to_b.tres"),
-	2 : preload("res://overworld/resources/try.tres"),
-	3 : preload("res://overworld/resources/the_bigger_they_are.tres")
+	
 }
 
 func _ready():
-	print(quests[1].title)
-	print(quests[1].description)
-	#quests[1].display_quest()
-	if quests[1].status == QuestStatus.of_type.available:
-		print("Puoi fare la missione!")
-	else:
-		print("Missione bloccata")
+	var dir = DirAccess.open("res://overworld/resources/")
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		var count = 0
+		while file_name != "":
+			if not dir.current_is_dir() and file_name.ends_with(".tres"):
+				quests[file_name.replace(".tres", "")] = load("res://overworld/resources/" + file_name)
+			file_name = dir.get_next()

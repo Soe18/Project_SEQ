@@ -19,11 +19,16 @@ signal round_changed() # segnale che manda alla GUI per incrementare il counter
 signal heal_between_rounds(amount) # segnale che manda al player per curarlo
 signal boss_defeted() # segnale che manda allo scene_manager per evocare il portale
 signal connect_boss_with_GUI(boss) # segnale che collega il boss alla barra della vita
+signal instantiate_pickup()
 
 var fighting # flag che determina quando esistono nemici
 var boss_is_defeted = false # flag che determina quando il boss è stato sconfitto
 var boss_spawned = false # flag che determina se il boss è spawnato
 var portal_spawned = false # flag che determina se il portale è spawnato
+
+var powerup_spawned = false
+var powerup_spawnable = true
+var powerup_picked = false
 
 @onready var time_between_rounds = $Round_cooldown
 @onready var boss_spawner = $Boss_spawner
@@ -40,20 +45,31 @@ func _ready():
 func _process(_delta):
 	fighting = false
 	var boss_present = false
+	var powerup_present = false
 	for i in get_children():
 		if "Enemy" in i.name:
 			fighting = true
 		if "Enemy" in i.name and is_boss_round():
 			boss_present = true
+		if "Powerup" in i.name:
+			powerup_present = true
 	
 	if boss_spawned and not boss_present:
 		boss_is_defeted = true
 	
-	if not boss_is_defeted:
-		if not fighting and time_between_rounds.is_stopped():
+	if powerup_spawned and not powerup_present:
+		powerup_picked = true
+	
+	if not boss_is_defeted or powerup_spawnable:
+		if not fighting and not powerup_spawned and powerup_spawnable:
+			emit_signal("instantiate_pickup")
+			powerup_spawned = true
+			powerup_picked = false
+			powerup_spawnable = false
+		elif not fighting and time_between_rounds.is_stopped() and powerup_picked:
 			time_between_rounds.start()
 	else:
-		if not portal_spawned:
+		if not portal_spawned and powerup_picked:
 			emit_signal("boss_defeted")
 			portal_spawned = true
 
@@ -147,3 +163,12 @@ func is_boss_round():
 		return true # ritorno vero
 	else: # altrimenti
 		return false # ritorno falso
+
+func _on_powerup_spawnable() -> void:
+	powerup_spawnable = true
+	powerup_picked = false
+	powerup_spawned = false
+
+func _on_powerup_handler_spawn_pickable(node : Variant) -> void:
+	node.reparent(self)
+	node.global_position = boss_spawner.global_position

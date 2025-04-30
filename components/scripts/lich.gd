@@ -2,7 +2,8 @@ extends CharacterBody2D
 
 var boss_name = "Kreegakaleet lu Gosata'ahm"
 
-@export var default_vit : int = 1500
+#@export var default_vit : int = 1500
+@export var default_vit : int = 15
 var current_vit = default_vit
 @export var default_str : int = 190
 var current_str = default_str
@@ -229,7 +230,7 @@ func _on_player_is_in_atk_range(is_in, body):
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
-			var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+			var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 			current_vit -= dmg_info[0]
 			emit_signal("set_health_bar", current_vit)
 			show_hitmarker("-" + str(dmg_info[0]), dmg_info[1])

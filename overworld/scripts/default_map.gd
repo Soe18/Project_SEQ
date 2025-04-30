@@ -21,13 +21,13 @@ func _ready():
 
 func _process(_delta):
 	if Input.is_action_just_pressed("base_atk") and player_in_area_to_change_char:
-		if QuestManager.quests[3].status == QuestStatus.of_type.hidden:
-			QuestManager.quests[3].display_quest()
-			QuestManager.quests[3].start_quest()
+		if QuestManager.quests["the_bigger_they_are"].status == QuestStatus.of_type.hidden:
+			QuestManager.quests["the_bigger_they_are"].display_quest()
+			QuestManager.quests["the_bigger_they_are"].start_quest()
 			leone_first_dialogue_bubble.visible = true
 			bubble_showing_time.start()
-		elif QuestManager.quests[3].status == QuestStatus.of_type.reached_goal:
-			QuestManager.quests[3].complete_quest()
+		elif QuestManager.quests["the_bigger_they_are"].status == QuestStatus.of_type.reached_goal:
+			QuestManager.quests["the_bigger_they_are"].complete_quest()
 			leone_second_dialogue_bubble.visible = true
 			bubble_showing_time.start()
 		else:

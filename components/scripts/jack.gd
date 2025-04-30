@@ -3,17 +3,17 @@ extends CharacterBody2D
 var char_name = "Jack"
 
 @export var default_vit : int = 140
-var current_vit = default_vit
+var current_vit : int = default_vit
 @export var default_str : int = 120
-var current_str = default_str
+var current_str : int = default_str
 @export var default_tem : int = 80
-var current_tem = default_tem
+var current_tem : int = default_tem
 @export var default_des : int = 150
-var current_des = default_des
+var current_des : int = default_des
 @export var default_pbc : int = 30
-var current_pbc = default_pbc
+var current_pbc : int = default_pbc
 @export var default_efc : float = 1.5
-var current_efc = default_efc
+var current_efc : float = default_efc
 
 @export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
@@ -41,6 +41,7 @@ signal launched_flashbang()
 var atk_state = Atk_States.IDLE
 
 var can_move = true
+var can_interact_with_something = false
 var grabbed = false
 var grab_marker
 var grab_sender
@@ -70,10 +71,11 @@ var gun_shake_strenght
 
 var changing_gun = false
 
-var SKILL2_WAIT_TIME = 35
-var SKILL1_WAIT_TIME = 26
-var ULTI_WAIT_TIME = 90
-var ULTI_DURATION = 20
+var EVADE_WAIT_TIME = 5.0
+var SKILL2_WAIT_TIME = 35.0
+var SKILL1_WAIT_TIME = 26.0
+var ULTI_WAIT_TIME = 90.0
+var ULTI_DURATION = 20.0
 
 var SHOTGUN_ROUNDS_COUNT = 6
 
@@ -107,6 +109,11 @@ var SHOTGUN_ROUNDS_COUNT = 6
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
+@onready var powerup_handler
+
+@warning_ignore("unused_parameter")
+@warning_ignore("unused_signal")
+
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
 		esegue il metodo per muoversi
@@ -115,9 +122,6 @@ var SHOTGUN_ROUNDS_COUNT = 6
 		esegue il metodo di evasione
 	se ha attivato la skill1
 		esegue il metodo di movimento della skill1'
-
-@warning_ignore("unused_parameter")
-@warning_ignore("unused_signal")
 
 func _ready():
 	emit_signal("set_health_bar", default_vit)
@@ -203,21 +207,25 @@ func switch_between_reload_animation(running):
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0:
+	if Input.is_action_pressed("base_atk") and not Input.is_action_just_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0:
+		if gun_prefix == "p_":
+			animation_player.play("shake_ammo")
+	
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0 and not can_interact_with_something:
 		if gun_prefix == "p_":
 			sprite.play("p_reload")
 			reset_axis()
 		else:
 			animation_player.play("shake_ammo")
 	
-	elif Input.is_action_pressed("base_atk") and not "change" in sprite.animation and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and atk_anim_finished and not changing_gun and gun_bullet_count > 0:
+	elif Input.is_action_pressed("base_atk") and not "change" in sprite.animation and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and atk_anim_finished and not changing_gun and gun_bullet_count > 0 and not can_interact_with_something:
 		can_move = false
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
 		sprite.play(gun_prefix+"shooting")
 		reset_axis()
 	
-	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"shooting" or sprite.animation == gun_prefix+"continue_shooting") and atk_anim_finished and not changing_gun  and shooting_delay_timer.is_stopped() and gun_bullet_count > 0:
+	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"shooting" or sprite.animation == gun_prefix+"continue_shooting") and atk_anim_finished and not changing_gun  and shooting_delay_timer.is_stopped() and gun_bullet_count > 0 and not can_interact_with_something:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		reaction_timer.stop()
@@ -419,6 +427,7 @@ func shoot(shotgun = false):
 	emit_signal("shake_camera", true, gun_shake_strenght)
 	instantiated_bullet.knockback_flag = gun_knockback_flag
 	instantiated_bullet.gun_stun_time = gun_stun_time
+	instantiated_bullet.powerup_handler = self.powerup_handler
 	get_parent().connect_player_projectile(instantiated_bullet)
 	instantiated_bullet.reparent(get_parent())
 
@@ -474,7 +483,7 @@ func _on_ulti_duration_timeout() -> void:
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
-	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 	var dmg = dmg_info[0]
 	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg

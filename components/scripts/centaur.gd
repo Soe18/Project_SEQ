@@ -246,7 +246,7 @@ func _on_player_is_in_atk_range(is_in, body):
 #		faccio partire il timer dello stun
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed:
-		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
@@ -257,7 +257,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 			emit_signal("shake_camera", true, dmg_info[2])
 		if sprinting and dmg >= 25:
 			sprinting = false
-		elif stun_sec > 0:
+		elif (dmg >= 30 or dmg <= 0) and stun_sec > 0:
 			sprint_collider.set_deferred("disabled", true)
 			is_performing_grab = false
 			moving = false

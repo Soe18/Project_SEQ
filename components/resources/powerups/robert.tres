@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Powerup" load_steps=2 format=3 uid="uid://c0s5q6gcsdsg"]
+
+[ext_resource type="Script" uid="uid://5w11p6jwfey5" path="res://components/scripts/powerups/powerup.gd" id="1_83vsu"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_83vsu")
+p_name = "Robert"
+description = "Increase VIT by &val&%"
+type = 1
+max_rarity = 4
+base = 20.0
+step = 7.5
+boost = 0.0
+metadata/_custom_type_script = "uid://5w11p6jwfey5"

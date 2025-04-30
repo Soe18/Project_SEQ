@@ -566,7 +566,7 @@ debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 one_shot = true
 
 [node name="Flee_timeout" type="Timer" parent="."]
-wait_time = 20.0
+wait_time = 10.0
 one_shot = true
 
 [node name="Heal_charge_time" type="Timer" parent="."]
@@ -597,6 +597,7 @@ target_desired_distance = 325.0
 path_max_distance = 10.0
 path_postprocessing = 1
 simplify_path = true
+simplify_epsilon = 2.0
 avoidance_enabled = true
 max_neighbors = 20
 max_speed = 1703.04

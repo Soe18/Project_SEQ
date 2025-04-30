@@ -22,6 +22,7 @@ config/icon="res://components/sprites/icon.svg"
 Menu="*res://overworld/scenes/menu.tscn"
 QuestManager="*res://overworld/scripts/quest/quest_manager.gd"
 QuestStatus="*res://overworld/scripts/quest/quest_status.gd"
+PowerupStats="*res://components/scripts/powerups/powerup_stats.gd"
 
 [display]
 

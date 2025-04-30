@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://d3fr55lfdcvjp"]
+[gd_scene load_steps=11 format=3 uid="uid://d3fr55lfdcvjp"]
 
 [ext_resource type="Script" uid="uid://rjp2dejwnqkq" path="res://components/scripts/basic_scene.gd" id="1_ohmap"]
 [ext_resource type="PackedScene" uid="uid://bm7culrlwfwta" path="res://scenes/GUI/basic_scene_GUI.tscn" id="2_87orx"]
+[ext_resource type="PackedScene" uid="uid://bk5ulwkaogwno" path="res://scenes/miscellaneous/powerup_handler.tscn" id="2_dphho"]
 [ext_resource type="AudioStream" uid="uid://du211hk4tj5vr" path="res://components/ost/The Legend of Zelda - Song of Storms  Windmill Hut 【Intense Symphonic Metal Cover】.mp3" id="2_drw8v"]
 [ext_resource type="AudioStream" uid="uid://dyaiglfa8wxco" path="res://components/ost/Beginning of the Journey - The Legend of Zelda A Link to the Past.mp3" id="3_a80dm"]
 [ext_resource type="Script" uid="uid://kd3qaonjbde6" path="res://components/scripts/GUI.gd" id="3_pywgm"]
@@ -35,6 +36,8 @@ y_sort_enabled = true
 script = ExtResource("1_ohmap")
 metadata/_edit_vertical_guides_ = []
 
+[node name="Powerup_handler" parent="." instance=ExtResource("2_dphho")]
+
 [node name="Ost_player" type="AudioStreamPlayer" parent="."]
 process_mode = 1
 stream = SubResource("AudioStreamInteractive_elj82")
@@ -45,9 +48,11 @@ bus = &"Music"
 process_mode = 3
 
 [node name="Round_GUI" parent="CanvasLayer" instance=ExtResource("2_87orx")]
+process_mode = 3
 visible = false
 
 [node name="GUI" type="Control" parent="CanvasLayer"]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

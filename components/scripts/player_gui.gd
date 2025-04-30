@@ -42,11 +42,15 @@ func _process(_delta):
 		alive = false
 		emit_signal("player_death")
 
-func _on_player_set_health_bar(vit):
+func _on_player_set_health_bar(vit : int):
 	if vit <= 0:
 		player.queue_free()
+	
+	if player.default_vit != healthbar.max_value:
+		healthbar.max_value = player.default_vit
+	
 	healthbar.value = vit
-	healthbar_label.text = str(vit) + "/" + str(max_health)
+	healthbar_label.text = str(vit) + "/" + str(player.default_vit)
 
 func _on_nathan_grab(is_grabbed):
 	if is_grabbed:

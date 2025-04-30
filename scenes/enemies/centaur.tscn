@@ -885,6 +885,7 @@ target_desired_distance = 120.0
 navigation_layers = 3
 path_postprocessing = 1
 simplify_path = true
+simplify_epsilon = 2.709
 avoidance_enabled = true
 radius = 31.0
 max_neighbors = 20
@@ -903,7 +904,7 @@ libraries = {
 autoplay = "RESET"
 
 [node name="Safe_timer" type="Timer" parent="."]
-wait_time = 20.0
+wait_time = 10.0
 one_shot = true
 
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]

@@ -212,5 +212,5 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_c681g")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_hqk6k")
+&"": SubResource("AnimationLibrary_hqk6k")
 }

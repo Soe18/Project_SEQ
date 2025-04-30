@@ -25,12 +25,19 @@ var active_enemy_container : Node2D
 @onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
 # variabile che contiene la gui specifica per quel player
 var player_gui
+@onready var powerup_handler : Node = $Powerup_handler
 
 var camera_follower = "res://scenes/miscellaneous/camera_follower.tscn"
 
-var tilesets = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn", "res://scenes/tilemaps/forest_tile_map.tscn", "res://scenes/tilemaps/deep_forest_tile_map.tscn"]
-var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn","res://scenes/miscellaneous/lightblue_enemy_container.tscn", "res://scenes/miscellaneous/forest_enemy_container.tscn", "res://scenes/miscellaneous/deep_forest_enemy_container.tscn"]
+var tilesets : Array = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn","res://scenes/tilemaps/forest_tile_map.tscn","res://scenes/tilemaps/deep_forest_tile_map.tscn"]
 
+var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn",
+						"res://scenes/miscellaneous/lightblue_enemy_container.tscn", 
+						"res://scenes/miscellaneous/forest_enemy_container.tscn", 
+						"res://scenes/miscellaneous/deep_forest_enemy_container.tscn"
+						]
+
+var portal_scene = preload("res://scenes/miscellaneous/travel_portal.tscn")
 var portal
 
 @warning_ignore("unused_parameter")
@@ -55,15 +62,19 @@ func _ready():
 	enemy_containers = new_container_order
 	
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
-	add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
-	active_tileset = get_child(get_child_count(true)-1)
+	self.add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
+	active_tileset = get_child(-1)
 	
 	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
-	active_enemy_container = get_child(get_child_count(true)-1)
+	active_enemy_container = get_child(-1)
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
 	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)
+	round_gui.powerup_spawnable.connect(active_enemy_container._on_powerup_spawnable)
+	active_enemy_container.instantiate_pickup.connect(powerup_handler._on_instantiate_pickable)
+	powerup_handler.spawn_pickable.connect(active_enemy_container._on_powerup_handler_spawn_pickable)
+	
 
 func _process(_delta):
 	if Input.is_action_just_pressed("fullscreen_toggle"):
@@ -71,17 +82,14 @@ func _process(_delta):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-	#
-	#if Input.is_action_just_pressed("reload_scene"):
-		## It reloads the dungeon, just for debuggin, this is ok :D
-		#get_tree().get_first_node_in_group("gm").load_dungeon()
 	
-	if Input.is_action_just_pressed("base_atk"):
-		for i in range(10):
-			var atk = randi_range(30, 999)
-			var skill_atk = randi_range(30, 999)
-			var tem = randi_range(30, 999)
-			print("atk: "+str(atk)+", skill atk: "+str(skill_atk)+", tem: "+str(tem)+" =  "+str(self.calculate_dmg(atk, skill_atk, tem, 0, 1, null)))
+	## stampa dei possibili output di danni per la formula, utile per testarla
+	#if Input.is_action_just_pressed("base_atk"):
+		#for i in range(10):
+			#var atk = randi_range(30, 999)
+			#var skill_atk = randi_range(30, 999)
+			#var tem = randi_range(30, 999)
+			#print("atk: "+str(atk)+", skill atk: "+str(skill_atk)+", tem: "+str(tem)+" =  "+str(self.calculate_dmg(atk, skill_atk, tem, 0, 1, null)))
 	
 	if player != null:
 		if not active_enemy_container.fighting:
@@ -127,6 +135,8 @@ func _on_gui_select_character(char):
 		player.scale = Vector2(1.4, 1.4)
 	activate_player_GUI() # funzione per attivare le GUI
 	connect_enemies_with_player() # connetto i nemici e il player
+	powerup_handler.player = player
+	player.powerup_handler = powerup_handler
 	gui.visible = false
 	canvas_layer.get_child(0).visible = true
 	Menu.game_status = Menu.GAME_STATUSES.dungeon
@@ -195,7 +205,7 @@ func connect_player_projectile(projectile):
 			projectile.take_dmg.connect(current_node._on_player_take_dmg)
 			projectile.inflict_knockback.connect(current_node.init_knockback)
 
-func calculate_dmg(str, atk_str, tem, pbc, efc, type):
+func calculate_dmg(str, atk_str, tem, pbc, efc, type, caller):
 	var crit = false
 	var shake_amount = 0
 	var dmg : int
@@ -208,6 +218,8 @@ func calculate_dmg(str, atk_str, tem, pbc, efc, type):
 		# aumento il danno in base all'efficienza del colpo critico (es. 15 * 1.5 = 15 + 7.5 = 22.5 = 23)
 		dmg = round(dmg * efc)
 		crit = true
+		if "Enemy" in caller.name:
+			powerup_handler.apply_powerup_boost("Vivian")
 	
 	if type == Attack_Types.PHYSICAL:
 		shake_amount = dmg / 3
@@ -253,7 +265,7 @@ func activate_player_GUI():
 
 func _on_boss_defeted():
 	# istanzio il portale
-	add_child(load("res://scenes/miscellaneous/travel_portal.tscn").instantiate(),true)
+	add_child(portal_scene.instantiate(),true)
 	# assegno alla variabile portal l'ultimo child della lista, cioè il nodo appena istanziato
 	portal = get_child(get_child_count()-1)
 	# metto il portale dove è spawnato il boss
@@ -262,6 +274,9 @@ func _on_boss_defeted():
 	portal.player = player
 	# collego il segnale del portale allo scene manager per cambiare stage
 	portal.change_stage.connect(self._on_change_stage)
+
+func _on_chamber_cleared():
+	powerup_handler
 
 func _on_change_stage():
 	boss_defeted_count += 1
@@ -289,3 +304,7 @@ func _on_change_stage():
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
 	active_enemy_container.connect_boss_with_GUI.connect(round_gui._on_boss_spawned)
 	active_enemy_container.heal_between_rounds.connect(player._on_get_healed)
+	
+	round_gui.powerup_spawnable.connect(active_enemy_container._on_powerup_spawnable)
+	active_enemy_container.instantiate_pickup.connect(powerup_handler._on_instantiate_pickable)
+	powerup_handler.spawn_pickable.connect(active_enemy_container._on_powerup_handler_spawn_pickable)

@@ -1,13 +1,15 @@
 extends Control
 
-var round_count = 0
+var round_count = 9
 @onready var round_displayer = $MarginContainer/PanelContainer/Round_displayer
 
 @onready var healthbar = $Boss_GUI/Health_bar
 @onready var healthbar_label = $Boss_GUI/Health_bar/Health_label
 
 @onready var animation_player = $AnimationPlayer
- 
+
+signal powerup_spawnable()
+
 var max_health
 
 var boss
@@ -19,9 +21,11 @@ func _ready():
 
 func _on_round_changed():
 	round_count += 1
-	if round_count == 6 and QuestManager.quests[2].status == QuestStatus.of_type.started:
-		QuestManager.quests[2].reach_goal_quest()
-		QuestManager.quests[2].complete_quest()
+	if round_count == 6 and QuestManager.quests["try"].status == QuestStatus.of_type.started:
+		QuestManager.quests["try"].reach_goal_quest()
+		QuestManager.quests["try"].complete_quest()
+	if round_count % 5 == 0:
+		emit_signal("powerup_spawnable")
 	round_displayer.text = "Ondata: " + str(round_count)
 
 func _on_boss_set_healthbar(vit):
@@ -34,8 +38,8 @@ func _on_boss_set_healthbar(vit):
 		boss.set_idle_timer.stop()
 		boss.stun_timer.stop()
 		animation_player.play("delete_boss_bar")
-		if QuestManager.quests[3].status == QuestStatus.of_type.started:
-			QuestManager.quests[3].reach_goal_quest()
+		if QuestManager.quests["the_bigger_they_are"].status == QuestStatus.of_type.started:
+			QuestManager.quests["the_bigger_they_are"].reach_goal_quest()
 	if vit > max_health:
 			vit = max_health
 	healthbar.value = vit

@@ -18,9 +18,6 @@ var current_efc = default_efc
 @export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
 
-enum Moving_States {IDLE, RUNNING}
-enum Move_Keys {UP, DOWN, LEFT, RIGHT}
-
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
@@ -45,9 +42,8 @@ var SKILL1_COLLIDER_POSITION_X
 
 var atk_state = Atk_States.IDLE
 
-var move_state = Moving_States.IDLE
-
 var can_move = true
+var can_interact_with_something = false
 var grabbed = false
 var grab_marker
 var grab_sender
@@ -123,6 +119,8 @@ var ult_moving_mod
 @onready var hit_flash_player = $Hit_flash_player
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
+
+@onready var powerup_handler
 
 'METODO CHE VIENE CHIAMATO AD OGNI FRAME
 	se il player si può muovere
@@ -201,7 +199,7 @@ func reset_axis():
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished:
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished and not can_interact_with_something:
 		can_move = false
 		bs_atk_collider.disabled = false
 		atk_anim_finished = false
@@ -309,7 +307,13 @@ func _on_skill_2_area_body_entered(body):
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type)
 		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
-		emit_signal("inflict_knockback", skill2_knockback_amount, skill2_knockback_force, self.global_position)
+		
+		var temp = [skill2_knockback_amount]
+		temp = powerup_handler.apply_powerup_boost("Alvin", temp)
+		if temp == null:
+			temp = [0]
+		
+		emit_signal("inflict_knockback", skill2_knockback_amount+temp[0], skill2_knockback_force, self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
@@ -320,7 +324,13 @@ func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type)
-		emit_signal("inflict_knockback", ult_knockback_amount, ult_knockback_force, self.global_position)
+		
+		var temp = [ult_knockback_amount]
+		temp = powerup_handler.apply_powerup_boost("Alvin", temp)
+		if temp == null:
+			temp = [0]
+		
+		emit_signal("inflict_knockback", ult_knockback_amount+temp[0], ult_knockback_force, self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -522,7 +532,7 @@ func evade():
 
 ' -- DIGEST SEGNALI NEMICI -- '
 func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
-	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 	var dmg = dmg_info[0]
 	show_hitmarker("-" + str(dmg), dmg_info[1])
 	current_vit -= dmg

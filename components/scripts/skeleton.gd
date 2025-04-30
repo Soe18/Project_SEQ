@@ -209,7 +209,7 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed and not parring:
-		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type)
+		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		current_vit -= dmg
 		if dmg > 0 and not dying:

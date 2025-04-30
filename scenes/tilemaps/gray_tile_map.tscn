@@ -1733,6 +1733,7 @@ texture = ExtResource("2_42pd3")
 [sub_resource type="TileSet" id="TileSet_5xdkc"]
 physics_layer_0/collision_layer = 3
 physics_layer_0/collision_mask = 3
+physics_layer_0/collision_priority = 99999.0
 physics_layer_1/collision_layer = 128
 physics_layer_1/collision_mask = 128
 terrain_set_0/mode = 0

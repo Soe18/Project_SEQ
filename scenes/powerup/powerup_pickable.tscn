@@ -1,0 +1,75 @@
+[gd_scene load_steps=8 format=3 uid="uid://e8dlarx2mhd4"]
+
+[ext_resource type="Script" uid="uid://d4m6nh3f0ow85" path="res://components/scripts/powerups/powerup_pickable.gd" id="1_s52ci"]
+[ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="2_nu28t"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vsghc"]
+radius = 15.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_s52ci"]
+radius = 106.019
+
+[sub_resource type="Animation" id="Animation_vsghc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_aw47s"]
+resource_name = "idle"
+length = 1.5
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -3.67), Vector2(0, 3.67)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6auq8"]
+_data = {
+&"RESET": SubResource("Animation_vsghc"),
+&"idle": SubResource("Animation_aw47s")
+}
+
+[node name="Powerup_pickable" type="StaticBody2D"]
+script = ExtResource("1_s52ci")
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+visible = false
+z_index = 1
+shape = SubResource("CircleShape2D_vsghc")
+disabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.074, 0.074)
+texture = ExtResource("2_nu28t")
+
+[node name="Pickup_range" type="Area2D" parent="."]
+
+[node name="Collider" type="CollisionShape2D" parent="Pickup_range"]
+shape = SubResource("CircleShape2D_s52ci")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_6auq8")
+}
+autoplay = "idle"
+
+[connection signal="body_entered" from="Pickup_range" to="." method="_on_pickup_range_body_entered"]
+[connection signal="body_exited" from="Pickup_range" to="." method="_on_pickup_range_body_exited"]

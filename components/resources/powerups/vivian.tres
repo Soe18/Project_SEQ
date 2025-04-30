@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Powerup" load_steps=2 format=3 uid="uid://cxjhtaauj6fwb"]
+
+[ext_resource type="Script" uid="uid://5w11p6jwfey5" path="res://components/scripts/powerups/powerup.gd" id="1_7o7ub"]
+
+[resource]
+script = ExtResource("1_7o7ub")
+p_name = "Vivian"
+description = "Quando il player effettua un CRIT, recupera il &val&% di VIT"
+type = 1
+max_rarity = 4
+base = 3.0
+step = 0.75
+boost = 0.0
+metadata/_custom_type_script = "uid://5w11p6jwfey5"
