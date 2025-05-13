@@ -16,6 +16,7 @@ bg_color = Color(1, 0, 0.0352941, 1)
 
 [node name="Nathan_GUI" type="Control"]
 process_mode = 1
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

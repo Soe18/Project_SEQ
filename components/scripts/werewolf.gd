@@ -121,7 +121,7 @@ func _physics_process(delta):
 				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
-				sprite.play("idle")
+				player_entered = true
 	elif not player_entered and not moving and sprite.animation != "howl":
 		sprite.play("idle")
 
@@ -234,7 +234,7 @@ func _on_player_is_in_atk_range(is_in, body):
 #		faccio partire il timer dello stun
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and not grabbed and not knockbacked:
-		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		
 		var rng = randi_range(0, 100)

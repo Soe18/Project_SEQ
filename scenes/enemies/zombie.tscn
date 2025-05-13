@@ -603,7 +603,6 @@ one_shot = true
 collision_mask = 3
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-visible = false
 shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 

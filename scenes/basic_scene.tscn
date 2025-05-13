@@ -116,5 +116,7 @@ theme_override_fonts/font = ExtResource("4_ai68a")
 theme_override_font_sizes/font_size = 44
 text = "Riprova"
 
+[connection signal="child_entered_tree" from="CanvasLayer" to="." method="_on_canvas_layer_child_entered_tree"]
+[connection signal="child_exiting_tree" from="CanvasLayer" to="." method="_on_canvas_layer_child_exiting_tree"]
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Exit" to="CanvasLayer/GUI" method="_on_exit_pressed"]
 [connection signal="pressed" from="CanvasLayer/GUI/GameOver_container/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/Retry" to="CanvasLayer/GUI" method="_on_retry_pressed"]

@@ -26,9 +26,9 @@ var boss_is_defeted = false # flag che determina quando il boss è stato sconfit
 var boss_spawned = false # flag che determina se il boss è spawnato
 var portal_spawned = false # flag che determina se il portale è spawnato
 
-var powerup_spawned = false
-var powerup_spawnable = true
-var powerup_picked = false
+var powerup_spawned = true
+var powerup_spawnable = false
+var powerup_picked = true
 
 @onready var time_between_rounds = $Round_cooldown
 @onready var boss_spawner = $Boss_spawner
@@ -75,7 +75,7 @@ func _process(_delta):
 
 # DIGEST DEL TIMER CHE DETERMINA QUANDO DEVE PARTIRE UNA NUOVA ONDATA
 func _on_round_cooldown_timeout():
-	var player = get_parent().player
+	var player = get_parent().get_parent().player
 	var heal_amount = round(player.default_vit / 4)
 	emit_signal("round_changed") # invio il segnale al round_gui per incremetare l'ondata
 	emit_signal("heal_between_rounds", heal_amount) # invio il segnale al player per curarsi di una certa quantità
@@ -91,7 +91,7 @@ func activate_markers():
 	active_markers.clear() # pulisco i marker attivi così da poter popolarlo correttamente
 	
 	# prendo il numero di ondata dalla round_gui
-	var round_count = get_parent().round_gui.round_count
+	var round_count = get_parent().get_parent().round_gui.round_count
 	
 	# determino il numero minimo di nemici arrotondando per difetto
 	var min_count = ceil(round_count/2)
@@ -157,7 +157,7 @@ func spawn_boss():
 # METODO CHE CONTROLLA SE E' IL ROUND IN CUI DEVE SPAWNARE IL BOSS
 func is_boss_round():
 	# prendo il numero di ondata dalla round_gui
-	var round_count = get_parent().round_gui.round_count 
+	var round_count = get_parent().get_parent().round_gui.round_count 
 	# se il round_count è > 0 ed è divisibile per n (ogni quanti round far spawnare il boss)
 	if round_count > 0 and round_count % 10 == 0: 
 		return true # ritorno vero

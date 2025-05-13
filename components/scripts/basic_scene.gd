@@ -4,7 +4,7 @@ var player
 var selected_character
 var paused = false
 var connected = false
-var boss_defeted_count = 3
+var boss_defeted_count = 0
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 @onready var Attack_Types = get_tree().get_first_node_in_group("gm").Attack_Types
@@ -29,20 +29,14 @@ var player_gui
 
 var camera_follower = "res://scenes/miscellaneous/camera_follower.tscn"
 
-var tilesets : Array = ["res://scenes/tilemaps/gray_tile_map.tscn","res://scenes/tilemaps/lightblue_tile_map.tscn","res://scenes/tilemaps/forest_tile_map.tscn","res://scenes/tilemaps/deep_forest_tile_map.tscn"]
-
-var enemy_containers = ["res://scenes/miscellaneous/gray_enemy_container.tscn",
-						"res://scenes/miscellaneous/lightblue_enemy_container.tscn", 
-						"res://scenes/miscellaneous/forest_enemy_container.tscn", 
-						"res://scenes/miscellaneous/deep_forest_enemy_container.tscn"
+var tilesets : Array = ["res://scenes/tilemaps/gray_tile_map.tscn",
+						#"res://scenes/tilemaps/lightblue_tile_map.tscn",
+						"res://scenes/tilemaps/forest_tile_map.tscn",
+						"res://scenes/tilemaps/deep_forest_tile_map.tscn"
 						]
 
 var portal_scene = preload("res://scenes/miscellaneous/travel_portal.tscn")
 var portal
-
-@warning_ignore("unused_parameter")
-@warning_ignore("unused_signal")
-@warning_ignore("shadowed_global_identifier")
 
 func _ready():
 	var temp : Array
@@ -52,21 +46,16 @@ func _ready():
 	#temp.shuffle()
 	
 	var new_tileset_order : Array
-	var new_container_order : Array
 	
 	for i in temp:
 		new_tileset_order.append(tilesets[i])
-		new_container_order.append(enemy_containers[i])
 	
 	tilesets = new_tileset_order
-	enemy_containers = new_container_order
 	
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
 	self.add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
 	active_tileset = get_child(-1)
-	
-	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
-	active_enemy_container = get_child(-1)
+	active_enemy_container = active_tileset.find_child("Enemy_container")
 	
 	active_enemy_container.round_changed.connect(round_gui._on_round_changed)
 	active_enemy_container.boss_defeted.connect(self._on_boss_defeted)
@@ -77,12 +66,6 @@ func _ready():
 	
 
 func _process(_delta):
-	if Input.is_action_just_pressed("fullscreen_toggle"):
-		if DisplayServer.window_get_mode(0) != DisplayServer.WINDOW_MODE_FULLSCREEN:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		else:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-	
 	## stampa dei possibili output di danni per la formula, utile per testarla
 	#if Input.is_action_just_pressed("base_atk"):
 		#for i in range(10):
@@ -121,7 +104,7 @@ func _on_gui_select_character(char):
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1.0, 1.0)
 	
-	add_child(load(camera_follower).instantiate())
+	add_child(load(camera_follower).instantiate(), true)
 	get_child(get_child_count()-1).player = player
 	player.camera = get_child(get_child_count()-1).camera
 	# impostazioni per la telecamera
@@ -173,6 +156,11 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			elif player.char_name == "Jack": # connetto il segnale del knockback
 				player.inflict_knockback.connect(current_node.init_knockback)
 			
+			if "Lich" in current_node.name:
+				for j in active_enemy_container.get_children():
+					if "Spawnpoint" in j.name: 
+						current_node.evocation_locations.append(j)
+			
 			# se il nodo è un mezzo-umano
 			if "Werewolf" in current_node.name:
 				for j in active_enemy_container.get_child_count(): # cicla per ogni figlio della scena
@@ -186,11 +174,6 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 			if "Centaur" in current_node.name:
 				current_node.grab_player.connect(player._on_enemy_grab)
 				current_node.inflict_knockback.connect(player.init_knockback)
-			
-			# se il nodo è il lich
-			if "Lich" in current_node.name:
-				# allora assegno i suoi marker di teletrasporto ai marker dell'enemy container attivo
-				current_node.possible_teleport_locations = active_enemy_container.markers
 			
 			# se il nodo è un boss
 			if "Boss" in current_node.name:
@@ -289,12 +272,9 @@ func _on_change_stage():
 	active_enemy_container.queue_free()
 	
 	# istanzio un nuovo nodo tileset e assegno quest'ultimo alla variabile del tileset attivo
-	add_child(load(tilesets[boss_defeted_count]).instantiate(),true)
-	active_tileset = get_child(get_child_count(true)-1)
-	
-	# istanzio un nuovo nodo enemy_container e assegno quest'ultimo alla variabile enemy_container attivo
-	add_child(load(enemy_containers[boss_defeted_count]).instantiate(),true)
-	active_enemy_container = get_child(get_child_count(true)-1)
+	add_child(load(tilesets[boss_defeted_count]).instantiate(), true)
+	active_tileset = get_child(-1)
+	active_enemy_container = get_child(-1).find_child("Enemy_container")
 	
 	player.global_position = active_enemy_container.boss_spawner.global_position
 	portal.global_position = active_enemy_container.boss_spawner.global_position
@@ -308,3 +288,13 @@ func _on_change_stage():
 	round_gui.powerup_spawnable.connect(active_enemy_container._on_powerup_spawnable)
 	active_enemy_container.instantiate_pickup.connect(powerup_handler._on_instantiate_pickable)
 	powerup_handler.spawn_pickable.connect(active_enemy_container._on_powerup_handler_spawn_pickable)
+
+func _on_canvas_layer_child_entered_tree(node: Node) -> void:
+	if canvas_layer:
+		for i in canvas_layer.get_children():
+			i.visible = not i.visible
+
+func _on_canvas_layer_child_exiting_tree(node: Node) -> void:
+	if canvas_layer:
+		for i in canvas_layer.get_children():
+			i.visible = not i.visible

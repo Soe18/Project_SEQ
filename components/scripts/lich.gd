@@ -2,8 +2,8 @@ extends CharacterBody2D
 
 var boss_name = "Kreegakaleet lu Gosata'ahm"
 
-#@export var default_vit : int = 1500
-@export var default_vit : int = 15
+@export var default_vit : int = 1500
+#@export var default_vit : int = 15
 var current_vit = default_vit
 @export var default_str : int = 190
 var current_str = default_str
@@ -35,6 +35,9 @@ var knockback_force
 var spawning = true # variabile a true finché non finisce l'animazione di spawning, altrimenti false
 var dying = false # variabile a false finché il boss è in vita, poi a true per l'animazione di death
 
+var MIN_DISTANCE : int = 10
+var MAX_DISTANCE : int = 30
+
 signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal set_health_bar(vit)
 signal got_grabbed(is_grabbed)
@@ -62,8 +65,6 @@ var choosed_atk
 @onready var third_round_timer = $Explosions_container/Third_round_timer
 @onready var reset_explosions = $Explosions_container/Reset
 
-@onready var evocation_container = $Evocation_container
-
 @onready var teleport_cooldown = $Teleport_Cooldown
 @onready var witchcraft_cooldown = $Witchcraft_Cooldown
 @onready var death_sphere_cooldown = $Death_sphere_Cooldown
@@ -81,7 +82,7 @@ var choosed_atk
 var player_entered = true
 var player_in_atk_range = false
 
-var possible_teleport_locations = []
+var ground_tilemap_layer : TileMapLayer
 
 # array da popolare nel ready, in modo da essere scalabile
 var first_round_explosions = []
@@ -90,19 +91,22 @@ var third_round_explosions = []
 var evocation_locations = []
 
 # array che contiene il percorso delle scene dei nemici evocabili, da rivedere
-var evocable_entities = ["res://scenes/enemies/zombie.tscn","res://scenes/enemies/skeleton.tscn","res://scenes/enemies/giant.tscn"]
+var evocable_entities = [
+						"res://scenes/enemies/zombie.tscn",
+						"res://scenes/enemies/skeleton.tscn",
+						"res://scenes/enemies/giant.tscn"
+						]
 
 # contatore per evitare l'istanzia di due nodi con lo stesso nome, casini nei connect
 var evocation_count = 0
 
-'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
-	setta la vita attuale a quella massima
-	imposta il valore massimo della barra della salute al massimo
-	setta la barra della salute'
+'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO'
 
 func _ready():
 	emit_signal("set_health_bar", current_vit)
 	sprite.play("spawn")
+	
+	ground_tilemap_layer = get_parent().get_parent().find_child("Ground",true,false)
 	
 	# popolo l'array con i marker del primo round di esplosioni
 	for i in first_round_container.get_children():
@@ -115,10 +119,6 @@ func _ready():
 	# popolo l'array con i marker del terzo round di esplosioni
 	for i in third_round_container.get_children():
 		third_round_explosions.append(i)
-	
-	# popolo l'array con i marker delle evocazioni
-	for i in evocation_container.get_children():
-		evocation_locations.append(i)
 	
 
 'METODO CHE VIENE PROCESSATO PER FRAME
@@ -133,6 +133,7 @@ func _physics_process(delta):
 	if dying: # se sta morendo ignoro qualsiasi altro processo
 		moving = false # non si deve muovere
 		sprite.play("death") # faccio partire l'animazione di morte
+		
 	elif not spawning: # se non sta spawnando e non è morto allora sta combattendo
 		if knockbacked:
 			apply_knockback(delta)
@@ -159,10 +160,11 @@ func _physics_process(delta):
 				if choosed_atk == Possible_Attacks.EVOCATION and evocation_cooldown.is_stopped() and stun_timer.is_stopped():
 					sprite.play("evocation") # faccio partire l'animazione del lich, vedi _on_sprite_animation_finished
 		elif not player_entered and moving: # se il player non è individuabile e può muoversi allora lo muovo e basta
-			if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
-					teleport()
-			else:
-				sprite.play("idle")
+			if is_instance_valid(player):
+				if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
+						teleport()
+				else:
+					player_entered = true
 		elif not player_entered and not moving: # se il player non è dentro e non può muoversi
 			sprite.play("idle") # lo metto in idle, non ha niente da fare tanto
 
@@ -192,6 +194,8 @@ func choose_atk():
 		choosed_atk = Possible_Attacks.EXPLOSIONS # 15%
 	else:
 		choosed_atk = Possible_Attacks.WITCHCRAFT # 25%
+	
+	#choosed_atk = Possible_Attacks.EVOCATION
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -230,7 +234,7 @@ func _on_player_is_in_atk_range(is_in, body):
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
-			var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+			var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 			current_vit -= dmg_info[0]
 			emit_signal("set_health_bar", current_vit)
 			show_hitmarker("-" + str(dmg_info[0]), dmg_info[1])
@@ -263,8 +267,9 @@ func _on_player_grab(is_been_grabbed, is_flipped, grab_position_marker):
 	setto il movimento a true'
 
 func _on_stun_timeout():
-	choosed_atk = Possible_Attacks.IDLE
-	set_idle()
+	if not dying:
+		choosed_atk = Possible_Attacks.IDLE
+		set_idle()
 
 # -------- SIGNAL DIGEST -------- #
 
@@ -304,13 +309,32 @@ func _on_sprite_2d_animation_finished():
 
 # DIGEST DEL TIMER CHE SEGNALA DI SCEGLIERE UN ATTACCO
 func _on_update_atk_timeout():
-	choose_atk()
-	$Update_Atk.start()
+	if not dying:
+		choose_atk()
+		$Update_Atk.start()
 
 # METODO CHE FA TELETRASPORTARE IL LICH IN UNO DEI WAYPOINT
 func teleport():
-	var current_tp = possible_teleport_locations.pick_random()
-	self.position = current_tp.global_position
+	var target_coord_vector : Vector2
+	var cell_position : Vector2i
+	var cell_properties
+	var cont : int = 0
+	var interval_reduction : int = 0
+	
+	while cell_properties == null:
+		#cell_position = ground_tilemap_layer.local_to_map(Vector2i(randi_range(self.position.x + MIN_DISTANCE, self.position.x + MAX_DISTANCE) * [-1, 1].pick_random(),randi_range(self.position.y + MIN_DISTANCE, self.position.y + MAX_DISTANCE) * [-1, 1].pick_random())) / 2
+		cell_position = ground_tilemap_layer.local_to_map(self.position) / 2
+		if cont == 5:
+			cont = 0
+			interval_reduction += 5
+		cell_position = Vector2i(randi_range(cell_position.x + MIN_DISTANCE - interval_reduction, cell_position.x + MAX_DISTANCE - interval_reduction) * [-1, 1].pick_random(), randi_range(cell_position.y + MIN_DISTANCE - interval_reduction, cell_position.y + MAX_DISTANCE - interval_reduction) * [-1, 1].pick_random())
+		
+		print(str(cell_position))
+		cell_properties = ground_tilemap_layer.get_cell_tile_data(cell_position)
+		cont += 1
+	
+	target_coord_vector = ground_tilemap_layer.map_to_local(cell_position)
+	self.position = target_coord_vector
 	teleport_cooldown.start()
 
 # METODO CHE FA PARTIRE L'ANIMAZIONE DELL'ATTACCO WITCHCRAFT
@@ -398,7 +422,8 @@ func _on_third_round_timer_timeout():
 
 # DIGEST DEL SEGNALE DI RESET DELLE ESPLOSIONI
 func _on_reset_timeout():
-	set_idle()
+	if not dying:
+		set_idle()
 
 # METODO DELL'ATTACCO EVOCATION
 func evocation():
@@ -412,7 +437,7 @@ func evocation():
 	if current_vit <= default_vit and current_vit > _85_health:
 		#evoca uno zombie in un posto casuale
 		add_child(load(evocable_entities[0]).instantiate(),true)
-		var evocated_entity = get_child(get_child_count()-1,true)
+		var evocated_entity = get_child(-1,true)
 		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
@@ -421,15 +446,15 @@ func evocation():
 	if current_vit <= _85_health and current_vit > _70_health:
 		#evoca due zombie uno alla posizione 0 e l'altro alla posizione 1
 		add_child(load(evocable_entities[0]).instantiate(),true)
-		var evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[0].position
+		var evocated_entity = get_child(-1)
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[1]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[1].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
@@ -438,21 +463,21 @@ func evocation():
 		#evoca due zombie e uno scheletro nelle tre posizioni
 		add_child(load(evocable_entities[0]).instantiate(),true)
 		var evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[0].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[0]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[1].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[1]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[2].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
@@ -461,7 +486,7 @@ func evocation():
 		#evoca un gigante nella posizione 2
 		add_child(load(evocable_entities[2]).instantiate(),true)
 		var evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[2].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
@@ -470,14 +495,14 @@ func evocation():
 		#evoca un gigante nella posizione 2 e uno zombie nella posizione 0
 		add_child(load(evocable_entities[2]).instantiate(),true)
 		var evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[2].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[0]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[0].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
@@ -486,27 +511,27 @@ func evocation():
 		#evoca tutte le entità in tutte le posizioni in ordine di indice crescente
 		add_child(load(evocable_entities[0]).instantiate(),true)
 		var evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[0].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[1]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[1].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 		
 		add_child(load(evocable_entities[2]).instantiate(),true)
 		evocated_entity = get_child(get_child_count()-1)
-		evocated_entity.position = evocation_locations[2].position
+		evocated_entity.position = evocation_locations.pick_random().position
 		evocation_count += 1
 		evocated_entity.name += "_"+str(evocation_count)
 		evocated_entity.reparent(get_parent())
 	
 	# faccio partire il metodo dello scene manager per connettere i nemici spawnati con il player
-	get_parent().get_parent().connect_enemies_with_player()
+	get_parent().get_parent().get_parent().connect_enemies_with_player()
 	evocation_cooldown.start() # faccio partire il cooldown
 
 
@@ -543,7 +568,7 @@ func apply_knockback(delta):
 
 func _on_knockback_reset():
 	knockbacked = false
-	if stun_timer.is_stopped():
+	if stun_timer.is_stopped() and not dying:
 		set_idle()
 
 func _on_change_stats(stat, amount, time_duration, ally_sender):

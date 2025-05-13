@@ -20,7 +20,7 @@ func _ready():
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
 
 func _process(_delta):
-	if Input.is_action_just_pressed("base_atk") and player_in_area_to_change_char:
+	if Input.is_action_just_pressed("ui_accept") and player_in_area_to_change_char:
 		if QuestManager.quests["the_bigger_they_are"].status == QuestStatus.of_type.hidden:
 			QuestManager.quests["the_bigger_they_are"].display_quest()
 			QuestManager.quests["the_bigger_they_are"].start_quest()

@@ -1271,6 +1271,7 @@ _data = {
 [node name="CharacterBody2D" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_priority = 99999.0
 motion_mode = 1
 script = ExtResource("1_4tu1l")
 damage_node = ExtResource("2_wfp2a")

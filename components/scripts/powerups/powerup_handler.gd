@@ -25,6 +25,7 @@ func _on_instantiate_pickable():
 	var pickable = get_child(-1)
 	pickable.handler = self
 	pickable.player = player
+	pickable.canvas_layer = get_parent().canvas_layer
 	for i in range(3):
 		var pulled_powerup = possible_powerups.pick_random()
 		var pulled_rar = PowerupStats.rar.find_key(randi_range(0, 4))

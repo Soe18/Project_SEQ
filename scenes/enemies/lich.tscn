@@ -439,6 +439,18 @@ animations = [{
 "texture": SubResource("AtlasTexture_lh2dt")
 }, {
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_2qmy8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_coqsy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fh66s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lh2dt")
+}, {
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_3lfpa")
 }],
 "loop": false,
@@ -901,7 +913,7 @@ z_index = 1
 material = SubResource("ShaderMaterial_41dip")
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_7kgit")
-animation = &"death"
+animation = &"spawn"
 autoplay = "spawn"
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
@@ -1015,18 +1027,6 @@ one_shot = true
 wait_time = 1.5
 one_shot = true
 
-[node name="Evocation_container" type="Node2D" parent="."]
-visible = false
-
-[node name="Evocation_location" type="Marker2D" parent="Evocation_container"]
-position = Vector2(150, 0)
-
-[node name="Evocation_location2" type="Marker2D" parent="Evocation_container"]
-position = Vector2(-150, 0)
-
-[node name="Evocation_location3" type="Marker2D" parent="Evocation_container"]
-position = Vector2(0, 190)
-
 [node name="Stun" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
@@ -1044,7 +1044,6 @@ wait_time = 2.0
 one_shot = true
 
 [node name="Teleport_Cooldown" type="Timer" parent="."]
-wait_time = 10.0
 one_shot = true
 
 [node name="Witchcraft_Cooldown" type="Timer" parent="."]

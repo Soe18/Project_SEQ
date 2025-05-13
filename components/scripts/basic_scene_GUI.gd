@@ -1,6 +1,6 @@
 extends Control
 
-var round_count = 9
+var round_count = 0
 @onready var round_displayer = $MarginContainer/PanelContainer/Round_displayer
 
 @onready var healthbar = $Boss_GUI/Health_bar

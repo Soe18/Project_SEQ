@@ -1,0 +1,67 @@
+[gd_scene load_steps=3 format=3 uid="uid://croeh76erog3o"]
+
+[ext_resource type="Theme" uid="uid://b4nldgljpi3dj" path="res://components/resources/themes/powerup_dialog.tres" id="1_twsqr"]
+[ext_resource type="Script" uid="uid://yclsfcs1bk7e" path="res://components/scripts/powerup_dialog.gd" id="2_lofdk"]
+
+[node name="Powerup_Dialog" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_twsqr")
+script = ExtResource("2_lofdk")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -302.5
+offset_top = -83.5
+offset_right = 302.5
+offset_bottom = 83.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="BoxContainer" type="BoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+vertical = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/BoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Scegli un Potenziamento:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Name, Rarity"
+
+[node name="Button2" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Name, Rarity"
+
+[node name="Button3" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Name, Rarity"
+
+[connection signal="pressed" from="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer/Button2" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="MarginContainer/PanelContainer/MarginContainer/BoxContainer/VBoxContainer/Button3" to="." method="_on_button_3_pressed"]

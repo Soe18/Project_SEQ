@@ -8,7 +8,7 @@ signal select_character(char)
 @warning_ignore("unused_signal")
 
 func _ready():
-	# non best solution lo so però è la più semplice e veloce
+	# non la migliore soluzione, lo so, però è la più semplice e veloce
 	if rufus_button: # controllo se almeno un pulsante esiste, se si sono nell'overworld, altrimenti no
 		#rufus_button.grab_focus()
 		jack_button.grab_focus()

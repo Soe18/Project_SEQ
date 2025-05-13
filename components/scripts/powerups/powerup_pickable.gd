@@ -2,19 +2,28 @@ extends StaticBody2D
 
 var player
 var handler
+var canvas_layer
+
+var powerup_dialog_scene = preload("res://scenes/GUI/powerup_dialog.tscn")
 
 var pulled_powerups : Array
 var pulled_rarities : Array
 
 var player_in_range = false
 
-signal new_powerup(powerup, rarity)
-
 func _physics_process(_delta: float) -> void:
-	if Input.is_action_just_pressed("base_atk") and player_in_range:
+	if Input.is_action_just_pressed("ui_accept") and player_in_range and player.can_move:
 		player.can_move = false
-		handler.new_powerup(pulled_powerups[0], pulled_rarities[0])
-		await get_tree().create_timer(0.1).timeout
+		var powerup_dialog_instance = powerup_dialog_scene.instantiate()
+		powerup_dialog_instance.pows = pulled_powerups
+		powerup_dialog_instance.rars = pulled_rarities
+		powerup_dialog_instance.new_powerup.connect(handler.new_powerup)
+		canvas_layer.add_child(powerup_dialog_instance)
+		Menu.game_status = Menu.GAME_STATUSES.unopenable
+		
+		await powerup_dialog_instance.tree_exiting
+		
+		Menu.game_status = Menu.GAME_STATUSES.dungeon
 		player.can_move = true
 		player.can_interact_with_something = false
 		self.queue_free()

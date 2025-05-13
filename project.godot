@@ -12,6 +12,7 @@ config_version=5
 
 config/name="Project_SEQ"
 run/main_scene="res://overworld/scenes/game_manager.tscn"
+config/auto_accept_quit=false
 config/features=PackedStringArray("4.4", "GL Compatibility")
 run/max_fps=60
 boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 1)
@@ -26,10 +27,11 @@ PowerupStats="*res://components/scripts/powerups/powerup_stats.gd"
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=360
-window/size/mode=2
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=3
 window/size/initial_position_type=3
+window/energy_saving/keep_screen_on=false
 window/custom_image=""
 window/defaults/default_clear_color=Color(0.309804, 0.309804, 0.309804, 1)
 
@@ -49,6 +51,10 @@ import/fbx/enabled=false
 [global_group]
 
 gm="Here should be placed only GameManager"
+
+[gui]
+
+theme/custom_font="uid://ct7fhrwy7parr"
 
 [importer_defaults]
 

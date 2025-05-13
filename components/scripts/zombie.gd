@@ -121,14 +121,14 @@ func _physics_process(delta):
 		if choosed_atk == Possible_Attacks.SPRINT and sprint_cooldown.is_stopped() and not sprinting and $Stun.is_stopped():
 			sprint()
 	elif not player_entered and moving:
-		if player:
+		if is_instance_valid(player):
 			if not navigation_agent.is_navigation_finished():
 				sprite.play("running")
 				target_position = navigation_agent.target_position
 				velocity = global_position.direction_to(target_position) * current_des
 				move_and_slide()
 			else:
-				sprite.play("idle")
+				player_entered = true
 	elif not player_entered and not moving:
 		sprite.play("idle")
 
@@ -232,7 +232,7 @@ func _on_player_is_in_atk_range(is_in, body):
 
 func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 	if is_in_atk_range and !grabbed:
-		var dmg_info = get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		show_hitmarker("-" + str(dmg), dmg_info[1])
 		current_vit -= dmg
