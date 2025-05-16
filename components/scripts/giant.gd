@@ -76,7 +76,6 @@ var PUNCH_EFFECT_POSITION_X
 var BODY_COLLIDER_POSITION_X
 var BODY_COLLIDER_ROTATION
 
-var player_entered = true
 var player_in_atk_range = false
 
 #METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -107,25 +106,16 @@ func _physics_process(delta):
 		apply_knockback(delta)
 	elif grabbed:
 		is_grabbed()
-	elif player_entered and moving and not attacking:
+	elif is_instance_valid(player) and moving and not attacking:
 		chase_player()
 		if choosed_atk == Possible_Attacks.PUNCH and punch_cooldown.is_stopped():
 			punch()
 		if choosed_atk == Possible_Attacks.EARTHQUAKE and earthquake_cooldown.is_stopped() and stun_timer.is_stopped():
 			earthquake()
-	elif not player_entered and moving:
-		if is_instance_valid(player):
-			if not navigation_agent.is_navigation_finished():
-				sprite.play("running")
-				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * current_des
-				move_and_slide()
-			else:
-				player_entered = true
-	elif not player_entered and not moving and not attacking:
+	elif not is_instance_valid(player) and not moving:
+		set_idle()
+	elif not is_instance_valid(player) and moving:
 		sprite.play("idle")
-		punch_effect.play("idle")
-		earthquake_effect.play("idle")
 
 'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
 	salvo la posizione attuale del player
@@ -294,30 +284,6 @@ func set_health_bar():
 	elif current_vit > default_vit:
 		current_vit = default_vit
 
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è entrato'
-
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è uscito'
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
 func _on_punch_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
@@ -380,7 +346,7 @@ func _on_effect_frame_changed():
 
 # FUNZIONE PER L'ATTACCO TERREMOTO'
 func earthquake():
-	if player_entered and stun_timer.is_stopped() and not grabbed:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed:
 		earthquake_cooldown.start()
 		attacking = true
 		moving = false
@@ -409,6 +375,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 
 func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed:
+		velocity = Vector2(0, 0)
 		moving = false
 		knockbacked = true
 		
@@ -424,6 +391,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

@@ -79,7 +79,6 @@ var choosed_atk
 @onready var update_atk_timer = $Update_Atk
 @onready var set_idle_timer = $Inhale_time
 
-var player_entered = true
 var player_in_atk_range = false
 
 var ground_tilemap_layer : TileMapLayer
@@ -137,9 +136,8 @@ func _physics_process(delta):
 	elif not spawning: # se non sta spawnando e non è morto allora sta combattendo
 		if knockbacked:
 			apply_knockback(delta)
-		elif player_entered and moving: # se vede il player (quindi è vivo) e può muoversi (non è stunnato)
-			if player and not grabbed: # se esiste il player e non è grabbato gestisco gli attacchi
-				
+		elif is_instance_valid(player) and moving: # se vede il player (quindi è vivo) e può muoversi (non è stunnato)
+			if not grabbed: # se esiste il player e non è grabbato gestisco gli attacchi
 				# se l'attacco è TELEPORT e il cooldown è finito
 				if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
 					teleport() # faccio partire il metodo teleport()
@@ -159,13 +157,9 @@ func _physics_process(delta):
 				# se l'attacco è EVOCATION e il cooldown è finito
 				if choosed_atk == Possible_Attacks.EVOCATION and evocation_cooldown.is_stopped() and stun_timer.is_stopped():
 					sprite.play("evocation") # faccio partire l'animazione del lich, vedi _on_sprite_animation_finished
-		elif not player_entered and moving: # se il player non è individuabile e può muoversi allora lo muovo e basta
-			if is_instance_valid(player):
-				if choosed_atk == Possible_Attacks.TELEPORT and teleport_cooldown.is_stopped():
-						teleport()
-				else:
-					player_entered = true
-		elif not player_entered and not moving: # se il player non è dentro e non può muoversi
+		elif not is_instance_valid(player) and not moving: # se il player non è individuabile e può muoversi allora lo muovo e basta
+			set_idle()
+		elif not is_instance_valid(player) and moving: # se il player non è dentro e non può muoversi
 			sprite.play("idle") # lo metto in idle, non ha niente da fare tanto
 
 # METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -538,16 +532,9 @@ func evocation():
 
 # //////////// AREA COMUNE TRA NODI //////////// #
 
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
 func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed:
+		velocity = Vector2(0, 0)
 		moving = false
 		knockbacked = true
 		
@@ -563,6 +550,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

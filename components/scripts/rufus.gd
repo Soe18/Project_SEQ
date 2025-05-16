@@ -144,7 +144,7 @@ func _physics_process(delta):
 		is_grabbed()
 	if can_move:
 		move(delta)
-	if stun_timer.is_stopped():
+	if stun_timer.is_stopped() and not can_interact_with_something:
 		atk_handler()
 	if is_evading:
 		evade()
@@ -199,7 +199,7 @@ func reset_axis():
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished and not can_interact_with_something:
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished:
 		can_move = false
 		bs_atk_collider.disabled = false
 		atk_anim_finished = false
@@ -428,7 +428,8 @@ func _on_effect_frame_changed():
 
 # METODO CHE FA MUOVERE LO SPRITE IN ALTO DURANTE L'ANIMAZIONE DELLA ULTI #
 func ult_moving():
-	body_collider.set_deferred("disabled", true)
+	self.set_collision_layer_value(1, false)
+	self.set_collision_mask_value(2, false)
 	sprite.z_index = 1
 	sprite.position.y += ult_moving_mod
 	if sprite.flip_h:
@@ -444,38 +445,38 @@ func ult_moving():
 
 #  -- set_idle mi permette di resettare il player allo stato di idle --  #
 func _on_set_idle():
-	reset_axis()
-	
-	atk_state = Atk_States.IDLE
-	
-	self.rotation_degrees = 0
-	sprite.z_index = 0
-	sprite.flip_v = false
-	
-	sprite.play("idle")
-	skill1_effect.play("idle")
-	skill2_effect.play("idle")
-	ult_effect.play("idle")
-	
-	bs_atk_collider.set_deferred("disabled", true)
-	skill1_collider.set_deferred("disabled", true)
-	skill2_collider.set_deferred("disabled", true)
-	eva_collider.set_deferred("disabled", true)
-	ult_collider.set_deferred("disabled", true)
-	
-	body_collider.set_deferred("disabled", false)
-	
-	self.set_collision_layer_value(1, true)
-	self.set_collision_layer_value(2, false)
-	
-	self.set_collision_mask_value(1, true)
-	self.set_collision_mask_value(2, false)
-	
-	can_move = true
-	is_evading = false
-	is_moving_ult = false
-	atk_anim_finished = true
-	sprite.position = Vector2.ZERO
+	if not grabbed:
+		reset_axis()
+		
+		atk_state = Atk_States.IDLE
+		
+		self.rotation_degrees = 0
+		sprite.z_index = 0
+		sprite.flip_v = false
+		
+		sprite.play("idle")
+		skill1_effect.play("idle")
+		skill2_effect.play("idle")
+		ult_effect.play("idle")
+		
+		bs_atk_collider.set_deferred("disabled", true)
+		skill1_collider.set_deferred("disabled", true)
+		skill2_collider.set_deferred("disabled", true)
+		eva_collider.set_deferred("disabled", true)
+		ult_collider.set_deferred("disabled", true)
+		
+		body_collider.set_deferred("disabled", false)
+		
+		self.set_collision_layer_value(1, true)
+		
+		self.set_collision_mask_value(2, true)
+		self.set_collision_mask_value(3, true)
+		
+		can_move = true
+		is_evading = false
+		is_moving_ult = false
+		atk_anim_finished = true
+		sprite.position = Vector2.ZERO
 
 func _on_ult_time_timeout():
 	emit_signal("set_idle")
@@ -501,9 +502,8 @@ func _on_combo_time_timeout():
 func evade():
 	velocity = Vector2.ZERO
 	self.set_collision_layer_value(1, false)
-	self.set_collision_layer_value(2,true)
-	self.set_collision_mask_value(1, false)
-	self.set_collision_mask_value(2, true)
+	self.set_collision_mask_value(2, false)
+	
 	if axis.x == 0 and axis.y < 0:
 		velocity.y += -evade_amount
 	elif axis.x == 0 and axis.y > 0:
@@ -556,9 +556,7 @@ func _on_enemy_grab(is_been_grabbed, grab_position_marker, sender):
 		grabbed = true
 		
 		self.set_collision_layer_value(1, false)
-		self.set_collision_layer_value(2, true)
-		self.set_collision_mask_value(1, false)
-		self.set_collision_mask_value(2, true)
+		self.set_collision_mask_value(2, false)
 		
 		grab_marker = grab_position_marker
 		grab_sender = sender
@@ -594,6 +592,7 @@ func _on_get_healed(amount):
 
 func init_knockback(amount, force, sender):
 	if not grabbed:
+		velocity = Vector2(0, 0)
 		can_move = false
 		knockbacked = true
 		
@@ -611,6 +610,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

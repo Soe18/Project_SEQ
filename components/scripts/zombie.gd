@@ -82,7 +82,6 @@ var sprinting = false
 @onready var bite_cooldown = $Bite_Cooldown
 @onready var sprint_cooldown = $Sprint_Cooldown
 
-var player_entered = true
 var player_in_atk_range = false
 
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -114,22 +113,15 @@ func _physics_process(delta):
 		is_grabbed()
 	elif sprinting:
 		sprint_to_player()
-	elif player_entered and moving:
+	elif is_instance_valid(player) and moving:
 		chase_player()
 		if choosed_atk == Possible_Attacks.BITE and bite_cooldown.is_stopped():
 			bite()
 		if choosed_atk == Possible_Attacks.SPRINT and sprint_cooldown.is_stopped() and not sprinting and $Stun.is_stopped():
 			sprint()
-	elif not player_entered and moving:
-		if is_instance_valid(player):
-			if not navigation_agent.is_navigation_finished():
-				sprite.play("running")
-				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * current_des
-				move_and_slide()
-			else:
-				player_entered = true
-	elif not player_entered and not moving:
+	elif not is_instance_valid(player) and not moving:
+		set_idle()
+	elif not is_instance_valid(player) and moving:
 		sprite.play("idle")
 
 'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -322,14 +314,6 @@ func set_idle():
 		sprint_charge_time.stop()
 		sprite.play("idle")
 
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
 func _on_bite_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
@@ -356,14 +340,14 @@ func _on_effect_animation_finished():
 	set_idle()
 
 func bite():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not sprinting:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not sprinting:
 		moving = false
 		bite_effect.play("effect")
 		sprite.play("attack")
 	bite_cooldown.start()
 
 func sprint():
-	if player_entered and stun_timer.is_stopped() and not grabbed and not sprinting:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed and not sprinting:
 		sprite.play("charging_sprint")
 		moving = false
 		sprint_charge_time.start()
@@ -388,6 +372,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 
 func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed:
+		velocity = Vector2(0, 0)
 		moving = false
 		sprinting = false
 		knockbacked = true
@@ -406,6 +391,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

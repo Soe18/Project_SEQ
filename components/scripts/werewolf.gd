@@ -81,7 +81,6 @@ var choosed_atk
 @onready var howl_charge_time = $Howl_charge_time
 @onready var agility_duration = $Agility_duration
 
-var player_entered = true
 var player_in_atk_range = false
 
 #METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -107,22 +106,15 @@ func _physics_process(delta):
 		apply_knockback(delta)
 	elif grabbed:
 		is_grabbed()
-	elif player_entered and moving:
+	elif is_instance_valid(player) and moving:
 		chase_player()
 		if choosed_atk == Possible_Attacks.CLAWS and claws_cooldown.is_stopped():
 			claws()
 		if choosed_atk == Possible_Attacks.HOWL and howl_cooldown.is_stopped():
 			howl()
-	elif not player_entered and moving and sprite.animation != "howl":
-		if player:
-			if not navigation_agent.is_navigation_finished():
-				sprite.play("running")
-				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * current_des
-				move_and_slide()
-			else:
-				player_entered = true
-	elif not player_entered and not moving and sprite.animation != "howl":
+	elif not is_instance_valid(player) and not moving:
+		set_idle()
+	elif not is_instance_valid(player) and moving:
 		sprite.play("idle")
 
 #METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -145,7 +137,7 @@ func flip(distance_to_player):
 			sprite.rotation_degrees = 90;
 
 func chase_player():
-	if player:
+	if player and not knockbacked:
 		navigation_agent.target_position = player.global_position
 		
 		if navigation_agent.is_navigation_finished():
@@ -176,7 +168,7 @@ func choose_atk():
 	#choosed_atk = Possible_Attacks.HOWL
 
 func claws():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
 		sprite.play("claws")
 		if agility_activated:
 			second_time_claw = false
@@ -344,14 +336,6 @@ func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "claws" and (sprite.frame == 1 or sprite.frame == 4):
 		emit_signal("take_dmg", current_str, claw_force, claw_stun_time, current_pbc, current_efc, claw_type)
 
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
 func _on_claws_area_body_entered(body: Node2D) -> void:
 	if body == player:
 		player_in_atk_range = true
@@ -385,6 +369,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 
 func init_knockback(amount, force, sender):
 	if (is_in_atk_range and not grabbed and not agility_activated) or sender == self.global_position:
+		velocity = Vector2(0, 0)
 		moving = false
 		knockbacked = true
 		
@@ -400,6 +385,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

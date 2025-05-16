@@ -74,7 +74,6 @@ var choosed_atk
 
 var flee_locations = []
 
-var player_entered = true
 var player_in_atk_range = false
 
 var flee_activated = false
@@ -100,35 +99,27 @@ func _physics_process(delta):
 		apply_knockback(delta)
 	elif grabbed:
 		is_grabbed()
-	elif player_entered and moving:
-		if is_instance_valid(player):
-			chase_player()
-			if choosed_atk == Possible_Attacks.MAGIC_DART and magic_dart_cooldown.is_stopped() and not flee_activated:
-				sprite.play("launch_dart")
-				moving = false
-				flee_timeout_timer.start()
-				magic_dart_cooldown.start()
-			if choosed_atk == Possible_Attacks.ENCHANTMENT and enchantment_cooldown.is_stopped() and not flee_activated:
-				sprite.play("launch_dart", 0.40)
-				moving = false
-				flee_timeout_timer.start()
-				enchantment_cooldown.start()
-			if choosed_atk == Possible_Attacks.HEAL and heal_cooldown.is_stopped() and not flee_activated:
-				sprite.play("charging_heal")
-				heal_charge_time.start()
-				moving = false
-				flee_timeout_timer.start()
-				heal_cooldown.start()
-	elif not player_entered and moving:
-		if is_instance_valid(player):
-			if not navigation_agent.is_navigation_finished():
-				sprite.play("running")
-				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * current_des
-				move_and_slide()
-			else:
-				player_entered = true
-	elif not player_entered and not moving:
+	elif is_instance_valid(player) and moving:
+		chase_player()
+		if choosed_atk == Possible_Attacks.MAGIC_DART and magic_dart_cooldown.is_stopped() and not flee_activated:
+			sprite.play("launch_dart")
+			moving = false
+			flee_timeout_timer.start()
+			magic_dart_cooldown.start()
+		if choosed_atk == Possible_Attacks.ENCHANTMENT and enchantment_cooldown.is_stopped() and not flee_activated:
+			sprite.play("launch_dart", 0.40)
+			moving = false
+			flee_timeout_timer.start()
+			enchantment_cooldown.start()
+		if choosed_atk == Possible_Attacks.HEAL and heal_cooldown.is_stopped() and not flee_activated:
+			sprite.play("charging_heal")
+			heal_charge_time.start()
+			moving = false
+			flee_timeout_timer.start()
+			heal_cooldown.start()
+	elif not is_instance_valid(player) and not moving:
+		set_idle()
+	elif not is_instance_valid(player) and moving:
 		sprite.play("idle")
 
 #METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -235,10 +226,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 				flee_delay.start()
 				flee_timeout_timer.start()
 				sprite.play("damaged")
-				self.set_collision_layer_value(1, false)
-				self.set_collision_layer_value(3, true)
-				self.set_collision_mask_value(1, false)
-				self.set_collision_mask_value(3, true)
+				self.set_collision_layer_value(2, false)
 			else:
 				moving = false
 				heal_charge_time.stop()
@@ -302,10 +290,7 @@ func _on_navigation_agent_2d_target_reached(timeout = false) -> void:
 		if navigation_agent.target_position != player.global_position or timeout:
 			flee_activated = false
 			flee_timeout_timer.stop()
-			self.set_collision_layer_value(1, true)
-			self.set_collision_layer_value(3, false)
-			self.set_collision_mask_value(1, true)
-			self.set_collision_mask_value(3, false)
+			self.set_collision_layer_value(2, true)
 			navigation_agent.target_desired_distance = 250
 			current_des -= 300
 			set_idle()
@@ -400,6 +385,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 
 func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed:
+		velocity = Vector2(0, 0)
 		moving = false
 		knockbacked = true
 		
@@ -415,6 +401,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 
@@ -422,14 +409,6 @@ func _on_knockback_reset():
 	knockbacked = false
 	if not stun_timer.is_stopped():
 		set_idle()
-
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
 
 # DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO
 func set_idle():

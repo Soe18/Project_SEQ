@@ -34,6 +34,11 @@ func _physics_process(_delta):
 	if queue.size() > MAX_LENGHT:
 		queue.pop_back()
 	
+	if queue[0].x < queue[-1].x:
+		sprite.flip_h = true
+	else:
+		sprite.flip_h = false
+	
 	trail.clear_points()
 	
 	for point in queue:

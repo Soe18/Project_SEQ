@@ -14,8 +14,6 @@ var player_in_area_to_change_char = false
 @onready var leone_second_dialogue_bubble = $Change_char/MarginContainer2
 @onready var bubble_showing_time = $Change_char/Timer
 
-@warning_ignore("shadowed_global_identifier")
-
 func _ready():
 	Menu.game_status = Menu.GAME_STATUSES.unopenable
 
@@ -46,7 +44,7 @@ func _on_gui_select_character(char: String) -> void:
 		elif char == "rufus":
 			player_scene = load("res://overworld/scenes/players/rufus_wander.tscn")
 		
-		add_child(player_scene.instantiate())
+		add_child(player_scene.instantiate(),true)
 		var instantiated_node = get_child(get_child_count()-1)
 		
 		if not player: # se non esiste player vuol dire che devo istanziarlo nel punto di base

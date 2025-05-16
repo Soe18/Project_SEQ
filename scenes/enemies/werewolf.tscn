@@ -1,4 +1,4 @@
-[gd_scene load_steps=82 format=3 uid="uid://c1ncws1k51fhp"]
+[gd_scene load_steps=81 format=3 uid="uid://c1ncws1k51fhp"]
 
 [ext_resource type="Script" uid="uid://bhpitipl544nw" path="res://components/scripts/werewolf.gd" id="1_0js6q"]
 [ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="1_6jmst"]
@@ -537,9 +537,6 @@ bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
 bg_color = Color(1, 0, 0.0352941, 1)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 1116.03
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vnrqd"]
 size = Vector2(40.5, 115)
 
@@ -584,6 +581,8 @@ _data = {
 [node name="WerewolfEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_layer = 2
+collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_0js6q")
@@ -648,16 +647,9 @@ one_shot = true
 wait_time = 0.365
 one_shot = true
 
-[node name="Area_of_detection" type="Area2D" parent="."]
-visible = false
-collision_mask = 3
-
-[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-visible = false
-shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
-
 [node name="Claws_area" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collider" type="CollisionShape2D" parent="Claws_area"]
 position = Vector2(33, 5)
@@ -713,8 +705,6 @@ autoplay = "RESET"
 [connection signal="animation_finished" from="Howl_effect" to="." method="_on_howl_effect_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
 [connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="body_entered" from="Claws_area" to="." method="_on_claws_area_body_entered"]
 [connection signal="body_exited" from="Claws_area" to="." method="_on_claws_area_body_exited"]
 [connection signal="timeout" from="Howl_charge_time" to="." method="_on_howl_charge_time_timeout"]

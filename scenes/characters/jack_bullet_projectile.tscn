@@ -72,10 +72,11 @@ one_shot = true
 autostart = true
 
 [node name="Area_to_impact" type="Area2D" parent="."]
+collision_mask = 6
+collision_priority = 1e+12
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area_to_impact"]
 z_index = 1
-position = Vector2(-3, 0)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_7nfri")
 debug_color = Color(0.862745, 0.133333, 0.133333, 0.0666667)

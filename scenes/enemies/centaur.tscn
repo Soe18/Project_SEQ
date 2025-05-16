@@ -1,4 +1,4 @@
-[gd_scene load_steps=106 format=3 uid="uid://dyovs1oxci81l"]
+[gd_scene load_steps=105 format=3 uid="uid://dyovs1oxci81l"]
 
 [ext_resource type="Script" uid="uid://6ftbwnc6kds5" path="res://components/scripts/centaur.gd" id="1_skvmw"]
 [ext_resource type="Texture2D" uid="uid://br8u4kbrbjw0w" path="res://components/sprites/enemies/centaur/centaur_sprint.png" id="2_76l67"]
@@ -627,9 +627,6 @@ bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
 bg_color = Color(1, 0, 0.0352941, 1)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 1116.03
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b6lvu"]
 size = Vector2(279, 289)
 
@@ -757,6 +754,8 @@ _data = {
 [node name="CentaurEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_layer = 2
+collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_skvmw")
@@ -820,17 +819,10 @@ show_percentage = false
 wait_time = 3.0
 one_shot = true
 
-[node name="Area_of_detection" type="Area2D" parent="."]
-position = Vector2(0, -53)
-collision_mask = 3
-
-[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-visible = false
-shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
-
 [node name="Halberd_area" type="Area2D" parent="."]
 position = Vector2(0, -53)
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collider" type="CollisionShape2D" parent="Halberd_area"]
 visible = false
@@ -841,6 +833,8 @@ debug_color = Color(1, 0, 0, 0)
 
 [node name="Sprint_area" type="Area2D" parent="."]
 position = Vector2(0, -53)
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collider" type="CollisionShape2D" parent="Sprint_area"]
 visible = false
@@ -854,6 +848,8 @@ debug_color = Color(0.658824, 0, 0, 0.0470588)
 one_shot = true
 
 [node name="Reset_sprint_area" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collision" type="CollisionShape2D" parent="Reset_sprint_area"]
 visible = false
@@ -911,8 +907,6 @@ one_shot = true
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="body_entered" from="Halberd_area" to="." method="_on_halberd_area_body_entered"]
 [connection signal="body_exited" from="Halberd_area" to="." method="_on_halberd_area_body_exited"]
 [connection signal="body_entered" from="Sprint_area" to="." method="_on_sprint_area_body_entered"]

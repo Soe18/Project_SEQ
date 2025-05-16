@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8m3imv5eplab"]
+[gd_scene load_steps=4 format=3 uid="uid://b8m3imv5eplab"]
 
 [ext_resource type="Script" uid="uid://baprrfml2codi" path="res://components/scripts/knockback_controller.gd" id="1_arpny"]
+[ext_resource type="Texture2D" uid="uid://cc6fresw3yyk8" path="res://components/sprites/icon.svg" id="2_y6jpb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_l2416"]
 
@@ -10,3 +11,8 @@ script = ExtResource("1_arpny")
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_l2416")
 disabled = true
+
+[node name="Debug_sprite" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(0.101563, 0.101563)
+texture = ExtResource("2_y6jpb")

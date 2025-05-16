@@ -39,6 +39,8 @@ var portal_scene = preload("res://scenes/miscellaneous/travel_portal.tscn")
 var portal
 
 func _ready():
+	#Engine.time_scale
+	#Engine.physics_ticks_per_second = 100
 	var temp : Array
 	for i in tilesets.size():
 		temp.append(i)

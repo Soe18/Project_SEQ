@@ -1271,6 +1271,7 @@ _data = {
 [node name="CharacterBody2D" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_mask = 6
 collision_priority = 99999.0
 motion_mode = 1
 script = ExtResource("1_4tu1l")
@@ -1374,6 +1375,7 @@ debug_color = Color(1, 1, 0, 0.0666667)
 position = Vector2(17, -14.444)
 
 [node name="Flashbang_area" type="Area2D" parent="."]
+collision_mask = 6
 
 [node name="Collider" type="CollisionShape2D" parent="Flashbang_area"]
 visible = false

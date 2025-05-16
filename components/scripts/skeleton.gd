@@ -69,7 +69,6 @@ var choosed_atk
 @onready var slash_cooldown = $Basic_atk_Cooldown
 @onready var patty_cooldown = $Parry_Cooldown
 
-var player_entered = true
 var player_in_atk_range = false
 
 'METODO CHE PARTE QUANDO VIENE ISTANZIATO IL NODO
@@ -99,22 +98,15 @@ func _physics_process(delta):
 		apply_knockback(delta)
 	elif grabbed:
 		is_grabbed()
-	elif player_entered and moving:
+	elif is_instance_valid(player) and moving:
 		chase_player()
 		if choosed_atk == Possible_Attacks.BASIC_ATK and slash_cooldown.is_stopped():
 			basic_atk()
 		elif choosed_atk == Possible_Attacks.PARRY and patty_cooldown.is_stopped():
 			parry()
-	elif not player_entered and moving:
-		if is_instance_valid(player):
-			if not navigation_agent.is_navigation_finished():
-				sprite.play("running")
-				target_position = navigation_agent.target_position
-				velocity = global_position.direction_to(target_position) * current_des
-				move_and_slide()
-			else:
-				player_entered = true
-	elif not player_entered and not moving and not parring:
+	elif not is_instance_valid(player) and not moving:
+		set_idle()
+	elif not is_instance_valid(player) and moving:
 		sprite.play("idle")
 
 'METODO CHE PERMETTE AL NODO DI SPOSTARSI VERSO IL PLAYER
@@ -295,31 +287,6 @@ func set_health_bar():
 func _on_timer_timeout():
 	body_collider.disabled = false
 
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ENTRA NELLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è entrato'
-
-func _on_area_of_detection_body_entered(body):
-	if body == player:
-		player_entered = true
-
-'DIGEST DELL\'AREA2D "area_of_detection", DETERMINA QUANDO IL PLAYER ESCE DALLA ZONA
-{
-	PARAMETRI
-	Node body: identifica il nodo che è entrato
-}
-	se il body è il player
-		allora setto che il player è uscito'
-
-func _on_area_of_detection_body_exited(body):
-	if body == player:
-		player_entered = false
-
-
 # -------- SIGNAL DIGEST -------- #
 
 'DIGEST CHE PERMETTE DI FAR RIPARTIRE IL MOVIMENTO'
@@ -350,14 +317,14 @@ func _on_effect_animation_finished():
 	set_idle()
 	
 func basic_atk():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
 		moving = false
 		basic_atk_effect.play("effect")
 		sprite.play("attack")
 	slash_cooldown.start()
 
 func parry():
-	if player_entered and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
+	if is_instance_valid(player) and stun_timer.is_stopped() and not grabbed and player_in_atk_range and not parring:
 		parring = true
 		sprite.play("parry")
 		parry_time.start()
@@ -399,6 +366,7 @@ func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 
 func init_knockback(amount, force, sender):
 	if is_in_atk_range and not grabbed and not parring:
+		velocity = Vector2(0, 0)
 		moving = false
 		knockbacked = true
 		
@@ -414,6 +382,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

@@ -1062,6 +1062,7 @@ _data = {
 [node name="CharacterBody2D" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_mask = 6
 collision_priority = 99999.0
 motion_mode = 1
 script = ExtResource("1_kqagk")
@@ -1092,6 +1093,7 @@ shape = SubResource("CapsuleShape2D_xdive")
 debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Basic_atk_Area" type="Area2D" parent="."]
+collision_mask = 6
 
 [node name="Atk_collider" type="CollisionShape2D" parent="Basic_atk_Area"]
 visible = false
@@ -1102,6 +1104,7 @@ debug_color = Color(0.666667, 0.458824, 0.611765, 0.419608)
 
 [node name="Skill_1_area" type="Area2D" parent="."]
 position = Vector2(0, 2)
+collision_mask = 6
 
 [node name="Effect" type="AnimatedSprite2D" parent="Skill_1_area"]
 z_index = 1
@@ -1120,6 +1123,7 @@ disabled = true
 debug_color = Color(0.823529, 0.172549, 0.878431, 0.419608)
 
 [node name="Skill2_area" type="Area2D" parent="."]
+collision_mask = 6
 
 [node name="Effect" type="AnimatedSprite2D" parent="Skill2_area"]
 z_index = 1
@@ -1137,6 +1141,7 @@ shape = SubResource("CapsuleShape2D_e35s4")
 disabled = true
 
 [node name="Eva_area" type="Area2D" parent="."]
+collision_mask = 6
 
 [node name="Eva_collider" type="CollisionShape2D" parent="Eva_area"]
 visible = false
@@ -1152,6 +1157,7 @@ one_shot = true
 
 [node name="Ult_area" type="Area2D" parent="."]
 position = Vector2(0, 57)
+collision_mask = 6
 
 [node name="Effect" type="AnimatedSprite2D" parent="Ult_area"]
 z_index = 1

@@ -1,6 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://cymi8puqyx10m"]
 
-[ext_resource type="Script" uid="uid://babij73bj1wb8" path="res://components/scripts/witchcraft_projectile.gd" id="1_gjp6w"]
+[ext_resource type="Script" uid="uid://babij73bj1wb8" path="res://components/scripts/Witchcraft_Projectile.gd" id="1_gjp6w"]
 [ext_resource type="Texture2D" uid="uid://pjhe0wnau24a" path="res://components/sprites/enemies/lich/lich_witchcraft_effect.png" id="2_kd70y"]
 [ext_resource type="Texture2D" uid="uid://bkcg36ttdeanw" path="res://components/sprites/enemies/lich/lich_explosions_effect.png" id="3_ql0cg"]
 
@@ -112,7 +112,7 @@ height = 56.0
 [node name="Witchcraft_Projectile" type="CharacterBody2D"]
 process_mode = 1
 collision_layer = 2
-collision_mask = 3
+collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_gjp6w")
 
@@ -136,6 +136,8 @@ one_shot = true
 autostart = true
 
 [node name="Area_to_impact" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area_to_impact"]
 position = Vector2(14, 0)

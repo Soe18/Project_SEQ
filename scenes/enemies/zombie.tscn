@@ -535,6 +535,8 @@ _data = {
 [node name="ZombieEnemy" type="CharacterBody2D"]
 process_mode = 1
 material = SubResource("ShaderMaterial_l2j2q")
+collision_layer = 2
+collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 safe_margin = 1.0
@@ -600,13 +602,15 @@ wait_time = 3.0
 one_shot = true
 
 [node name="Area_of_detection" type="Area2D" parent="."]
-collision_mask = 3
+collision_layer = 2
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 shape = SubResource("CircleShape2D_y6mgf")
 debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
 
 [node name="Bite_Area" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collider" type="CollisionShape2D" parent="Bite_Area"]
 position = Vector2(40.25, 16)
@@ -622,6 +626,8 @@ autoplay = "idle"
 flip_h = true
 
 [node name="Sprint_Area" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 5
 
 [node name="Collider" type="CollisionShape2D" parent="Sprint_Area"]
 visible = false

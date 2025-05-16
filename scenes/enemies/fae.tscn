@@ -1,4 +1,4 @@
-[gd_scene load_steps=73 format=3 uid="uid://dlv5xy3f7qvmt"]
+[gd_scene load_steps=72 format=3 uid="uid://dlv5xy3f7qvmt"]
 
 [ext_resource type="Script" uid="uid://dq1jg0a0tecit" path="res://components/scripts/fae.gd" id="1_4p6sl"]
 [ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_5kx2b"]
@@ -440,9 +440,6 @@ bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
 bg_color = Color(1, 0, 0.0352941, 1)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 1116.03
-
 [sub_resource type="Animation" id="Animation_6bd6i"]
 length = 0.001
 tracks/0/type = "value"
@@ -484,7 +481,8 @@ _data = {
 [node name="FaeEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
-collision_mask = 3
+collision_layer = 2
+collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_4p6sl")
@@ -497,6 +495,7 @@ enchantment_projectile_node = ExtResource("5_ls43h")
 position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+y_sort_enabled = true
 material = SubResource("ShaderMaterial_ml2dn")
 position = Vector2(2.00001, -0.999992)
 scale = Vector2(1.5, 1.5)
@@ -554,14 +553,6 @@ wait_time = 2.51
 one_shot = true
 autostart = true
 
-[node name="Area_of_detection" type="Area2D" parent="."]
-collision_mask = 3
-
-[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-visible = false
-shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
-
 [node name="Flee_delay" type="Timer" parent="."]
 one_shot = true
 
@@ -614,8 +605,6 @@ autoplay = "RESET"
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
 [connection signal="timeout" from="GrabTime" to="." method="_on_timer_timeout"]
 [connection signal="timeout" from="Update_Atk" to="." method="_on_update_atk_timeout"]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="timeout" from="Flee_delay" to="." method="_on_flee_delay_timeout"]
 [connection signal="timeout" from="Flee_timeout" to="." method="_on_flee_timeout_timeout"]
 [connection signal="timeout" from="Heal_charge_time" to="." method="_on_heal_charge_time_timeout"]

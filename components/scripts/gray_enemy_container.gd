@@ -115,10 +115,10 @@ func activate_markers():
 	#enemy_count = 1
 	
 	# ///////////// PRINT DI DEBUG ///////////// #
-	print("round_count = " + str(round_count))
-	print("min_count = " + str(min_count))
-	print("max_count = " + str(max_count))
-	print("enemy_count = " + str(enemy_count))
+	#print("round_count = " + str(round_count))
+	#print("min_count = " + str(min_count))
+	#print("max_count = " + str(max_count))
+	#print("enemy_count = " + str(enemy_count))
 	# ///////////// PRINT DI DEBUG ///////////// #
 	
 	for i in enemy_count: # ciclo con i < enemy_count
@@ -141,10 +141,10 @@ func activate_markers():
 			out = true # seleziono il percorso
 		
 		add_child(enemy_scene.instantiate(),true) # insanzio come nodo figlio il nemico
-		#add_child(possible_enemies[0].instantiate(),true) # debug
+		#add_child(possible_enemies[5].instantiate(),true) # debug
 		
 		# setto la posizione del nemico spawnato al marker attivo
-		get_child(get_child_count()-1).position = i.position 
+		get_child(-1).position = i.position 
 
 # METODO CHE SPAWNA IL BOSS
 func spawn_boss():

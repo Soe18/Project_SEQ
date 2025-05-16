@@ -139,7 +139,7 @@ func _physics_process(delta):
 		is_grabbed()
 	if can_move:
 		move(delta)
-	if stun_timer.is_stopped():
+	if stun_timer.is_stopped() and not can_interact_with_something:
 		atk_handler()
 
 'METODO CHE GESTISCE IL MOVIMENTO DEL PLAYER
@@ -211,21 +211,21 @@ func atk_handler():
 		if gun_prefix == "p_":
 			animation_player.play("shake_ammo")
 	
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0 and not can_interact_with_something:
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and gun_bullet_count <= 0:
 		if gun_prefix == "p_":
 			sprite.play("p_reload")
 			reset_axis()
 		else:
 			animation_player.play("shake_ammo")
 	
-	elif Input.is_action_pressed("base_atk") and not "change" in sprite.animation and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and atk_anim_finished and not changing_gun and gun_bullet_count > 0 and not can_interact_with_something:
+	elif Input.is_action_pressed("base_atk") and not "change" in sprite.animation and (sprite.animation == gun_prefix+"idle" or sprite.animation == gun_prefix+"running") and atk_anim_finished and not changing_gun and gun_bullet_count > 0:
 		can_move = false
 		atk_anim_finished = false
 		atk_state = Atk_States.BASE_ATK
 		sprite.play(gun_prefix+"shooting")
 		reset_axis()
 	
-	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"shooting" or sprite.animation == gun_prefix+"continue_shooting") and atk_anim_finished and not changing_gun  and shooting_delay_timer.is_stopped() and gun_bullet_count > 0 and not can_interact_with_something:
+	elif Input.is_action_pressed("base_atk") and (sprite.animation == gun_prefix+"shooting" or sprite.animation == gun_prefix+"continue_shooting") and atk_anim_finished and not changing_gun  and shooting_delay_timer.is_stopped() and gun_bullet_count > 0:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		reaction_timer.stop()
@@ -449,10 +449,9 @@ func _on_set_idle():
 		sprite.play(gun_prefix+"idle")
 		
 		self.set_collision_layer_value(1, true)
-		self.set_collision_layer_value(2, false)
 		
-		self.set_collision_mask_value(1, true)
-		self.set_collision_mask_value(2, false)
+		self.set_collision_mask_value(2, true)
+		self.set_collision_mask_value(3, true)
 		
 		flashbang_collider.set_deferred("disabled", true)
 		
@@ -551,6 +550,7 @@ func _on_get_healed(amount):
 
 func init_knockback(amount, force, sender):
 	if not grabbed:
+		velocity = Vector2(0, 0)
 		can_move = false
 		knockbacked = true
 		
@@ -568,6 +568,7 @@ func init_knockback(amount, force, sender):
 		knockback_controller.target_reached.connect(self._on_knockback_reset)
 
 func apply_knockback(delta):
+	velocity = Vector2(0, 0)
 	self.global_position = self.global_position.lerp(knockback_target_point, knockback_force * delta)
 	move_and_slide()
 

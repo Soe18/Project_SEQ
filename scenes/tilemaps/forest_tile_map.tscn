@@ -2810,7 +2810,7 @@ texture = ExtResource("2_a4dah")
 7:31/0/z_index = 1
 
 [sub_resource type="TileSet" id="TileSet_5xdkc"]
-physics_layer_0/collision_layer = 3
+physics_layer_0/collision_layer = 4
 physics_layer_0/collision_mask = 3
 physics_layer_0/collision_priority = 99999.0
 physics_layer_1/collision_layer = 128
@@ -2859,6 +2859,12 @@ tile_map_data = PackedByteArray("AADV/93/AAABAAUAAADV/97/AAABAAYAAADW/93/AAACAAU
 tile_set = SubResource("TileSet_5xdkc")
 navigation_enabled = false
 
+[node name="Boundaries" type="TileMapLayer" parent="."]
+z_index = -1
+use_parent_material = true
+scale = Vector2(2, 2)
+tile_set = SubResource("TileSet_5xdkc")
+
 [node name="Walls" type="TileMapLayer" parent="."]
 use_parent_material = true
 scale = Vector2(2, 2)
@@ -2879,6 +2885,7 @@ tile_map_data = PackedByteArray("AAAwAAYABAAaAAsAAAAwAAcABAAaAAwAAAAwAAgABAAaAA0
 tile_set = SubResource("TileSet_5xdkc")
 
 [node name="Enemy_container" type="Node2D" parent="."]
+y_sort_enabled = true
 script = ExtResource("6_h2jqb")
 
 [node name="Round_cooldown" type="Timer" parent="Enemy_container"]

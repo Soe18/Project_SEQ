@@ -13,6 +13,7 @@ var player_in_range = false
 
 func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("ui_accept") and player_in_range and player.can_move:
+		player._on_set_idle()
 		player.can_move = false
 		var powerup_dialog_instance = powerup_dialog_scene.instantiate()
 		powerup_dialog_instance.pows = pulled_powerups
@@ -21,7 +22,7 @@ func _physics_process(_delta: float) -> void:
 		canvas_layer.add_child(powerup_dialog_instance)
 		Menu.game_status = Menu.GAME_STATUSES.unopenable
 		
-		await powerup_dialog_instance.tree_exiting
+		await powerup_dialog_instance.tree_exited
 		
 		Menu.game_status = Menu.GAME_STATUSES.dungeon
 		player.can_move = true

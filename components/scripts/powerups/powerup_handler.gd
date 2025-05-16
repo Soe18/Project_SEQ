@@ -87,7 +87,7 @@ func apply_powerup_boost(powerup_name : String, param : Array = [null]) -> Varia
 			if i.p_name == "Alvin":
 				param.all(
 					func(element): 
-					i.boost = increase_stat_by_percentage(element, rarity_power(i))
+					element = increase_stat_by_percentage(element, rarity_power(i))
 					return i.boost
 					)
 				return param

@@ -895,6 +895,8 @@ _data = {
 [node name="LichBossEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+collision_layer = 2
+collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_ic8pi")
@@ -910,6 +912,7 @@ position = Vector2(0, -64)
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
+y_sort_enabled = true
 material = SubResource("ShaderMaterial_41dip")
 scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_7kgit")
@@ -933,8 +936,8 @@ debug_color = Color(1, 1, 0, 0.0666667)
 
 [node name="Area_of_detection" type="Area2D" parent="."]
 visible = false
-collision_layer = 3
-collision_mask = 3
+y_sort_enabled = true
+collision_layer = 2
 
 [node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
 shape = SubResource("CircleShape2D_kwgoo")
@@ -1071,8 +1074,6 @@ autoplay = "RESET"
 [connection signal="animation_finished" from="Sprite2D" to="." method="_on_sprite_2d_animation_finished"]
 [connection signal="frame_changed" from="Sprite2D" to="." method="_on_sprite_2d_frame_changed"]
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="timeout" from="Explosions_container/Second_round_timer" to="." method="_on_second_round_timer_timeout"]
 [connection signal="timeout" from="Explosions_container/Third_round_timer" to="." method="_on_third_round_timer_timeout"]
 [connection signal="timeout" from="Explosions_container/Reset" to="." method="_on_reset_timeout"]
