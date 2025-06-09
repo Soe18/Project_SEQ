@@ -1,4 +1,4 @@
-[gd_scene load_steps=80 format=3 uid="uid://d2wge2miret0o"]
+[gd_scene load_steps=79 format=3 uid="uid://d2wge2miret0o"]
 
 [ext_resource type="Script" uid="uid://br8ws5a8se0ge" path="res://components/scripts/zombie.gd" id="1_4dl1i"]
 [ext_resource type="Shader" uid="uid://c3ywoxg7w2n4d" path="res://components/shaders/hit_shader.gdshader" id="1_p876d"]
@@ -436,9 +436,6 @@ bg_color = Color(0.219608, 0.219608, 0.219608, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rxx2"]
 bg_color = Color(1, 0, 0.0352941, 1)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_y6mgf"]
-radius = 1116.03
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kr4ka"]
 size = Vector2(63.5, 120)
 
@@ -601,13 +598,6 @@ metadata/_edit_use_anchors_ = true
 wait_time = 3.0
 one_shot = true
 
-[node name="Area_of_detection" type="Area2D" parent="."]
-collision_layer = 2
-
-[node name="Collider" type="CollisionShape2D" parent="Area_of_detection"]
-shape = SubResource("CircleShape2D_y6mgf")
-debug_color = Color(0.509804, 0.545098, 0.54902, 0.286275)
-
 [node name="Bite_Area" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 5
@@ -676,8 +666,6 @@ libraries = {
 
 [connection signal="animation_finished" from="Status_alert_sprite" to="." method="_on_status_alert_sprite_animation_finished"]
 [connection signal="timeout" from="Stun" to="." method="_on_stun_timeout"]
-[connection signal="body_entered" from="Area_of_detection" to="." method="_on_area_of_detection_body_entered"]
-[connection signal="body_exited" from="Area_of_detection" to="." method="_on_area_of_detection_body_exited"]
 [connection signal="body_entered" from="Bite_Area" to="." method="_on_basic_atk_area_body_entered"]
 [connection signal="body_exited" from="Bite_Area" to="." method="_on_basic_atk_area_body_exited"]
 [connection signal="animation_finished" from="Bite_Area/Effect" to="." method="_on_effect_animation_finished"]

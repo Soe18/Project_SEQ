@@ -30,8 +30,9 @@ PowerupStats="*res://components/scripts/powerups/powerup_stats.gd"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=3
-window/size/initial_position_type=3
 window/energy_saving/keep_screen_on=false
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 window/custom_image=""
 window/defaults/default_clear_color=Color(0.309804, 0.309804, 0.309804, 1)
 
@@ -42,6 +43,20 @@ movie_writer/disable_vsync=true
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://components/scripts/": "green",
+"res://components/sprites/": "red",
+"res://overworld/scenes/": "yellow",
+"res://overworld/scripts/": "green",
+"res://scenes/": "yellow",
+"res://scenes/GUI/": "green",
+"res://scenes/characters/": "blue",
+"res://scenes/enemies/": "red",
+"res://scenes/tilemaps/": "teal"
+}
 
 [filesystem]
 

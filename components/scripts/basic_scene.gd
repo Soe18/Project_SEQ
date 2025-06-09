@@ -4,7 +4,7 @@ var player
 var selected_character
 var paused = false
 var connected = false
-var boss_defeted_count = 0
+var boss_defeted_count = 1
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 @onready var Attack_Types = get_tree().get_first_node_in_group("gm").Attack_Types
@@ -19,10 +19,6 @@ var active_enemy_container : Node2D
 @onready var round_gui = canvas_layer.find_child("Round_GUI")
 # music player che contiene le ost
 @onready var ost_player = $Ost_player
-# contenitore della gui di pausa
-@onready var pause_gui = $CanvasLayer/Pause_GUI
-# riferimento all'animation player della pause gui
-@onready var pause_animation_player = $CanvasLayer/Pause_GUI/PanelContainer/VBoxContainer/AnimationPlayer
 # variabile che contiene la gui specifica per quel player
 var player_gui
 @onready var powerup_handler : Node = $Powerup_handler

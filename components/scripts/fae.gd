@@ -48,8 +48,6 @@ var choosed_atk
 
 @onready var hitmarker_spawnpoint = $Hitmarker_spawn
 
-@onready var area_of_detection = $Area_of_detection
-
 @onready var status_sprite = $Status_alert_sprite
 
 @onready var projectile_spawnpoint = $Projectile_spawnpoint

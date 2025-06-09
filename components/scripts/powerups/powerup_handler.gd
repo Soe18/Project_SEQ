@@ -28,7 +28,7 @@ func _on_instantiate_pickable():
 	pickable.canvas_layer = get_parent().canvas_layer
 	for i in range(3):
 		var pulled_powerup = possible_powerups.pick_random()
-		var pulled_rar = PowerupStats.rar.find_key(randi_range(0, 4))
+		var pulled_rar = PowerupStats.rar.find_key(randi_range(0, pulled_powerup.max_rarity))
 		
 		if active_powerups.has(pulled_powerup):
 			var prev_rar = active_powerups[active_powerups.find(pulled_powerup)].max_rarity
@@ -42,6 +42,14 @@ func _on_instantiate_pickable():
 		
 		pickable.pulled_powerups.append(pulled_powerup)
 		pickable.pulled_rarities.append(PowerupStats.rar.get(pulled_rar))
+	##DEBUG
+	#for i in range(3):
+		#var pulled_powerup = possible_powerups[0]
+		#var pulled_rar = PowerupStats.rar.get("common") + i
+		#
+		#pickable.pulled_powerups.append(pulled_powerup)
+		#pickable.pulled_rarities.append(PowerupStats.rar.get(pulled_rar))
+	
 	emit_signal("spawn_pickable", pickable)
 
 func new_powerup(resource : Resource, pulled_rarity : PowerupStats.rar) -> void:

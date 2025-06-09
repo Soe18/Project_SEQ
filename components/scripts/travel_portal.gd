@@ -9,7 +9,7 @@ signal change_stage()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Input.is_action_just_pressed("base_atk") and player_in_range:
+	if Input.is_action_just_pressed("ui_accept") and player_in_range:
 		player.can_move = false
 		self.z_index = 99
 		animation_player.play("travel")

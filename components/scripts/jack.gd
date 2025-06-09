@@ -53,8 +53,8 @@ var knockback_force
 var atk_anim_finished = true
 
 var Guns = {
-	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_" , "shake_strenght" : 2},
-	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_" , "shake_strenght" : 3},
+	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_" , "shake_strenght" : 9},
+	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_" , "shake_strenght" : 11},
 	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 45, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_" , "shake_strenght" : 20}
 }
 

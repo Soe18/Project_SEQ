@@ -2859,11 +2859,17 @@ tile_map_data = PackedByteArray("AADV/93/AAABAAUAAADV/97/AAABAAYAAADW/93/AAACAAU
 tile_set = SubResource("TileSet_5xdkc")
 navigation_enabled = false
 
-[node name="Boundaries" type="TileMapLayer" parent="."]
+[node name="Boundaries" type="StaticBody2D" parent="."]
 z_index = -1
 use_parent_material = true
 scale = Vector2(2, 2)
-tile_set = SubResource("TileSet_5xdkc")
+collision_layer = 8
+collision_mask = 7
+collision_priority = 1e+10
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Boundaries"]
+visible = false
+polygon = PackedVector2Array(-352, 239.5, -528.5, 240, -529.5, 480.5, -129.5, 480, -129, 418.5, -67, 417.5, -66, 319, 32.5, 319.5, 30.5, 399.5, 94, 402, 95, 496, 144, 496, 144.5, 559.5, 271.5, 561.5, 271.5, 576.5, 350.5, 577, 351.5, 607.5, 366.5, 607.5, 367, 623.5, 593.5, 624, 591.5, 609, 609, 609, 607.5, 496, 464, 494.5, 464.5, 447.5, 351.5, 447, 352.5, 398, 448.5, 399.5, 447, 128, 416, 128, 415.5, 47.5, 671, 47.5, 674, -111.5, 511, -109, 511, -225, 463, -225, 464.5, -370.5, 79.5, -366.5, 79, -494, -333.5, -495, -334.5, -261, -479.5, -256.5, -477.5, -80, -675, -79, -674, 83, -318, 78.5, -317.5, 106, -350.5, 108, -352, 239.5, -1101.5, 225, -1074.5, -915, 1143, -909, 1217, 1062.5, -1128.5, 1099.5, -1101.5, 225)
 
 [node name="Walls" type="TileMapLayer" parent="."]
 use_parent_material = true

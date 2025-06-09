@@ -12,5 +12,3 @@ func _physics_process(delta: float) -> void:
 	if global_position.distance_to(target_point) < 3:
 		emit_signal("target_reached")
 		queue_free()
-	
-	move_and_slide()

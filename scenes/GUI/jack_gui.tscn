@@ -163,6 +163,7 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("5_m06he")
 texture_progress = ExtResource("4_0xiyi")
+metadata/_edit_use_anchors_ = true
 
 [node name="Skill2_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
 clip_contents = true
@@ -183,6 +184,7 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("6_twk8r")
 texture_progress = ExtResource("4_0xiyi")
+metadata/_edit_use_anchors_ = true
 
 [node name="Ulti_cooldown" type="TextureProgressBar" parent="GridContainer/Control"]
 clip_contents = true
@@ -201,6 +203,7 @@ allow_greater = true
 fill_mode = 5
 texture_under = ExtResource("7_ui6vk")
 texture_progress = ExtResource("4_0xiyi")
+metadata/_edit_use_anchors_ = true
 
 [node name="Flashbang_effect" type="Panel" parent="."]
 layout_mode = 1

@@ -10,9 +10,10 @@ var rars : Array
 signal new_powerup(powerup, rarity)
 
 func _ready() -> void:
-	first_btn.text = str(pows[0].p_name) + ", " + str(rars[0])
-	second_btn.text = str(pows[1].p_name) + ", " + str(rars[1])
-	third_btn.text = str(pows[2].p_name) + ", " + str(rars[2])
+	
+	first_btn.text = str(pows[0].p_name) + ", " + str(PowerupStats.rar.find_key(rars[0]))
+	second_btn.text = str(pows[1].p_name) + ", " + str(PowerupStats.rar.find_key(rars[1]))
+	third_btn.text = str(pows[2].p_name) + ", " + str(PowerupStats.rar.find_key(rars[2]))
 	first_btn.grab_focus()
 
 func _on_button_pressed() -> void:

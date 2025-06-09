@@ -144,7 +144,7 @@ func _physics_process(delta):
 		is_grabbed()
 	if can_move:
 		move(delta)
-	if stun_timer.is_stopped() and not can_interact_with_something:
+	if stun_timer.is_stopped():
 		atk_handler()
 	if is_evading:
 		evade()
@@ -199,7 +199,7 @@ func reset_axis():
 	o si sta spostando) oppure il numero di combo che sta facendo ed infine se non è in cooldown'
 
 func atk_handler():
-	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished:
+	if Input.is_action_just_pressed("base_atk") and (sprite.animation == "idle" or sprite.animation == "running") and atk_anim_finished and not can_interact_with_something:
 		can_move = false
 		bs_atk_collider.disabled = false
 		atk_anim_finished = false
@@ -207,31 +207,31 @@ func atk_handler():
 		sprite.play("base atk1")
 		reset_axis()
 	
-	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished:
+	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk1" and atk_anim_finished and not can_interact_with_something:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		combo_time.stop()
 		sprite.play("base atk2")
 	
-	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk2" and atk_anim_finished:
+	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk2" and atk_anim_finished and not can_interact_with_something:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		combo_time.stop()
 		sprite.play("base atk3")
 	
-	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk3" and atk_anim_finished:
+	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk3" and atk_anim_finished and not can_interact_with_something:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		combo_time.stop()
 		sprite.play("base atk4")
 	
-	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk4" and atk_anim_finished:
+	elif Input.is_action_just_pressed("base_atk") and sprite.animation == "base atk4" and atk_anim_finished and not can_interact_with_something:
 		atk_state = Atk_States.BASE_ATK
 		atk_anim_finished = false
 		combo_time.stop()
 		sprite.play("base atk5")
 	
-	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "running") and skill1_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("skill1") and (sprite.animation == "idle" or sprite.animation == "running") and skill1_cooldown.is_stopped() and not can_interact_with_something:
 		skill1_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK1
@@ -240,7 +240,7 @@ func atk_handler():
 		skill1_effect.play("effect")
 		reset_axis()
 	
-	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "running") and eva_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("evade") and (sprite.animation == "idle" or sprite.animation == "running") and eva_cooldown.is_stopped() and not can_interact_with_something:
 		#if not knockbacked and stun_timer.is_stopped() and ult_stop_timer.is_stopped():
 		eva_cooldown.start()
 		can_move = false
@@ -250,7 +250,7 @@ func atk_handler():
 		eva_collider.disabled = false
 		is_evading = true
 	
-	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "running") and skill2_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("skill2") and (sprite.animation == "idle" or sprite.animation == "running") and skill2_cooldown.is_stopped() and not can_interact_with_something:
 		skill2_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.SK2
@@ -258,7 +258,7 @@ func atk_handler():
 		skill2_effect.play("effect")
 		reset_axis()
 
-	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "running") and ulti_cooldown.is_stopped():
+	elif Input.is_action_just_pressed("ult") and (sprite.animation == "idle" or sprite.animation == "running") and ulti_cooldown.is_stopped() and not can_interact_with_something:
 		ulti_cooldown.start()
 		can_move = false
 		atk_state = Atk_States.ULT
@@ -308,12 +308,12 @@ func _on_skill_2_area_body_entered(body):
 		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type)
 		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
 		
-		var temp = [skill2_knockback_amount]
+		var temp = [skill2_knockback_amount, skill2_knockback_force]
 		temp = powerup_handler.apply_powerup_boost("Alvin", temp)
 		if temp == null:
-			temp = [0]
+			temp = [0, 0]
 		
-		emit_signal("inflict_knockback", skill2_knockback_amount+temp[0], skill2_knockback_force, self.global_position)
+		emit_signal("inflict_knockback", skill2_knockback_amount+temp[0], skill2_knockback_force-temp[1], self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
@@ -325,12 +325,12 @@ func _on_ult_area_body_entered(body):
 		emit_signal("is_in_atk_range", true, body)
 		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type)
 		
-		var temp = [ult_knockback_amount]
+		var temp = [ult_knockback_amount, ult_knockback_force]
 		temp = powerup_handler.apply_powerup_boost("Alvin", temp)
 		if temp == null:
-			temp = [0]
+			temp = [0, 0]
 		
-		emit_signal("inflict_knockback", ult_knockback_amount+temp[0], ult_knockback_force, self.global_position)
+		emit_signal("inflict_knockback", ult_knockback_amount+temp[0], ult_knockback_force-temp[1], self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
