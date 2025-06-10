@@ -1,7 +1,6 @@
-[gd_scene load_steps=186 format=3 uid="uid://b3nwx0erq4kqx"]
+[gd_scene load_steps=185 format=3 uid="uid://b3nwx0erq4kqx"]
 
 [ext_resource type="Script" uid="uid://bkmqji7j35m0b" path="res://components/scripts/jack.gd" id="1_4tu1l"]
-[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_wfp2a"]
 [ext_resource type="Texture2D" uid="uid://o1s5vs53dc4a" path="res://components/sprites/jack/pistol/jack_damaged_p.png" id="3_84yut"]
 [ext_resource type="PackedScene" uid="uid://dxg3446h3vq6m" path="res://scenes/characters/jack_bullet_projectile.tscn" id="3_wfqrd"]
 [ext_resource type="PackedScene" uid="uid://uutcjyrpx2ri" path="res://scenes/miscellaneous/time_of_change.tscn" id="4_bxdqx"]
@@ -1275,7 +1274,6 @@ collision_mask = 6
 collision_priority = 99999.0
 motion_mode = 1
 script = ExtResource("1_4tu1l")
-damage_node = ExtResource("2_wfp2a")
 knockback_controller_node = ExtResource("5_m4st2")
 change_stats_timer_node = ExtResource("4_bxdqx")
 bullet_scene = ExtResource("3_wfqrd")
@@ -1359,6 +1357,7 @@ metadata/_aseprite_wizard_interface_config_ = {
 }
 
 [node name="Status_alert_sprite" type="AnimatedSprite2D" parent="."]
+self_modulate = Color(2, 2, 2, 1)
 y_sort_enabled = true
 position = Vector2(-2.38419e-07, 10)
 scale = Vector2(0.0609922, 0.0609922)

@@ -23,7 +23,7 @@ func _on_round_changed():
 		QuestManager.quests["try"].reach_goal_quest()
 		QuestManager.quests["try"].complete_quest()
 	# FREQUENZA DI SPAWN DEI POWERUPS
-	if round_count % 5 == 0:
+	if round_count % 1 == 0:
 		emit_signal("powerup_spawnable")
 	round_displayer.text = "Ondata: " + str(round_count)
 

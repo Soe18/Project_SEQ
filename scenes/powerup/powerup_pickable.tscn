@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://e8dlarx2mhd4"]
+[gd_scene load_steps=11 format=3 uid="uid://e8dlarx2mhd4"]
 
 [ext_resource type="Script" uid="uid://d4m6nh3f0ow85" path="res://components/scripts/powerups/powerup_pickable.gd" id="1_s52ci"]
 [ext_resource type="Texture2D" uid="uid://cc25xbyrctd1l" path="res://components/sprites/GUI/player_GUI/rufus/Skill1_GUI_rufus.png" id="2_nu28t"]
@@ -47,6 +47,33 @@ _data = {
 &"idle": SubResource("Animation_aw47s")
 }
 
+[sub_resource type="Gradient" id="Gradient_s52ci"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_nu28t"]
+gradient = SubResource("Gradient_s52ci")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xt82p"]
+emission_shape = 1
+emission_sphere_radius = 18.93
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 522.87
+initial_velocity_max = 594.6
+gravity = Vector3(0, 0, 0)
+linear_accel_min = 68.65
+linear_accel_max = 79.46
+radial_accel_min = 69.19
+radial_accel_max = 69.19
+scale_min = 2.0
+scale_max = 6.0
+scale_over_velocity_min = 151.35
+scale_over_velocity_max = 210.81
+color = Color(0.961884, 0.269085, 0, 1)
+color_ramp = SubResource("GradientTexture1D_nu28t")
+hue_variation_min = -2.23517e-08
+hue_variation_max = 0.05
+
 [node name="Powerup_pickable" type="StaticBody2D"]
 script = ExtResource("1_s52ci")
 
@@ -71,5 +98,14 @@ libraries = {
 }
 autoplay = "idle"
 
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+self_modulate = Color(2.5, 2.5, 2.5, 1)
+emitting = false
+amount = 600
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_xt82p")
+
 [connection signal="body_entered" from="Pickup_range" to="." method="_on_pickup_range_body_entered"]
 [connection signal="body_exited" from="Pickup_range" to="." method="_on_pickup_range_body_exited"]
+[connection signal="finished" from="GPUParticles2D" to="." method="_on_gpu_particles_2d_finished"]

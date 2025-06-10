@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=4 uid="uid://bj2kgefwjilfo"]
+[gd_scene load_steps=46 format=4 uid="uid://bj2kgefwjilfo"]
 
 [ext_resource type="Texture2D" uid="uid://75cr12oopvxu" path="res://components/sprites/tilemaps/gentle sheets/gentle forest v02.png" id="1_5rf5p"]
 [ext_resource type="Texture2D" uid="uid://d3hs07eu4qksw" path="res://components/sprites/tilemaps/gentle sheets/gentle forest v01.png" id="1_giiw4"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://q2imrs4vnjdw" path="res://components/sprites/tilemaps/gentle sheets/gentle 32x32 v02.png" id="2_uhsu3"]
 [ext_resource type="Texture2D" uid="uid://ci5swhoouhgne" path="res://components/sprites/tilemaps/gentle sheets/gentle trees 80x96 v02.png" id="3_2c702"]
 [ext_resource type="Script" uid="uid://b6ky75s4yqxlb" path="res://components/scripts/gray_enemy_container.gd" id="6_h2jqb"]
+[ext_resource type="Shader" uid="uid://camrr6hu5udic" path="res://components/shaders/test.gdshader" id="7_sa7gj"]
+[ext_resource type="Script" uid="uid://bm2h8iqn32du6" path="res://components/scripts/shader_pause_detector.gd" id="8_anuhl"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_kj4iq"]
 tile_data = PackedInt32Array(262144, 524292, 21, 327680, 524292, 22, 131073, 589828, 19, 196609, 589828, 20, 262145, 589828, 21, 327681, 589828, 22, 65538, 655364, 18, 131074, 655364, 19, 196610, 655364, 20, 262146, 655364, 21, 327682, 655364, 22, 65539, 720900, 18, 131075, 720900, 19, 196611, 720900, 20, 262147, 720900, 21, 327683, 720900, 22, 65540, 786436, 18, 131076, 786436, 19, 196612, 786436, 20, 262148, 786436, 21, 327684, 786436, 22, 65541, 851972, 18, 131077, 851972, 19, 196613, 851972, 20, 262149, 851972, 21, 327685, 851972, 22, 6, 917508, 17, 65542, 917508, 18, 131078, 917508, 19, 196614, 917508, 20, 262150, 917508, 21, 327686, 917508, 22, 7, 983044, 17, 65543, 983044, 18, 131079, 983044, 19, 196615, 983044, 20, 262151, 983044, 21, 327687, 983044, 22)
@@ -2841,6 +2843,28 @@ pattern_13 = SubResource("TileMapPattern_iiltd")
 pattern_14 = SubResource("TileMapPattern_jhyig")
 pattern_15 = SubResource("TileMapPattern_lc316")
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_anuhl"]
+noise_type = 0
+frequency = 0.0254
+offset = Vector3(0, -188.98, 0)
+domain_warp_amplitude = -13.03
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_rp21u"]
+width = 180
+height = 260
+seamless = true
+seamless_blend_skirt = 0.75
+normalize = false
+noise = SubResource("FastNoiseLite_anuhl")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_odu20"]
+shader = ExtResource("7_sa7gj")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_rp21u")
+shader_parameter/density = 1.0
+shader_parameter/direction = Vector2(0.02, 0.1)
+shader_parameter/speed_multiplyer = 0.01
+shader_parameter/speed_scale = 0.0
+
 [node name="BaseTileMap" type="Node2D"]
 process_mode = 1
 y_sort_enabled = true
@@ -2865,11 +2889,10 @@ use_parent_material = true
 scale = Vector2(2, 2)
 collision_layer = 8
 collision_mask = 7
-collision_priority = 1e+10
+collision_priority = 99999.0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Boundaries"]
-visible = false
-polygon = PackedVector2Array(-352, 239.5, -528.5, 240, -529.5, 480.5, -129.5, 480, -129, 418.5, -67, 417.5, -66, 319, 32.5, 319.5, 30.5, 399.5, 94, 402, 95, 496, 144, 496, 144.5, 559.5, 271.5, 561.5, 271.5, 576.5, 350.5, 577, 351.5, 607.5, 366.5, 607.5, 367, 623.5, 593.5, 624, 591.5, 609, 609, 609, 607.5, 496, 464, 494.5, 464.5, 447.5, 351.5, 447, 352.5, 398, 448.5, 399.5, 447, 128, 416, 128, 415.5, 47.5, 671, 47.5, 674, -111.5, 511, -109, 511, -225, 463, -225, 464.5, -370.5, 79.5, -366.5, 79, -494, -333.5, -495, -334.5, -261, -479.5, -256.5, -477.5, -80, -675, -79, -674, 83, -318, 78.5, -317.5, 106, -350.5, 108, -352, 239.5, -1101.5, 225, -1074.5, -915, 1143, -909, 1217, 1062.5, -1128.5, 1099.5, -1101.5, 225)
+polygon = PackedVector2Array(-352, 239.5, -528.5, 240, -529.5, 480.5, -129.5, 480, -129, 418.5, -67, 417.5, -66, 319, 32.5, 319.5, 30.5, 399.5, 94, 402, 95, 496, 144, 496, 144.5, 559.5, 271.5, 561.5, 271.5, 576.5, 350.5, 577, 351.5, 607.5, 366.5, 607.5, 367, 623.5, 593.5, 624, 591.5, 609, 609, 609, 607.5, 496, 464, 494.5, 464.5, 447.5, 351.5, 447, 352.5, 398, 448.5, 399.5, 447, 128, 416, 128, 415.5, 47.5, 671, 47.5, 674, -111.5, 508, -106, 511, -225, 463, -225, 464.5, -370.5, 79.5, -366.5, 79, -494, -333.5, -495, -334.5, -261, -479.5, -256.5, -477.5, -80, -675, -79, -674, 83, -318, 78.5, -317.5, 106, -350.5, 108, -352, 239.5, -1101.5, 225, -1074.5, -915, 1143, -909, 1217, 1062.5, -1128.5, 1099.5, -1101.5, 225)
 
 [node name="Walls" type="TileMapLayer" parent="."]
 use_parent_material = true
@@ -2938,5 +2961,16 @@ position = Vector2(377, -31)
 position = Vector2(405, 345)
 
 [node name="Boss_spawner" type="Marker2D" parent="Enemy_container"]
+
+[node name="Shadow_shader" type="ColorRect" parent="."]
+z_index = 2
+material = SubResource("ShaderMaterial_odu20")
+offset_left = -1738.0
+offset_top = -1691.0
+offset_right = 2354.0
+offset_bottom = 1632.0
+color = Color(0, 0, 0, 1)
+script = ExtResource("8_anuhl")
+metadata/_edit_use_anchors_ = true
 
 [connection signal="timeout" from="Enemy_container/Round_cooldown" to="Enemy_container" method="_on_round_cooldown_timeout"]

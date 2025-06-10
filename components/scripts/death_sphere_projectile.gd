@@ -14,7 +14,7 @@ var lich_efc
 
 @onready var area_of_effect = $Area2D/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 
 '
 effect y = -18.5
@@ -47,7 +47,7 @@ func _on_area_to_impact_body_entered(body):
 
 func _on_area_2d_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",lich_str, 25, 2, lich_pbc, lich_efc, atk_type)
+		emit_signal("take_dmg",lich_str, 25, 2, lich_pbc, lich_efc, atk_type, self)
 
 func _on_sprite_2d_animation_finished():
 	if sprite.animation == "spawn":

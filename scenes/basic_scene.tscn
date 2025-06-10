@@ -1,12 +1,22 @@
-[gd_scene load_steps=11 format=3 uid="uid://d3fr55lfdcvjp"]
+[gd_scene load_steps=14 format=3 uid="uid://d3fr55lfdcvjp"]
 
 [ext_resource type="Script" uid="uid://rjp2dejwnqkq" path="res://components/scripts/basic_scene.gd" id="1_ohmap"]
 [ext_resource type="PackedScene" uid="uid://bm7culrlwfwta" path="res://scenes/GUI/basic_scene_GUI.tscn" id="2_87orx"]
 [ext_resource type="PackedScene" uid="uid://bk5ulwkaogwno" path="res://scenes/miscellaneous/powerup_handler.tscn" id="2_dphho"]
 [ext_resource type="AudioStream" uid="uid://du211hk4tj5vr" path="res://components/ost/The Legend of Zelda - Song of Storms  Windmill Hut 【Intense Symphonic Metal Cover】.mp3" id="2_drw8v"]
+[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_y6kn3"]
 [ext_resource type="AudioStream" uid="uid://dyaiglfa8wxco" path="res://components/ost/Beginning of the Journey - The Legend of Zelda A Link to the Past.mp3" id="3_a80dm"]
+[ext_resource type="PackedScene" uid="uid://b4rv7acd7efa1" path="res://scenes/miscellaneous/hit_particles.tscn" id="3_cqlw0"]
 [ext_resource type="Script" uid="uid://kd3qaonjbde6" path="res://components/scripts/GUI.gd" id="3_pywgm"]
 [ext_resource type="FontFile" uid="uid://ct7fhrwy7parr" path="res://components/fonts/basis33.ttf" id="4_ai68a"]
+
+[sub_resource type="Environment" id="Environment_dphho"]
+background_mode = 3
+background_color = Color(1, 1, 1, 1)
+glow_enabled = true
+glow_intensity = 1.0
+glow_strength = 0.95
+glow_blend_mode = 0
 
 [sub_resource type="AudioStreamInteractive" id="AudioStreamInteractive_elj82"]
 clip_count = 2
@@ -34,7 +44,12 @@ bg_color = Color(0.431373, 0, 0, 1)
 process_mode = 3
 y_sort_enabled = true
 script = ExtResource("1_ohmap")
+hitmarker_scene = ExtResource("2_y6kn3")
+hit_particles_scene = ExtResource("3_cqlw0")
 metadata/_edit_vertical_guides_ = []
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_dphho")
 
 [node name="Powerup_handler" parent="." instance=ExtResource("2_dphho")]
 

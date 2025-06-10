@@ -70,6 +70,14 @@ theme_override_fonts/font = ExtResource("2_0a4l1")
 theme_override_font_sizes/font_size = 32
 text = "Fuggi dal dungeon"
 
+[node name="UntangleButton" type="Button" parent="FirstMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_0a4l1")
+theme_override_font_sizes/font_size = 32
+text = "Sono incastrato"
+
 [node name="QuitButton" type="Button" parent="FirstMenu/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -151,4 +159,5 @@ parameters/looping = true
 [connection signal="pressed" from="FirstMenu/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
 [connection signal="pressed" from="FirstMenu/VBoxContainer/QuestButton" to="." method="_on_quest_button_pressed"]
 [connection signal="pressed" from="FirstMenu/VBoxContainer/EscapeButton" to="." method="_on_escape_button_pressed"]
+[connection signal="pressed" from="FirstMenu/VBoxContainer/UntangleButton" to="." method="_on_untangle_button_pressed"]
 [connection signal="pressed" from="FirstMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]

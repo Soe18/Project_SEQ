@@ -14,6 +14,8 @@ enum GAME_STATUSES{
 @onready var quest_container = %QuestContainer
 @onready var pause_ost = %Pause_ost_player
 
+signal untangle_player()
+
 var is_delay_finished : bool = true
 var game_status : GAME_STATUSES = GAME_STATUSES.unopenable
 
@@ -31,6 +33,7 @@ func _input(event):
 
 func pause_game():
 	if is_delay_finished:
+		
 		pause_ost.play()
 		is_delay_finished = false
 		get_tree().paused = true
@@ -61,3 +64,7 @@ func _on_re_open_menu_delay_timeout():
 func _on_escape_button_pressed():
 	resume_game()
 	get_tree().get_first_node_in_group("gm").load_map()
+
+func _on_untangle_button_pressed() -> void:
+	emit_signal("untangle_player")
+	resume_game()

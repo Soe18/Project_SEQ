@@ -13,8 +13,9 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+
+var scene_manager : Node2D
 
 var var_velocity = 2
 var is_in_atk_range = false
@@ -34,7 +35,7 @@ var soul_out = false
 @export var slice_stun_time = 0.5
 @onready var slice_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal got_grabbed(is_grabbed)
 signal shake_camera(shake, strenght)
 
@@ -199,15 +200,16 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
 	if is_in_atk_range and !grabbed and not parring:
-		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		current_vit -= dmg
 		if dmg > 0 and not dying:
+			scene_manager.emit_hit_particles(sender, self)
 			hit_flash_player.stop()
 			hit_flash_player.play("hit_flash")
-			show_hitmarker("-" + str(dmg), dmg_info[1])
+			scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 			emit_signal("shake_camera", true, dmg_info[2])
 		if stun_sec > 0 and not (dying or soul_out):
 			moving = false
@@ -312,7 +314,7 @@ func _on_basic_atk_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and basic_atk_effect.animation == "effect" and not grabbed and player_in_atk_range and not (soul_out or dying):
-		emit_signal("take_dmg", current_str, slice_force, slice_stun_time, current_pbc, current_efc, slice_type)
+		emit_signal("take_dmg", current_str, slice_force, slice_stun_time, current_pbc, current_efc, slice_type, self)
 	basic_atk_effect.play("idle")
 	set_idle()
 	
@@ -417,18 +419,3 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

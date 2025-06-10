@@ -16,8 +16,9 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.2
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+
+var scene_manager : Node2D
 
 # attributo contenente le scene dei proiettili
 @export var witchcraft_scene : PackedScene
@@ -38,7 +39,6 @@ var dying = false # variabile a false finché il boss è in vita, poi a true per
 var MIN_DISTANCE : int = 10
 var MAX_DISTANCE : int = 30
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
 signal set_health_bar(vit)
 signal got_grabbed(is_grabbed)
 signal shake_camera(shake, strenght)
@@ -225,13 +225,13 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
 	if not spawning and not dying:
 		if is_in_atk_range and !grabbed:
-			var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+			var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 			current_vit -= dmg_info[0]
 			emit_signal("set_health_bar", current_vit)
-			show_hitmarker("-" + str(dmg_info[0]), dmg_info[1])
+			scene_manager.show_hitmarker("-" + str(dmg_info[0]), dmg_info[1], hitmarker_spawnpoint)
 			
 			# sto stronzo ha uno stun_reduction, cioè diminuisce i secondi di stun
 			stun_sec -= 0.5
@@ -240,6 +240,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 				stun_sec = 0 # semplicemente li riporta a 0
 			
 			if dmg_info[0] > 0:
+				scene_manager.emit_hit_particles(sender, self)
 				hit_flash_player.stop()
 				hit_flash_player.play("hit_flash")
 				emit_signal("shake_camera", true, dmg_info[2])
@@ -588,18 +589,3 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg_info, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg_info
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

@@ -15,13 +15,14 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+
+var scene_manager : Node2D
 
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
@@ -288,7 +289,7 @@ func _on_basic_atk_area_body_exited(body):
 func _on_eva_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, evade_force, evade_stun_time, current_pbc, current_efc, evade_type)
+		emit_signal("take_dmg", current_str, evade_force, evade_stun_time, current_pbc, current_efc, evade_type, self)
 
 func _on_eva_area_body_exited(body):
 	if body != self:
@@ -305,7 +306,7 @@ func _on_skill_1_area_body_exited(body):
 func _on_skill_2_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type)
+		emit_signal("take_dmg", current_str, skill2_force, skill2_stun_time, current_pbc, current_efc, skill2_type, self)
 		emit_signal("change_stats", skill2_changed_stat, skill2_stat_amount, skill2_duration, false)
 		
 		var temp = [skill2_knockback_amount, skill2_knockback_force]
@@ -313,7 +314,7 @@ func _on_skill_2_area_body_entered(body):
 		if temp == null:
 			temp = [0, 0]
 		
-		emit_signal("inflict_knockback", skill2_knockback_amount+temp[0], skill2_knockback_force-temp[1], self.global_position)
+		emit_signal("inflict_knockback", skill2_knockback_amount+temp[0], skill2_knockback_force, self.global_position)
 		#emit_signal("inflict_knockback", 10, 10, self.global_position)
 
 func _on_skill_2_area_body_exited(body):
@@ -323,14 +324,14 @@ func _on_skill_2_area_body_exited(body):
 func _on_ult_area_body_entered(body):
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type)
+		emit_signal("take_dmg", current_str, ult_force, ult_stun_time, current_pbc, current_efc, ult_type, self)
 		
 		var temp = [ult_knockback_amount, ult_knockback_force]
 		temp = powerup_handler.apply_powerup_boost("Alvin", temp)
 		if temp == null:
 			temp = [0, 0]
 		
-		emit_signal("inflict_knockback", ult_knockback_amount+temp[0], ult_knockback_force-temp[1], self.global_position)
+		emit_signal("inflict_knockback", ult_knockback_amount+temp[0], ult_knockback_force, self.global_position)
 
 func _on_ult_area_body_exited(body):
 	if body != self:
@@ -386,27 +387,27 @@ func _on_sprite_2d_frame_changed():
 	if sprite.frame == 2 and sprite.animation == "base atk1":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type, self)
 	
 	elif sprite.frame == 2 and sprite.animation == "base atk2":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type, self)
 	
 	elif sprite.frame == 1 and sprite.animation == "base atk3":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type)
+		emit_signal("take_dmg", current_str, basic_atk_force, basic_stun_time, current_pbc, current_efc, basic_atk_type, self)
 	
 	elif sprite.frame == 1 and sprite.animation == "base atk4":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
+		emit_signal("take_dmg", current_str, basic_atk_force+1, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type, self)
 	
 	elif sprite.frame == 4 and sprite.animation == "base atk5":
 		bs_atk_collider.set_deferred("disabled", true)
 		bs_atk_collider.set_deferred("disabled", false)
-		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type)
+		emit_signal("take_dmg", current_str, basic_atk_force+2, basic_stun_time+0.1, current_pbc, current_efc, basic_atk_type, self)
 	
 	if sprite.frame == 7 and sprite.animation == "ult_animation":
 		sprite.pause()
@@ -415,7 +416,7 @@ func _on_sprite_2d_frame_changed():
 
 func _on_effect_frame_changed():
 	if skill1_effect.frame % 2 == 0 and atk_state == Atk_States.SK1:
-		emit_signal("take_dmg", current_str, skill1_force, skill1_stun_time, current_pbc, current_efc, skill1_type)
+		emit_signal("take_dmg", current_str, skill1_force, skill1_stun_time, current_pbc, current_efc, skill1_type, self)
 	
 	elif skill2_effect.frame == 2 and atk_state == Atk_States.SK2:
 		skill2_collider.set_deferred("disabled", false)
@@ -531,13 +532,14 @@ func evade():
 	move_and_slide()
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
-	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
+	var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 	var dmg = dmg_info[0]
-	show_hitmarker("-" + str(dmg), dmg_info[1])
+	scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
 	if dmg > 0:
+		scene_manager.emit_hit_particles(sender, self)
 		hit_flash_player.stop()
 		hit_flash_player.play("hit_flash")
 		emit_signal("shake_camera", true, dmg_info[2])
@@ -645,18 +647,3 @@ func _on_change_stats(stat, amount, time_duration, _ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

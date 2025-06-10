@@ -1,10 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4807qupf2063"]
+[gd_scene load_steps=4 format=3 uid="uid://c4807qupf2063"]
 
 [ext_resource type="Script" uid="uid://5vw2wvnwf4lu" path="res://overworld/scripts/game_manager.gd" id="1_a5b2e"]
 [ext_resource type="PackedScene" uid="uid://rcyq8rr7fln" path="res://overworld/scenes/maps/default_map.tscn" id="2_fdxyn"]
+
+[sub_resource type="Environment" id="Environment_pbydj"]
+background_mode = 3
+background_color = Color(1, 1, 1, 1)
+glow_enabled = true
+glow_intensity = 1.0
+glow_strength = 0.95
+glow_blend_mode = 0
 
 [node name="GameManager" type="Node" groups=["gm"]]
 process_mode = 3
 script = ExtResource("1_a5b2e")
 
 [node name="DefaultMap" parent="." instance=ExtResource("2_fdxyn")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="DefaultMap"]
+environment = SubResource("Environment_pbydj")

@@ -13,8 +13,9 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+
+var scene_manager : Node2D
 
 var is_in_atk_range = false
 var moving = true
@@ -39,7 +40,7 @@ var agility_multiplyer = 50
 
 var second_time_claw = true
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal got_grabbed(is_grabbed)
 signal change_stats(stat, amount, time_duration, ally_sender)
 signal shake_camera(shake, strenght)
@@ -222,9 +223,9 @@ func _on_player_is_in_atk_range(is_in, body):
 #		impedisco al nodo di muoversi mentre viene attaccato
 #		imposto il tempo di stun con il parametro passato
 #		faccio partire il timer dello stun
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
 	if is_in_atk_range and not grabbed and not knockbacked:
-		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
 		
 		var rng = randi_range(0, 100)
@@ -233,9 +234,10 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 		
 		if not agility_activated:
 			if dmg > 0:
+				scene_manager.emit_hit_particles(sender, self)
 				hit_flash_player.stop()
 				hit_flash_player.play("hit_flash")
-			show_hitmarker("-" + str(dmg), dmg_info[1])
+			scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 			current_vit -= dmg
 			set_health_bar()
 			if dmg > 0:
@@ -248,7 +250,7 @@ func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
 				sprite.play("damaged")
 		else:
 			moving = false
-			show_hitmarker("Schivato", false)
+			scene_manager.show_hitmarker("Schivato", false, hitmarker_spawnpoint)
 			sprite.play("agility")
 			howl_charge_time.stop()
 
@@ -284,7 +286,7 @@ func _on_player_grab(is_been_grabbed, is_flipped, grab_position_marker):
 				healthbar.visible = true
 	else:
 		moving = false
-		show_hitmarker("Schivato", false)
+		scene_manager.show_hitmarker("Schivato", false, hitmarker_spawnpoint)
 		sprite.play("agility")
 		howl_charge_time.stop()
 
@@ -332,7 +334,7 @@ func _on_sprite_2d_animation_finished() -> void:
 
 func _on_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "claws" and (sprite.frame == 1 or sprite.frame == 4):
-		emit_signal("take_dmg", current_str, claw_force, claw_stun_time, current_pbc, current_efc, claw_type)
+		emit_signal("take_dmg", current_str, claw_force, claw_stun_time, current_pbc, current_efc, claw_type, self)
 
 func _on_claws_area_body_entered(body: Node2D) -> void:
 	if body == player:
@@ -422,18 +424,3 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

@@ -10,14 +10,14 @@ var player
 
 @onready var area_of_effect = $Area_of_effect/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, sender)
 
 func _ready():
 	sprite.play("effect")
 
 func _on_area_of_effect_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",lich_str, 17, 3, lich_pbc, lich_efc, atk_type)
+		emit_signal("take_dmg",lich_str, 17, 3, lich_pbc, lich_efc, atk_type, self)
 
 func _on_sprite_2d_animation_finished():
 	queue_free()

@@ -1,8 +1,7 @@
-[gd_scene load_steps=105 format=3 uid="uid://dyovs1oxci81l"]
+[gd_scene load_steps=104 format=3 uid="uid://dyovs1oxci81l"]
 
 [ext_resource type="Script" uid="uid://6ftbwnc6kds5" path="res://components/scripts/centaur.gd" id="1_skvmw"]
 [ext_resource type="Texture2D" uid="uid://br8u4kbrbjw0w" path="res://components/sprites/enemies/centaur/centaur_sprint.png" id="2_76l67"]
-[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_b2v3u"]
 [ext_resource type="Texture2D" uid="uid://c44e65g0wl4in" path="res://components/sprites/enemies/centaur/centaur_charging_sprint.png" id="2_ojs73"]
 [ext_resource type="PackedScene" uid="uid://b8m3imv5eplab" path="res://scenes/miscellaneous/knockback_controller.tscn" id="3_sfo5h"]
 [ext_resource type="Texture2D" uid="uid://bine04cavl5rq" path="res://components/sprites/enemies/centaur/centaur_damaged.png" id="3_u6ypf"]
@@ -759,7 +758,6 @@ collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_skvmw")
-damage_node = ExtResource("2_b2v3u")
 knockback_controller_node = ExtResource("3_sfo5h")
 
 [node name="Hitmarker_spawn" type="Marker2D" parent="."]

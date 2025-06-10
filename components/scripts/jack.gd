@@ -15,15 +15,16 @@ var current_pbc : int = default_pbc
 @export var default_efc : float = 1.5
 var current_efc : float = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
 @export var change_stats_timer_node : PackedScene
+
+var scene_manager : Node2D
 @export var bullet_scene : PackedScene
 
 enum Atk_States {IDLE, BASE_ATK, SK1, SK2, EVA, ULT}
 
 signal is_in_atk_range(is_in, body)
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, sender)
 signal set_idle()
 signal set_health_bar(current_vit)
 signal get_healed(amount)
@@ -53,8 +54,8 @@ var knockback_force
 var atk_anim_finished = true
 
 var Guns = {
-	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_" , "shake_strenght" : 9},
-	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_" , "shake_strenght" : 11},
+	"pistol" : {"force" : 2000, "precision" : 0.1, "delay" : 0.4, "gun_str" : 20, "knockback" : false, "stun_time" : 0, "bullet_count" : 8, "prefix" : "p_" , "shake_strenght" : 6},
+	"assault" : {"force" : 2000, "precision" : 0.15, "delay" : 0.05, "gun_str" : 30, "knockback" : false, "stun_time" : 0, "bullet_count" : 30, "prefix" : "as_" , "shake_strenght" : 9},
 	"shotgun" : {"force" : 1700, "precision" : 0.3, "delay" : 0.9, "gun_str" : 45, "knockback" : true, "stun_time" : 1.5, "bullet_count" : 2, "prefix" : "sh_" , "shake_strenght" : 20}
 }
 
@@ -291,7 +292,7 @@ func atk_handler():
 func _on_flashbang_area_body_entered(body: Node2D) -> void:
 	if body != self:
 		emit_signal("is_in_atk_range", true, body)
-		emit_signal("take_dmg", 0, 0, 4, 0, 0, flashbang_type)
+		emit_signal("take_dmg", 0, 0, 4, 0, 0, flashbang_type, self)
 		emit_signal("inflict_knockback", 300, 5, self.global_position)
 
 func _on_flashbang_area_body_exited(body: Node2D) -> void:
@@ -481,13 +482,14 @@ func _on_ulti_duration_timeout() -> void:
 
 
 ' -- DIGEST SEGNALI NEMICI -- '
-func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
-	var dmg_info = get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+func _on_enemy_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
+	var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 	var dmg = dmg_info[0]
-	show_hitmarker("-" + str(dmg), dmg_info[1])
+	scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 	current_vit -= dmg
 	emit_signal("set_health_bar", current_vit)
 	if dmg > 0:
+		scene_manager.emit_hit_particles(sender, self)
 		hit_flash_player.stop()
 		hit_flash_player.play("hit_flash")
 		emit_signal("shake_camera", true, dmg_info[2])
@@ -603,18 +605,3 @@ func _on_change_stats(stat, amount, time_duration, _ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

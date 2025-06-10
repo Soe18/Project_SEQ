@@ -13,8 +13,9 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+
+var scene_manager : Node2D
 
 var is_in_atk_range = false
 var moving = true
@@ -34,7 +35,7 @@ var attacking = false
 @export var earthquake_force = 2.5
 @onready var earthquake_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal got_grabbed(is_grabbed)
 signal shake_camera(shake, strenght)
 
@@ -208,14 +209,15 @@ func _on_player_is_in_atk_range(is_in, body):
 		imposto il tempo di stun con il parametro passato
 		faccio partire il timer dello stun'
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
 	if is_in_atk_range and !grabbed:
-		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
-		show_hitmarker("-" + str(dmg), dmg_info[1])
+		scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 		current_vit -= dmg
 		set_health_bar()
 		if dmg > 0:
+			scene_manager.emit_hit_particles(sender, self)
 			hit_flash_player.stop()
 			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
@@ -314,7 +316,7 @@ func _on_sprite_2d_frame_changed():
 		else:
 			earthquake_effect.play("effect")
 	if sprite.animation == "punch" and sprite.frame == 8 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc, punch_type)
+		emit_signal("take_dmg", current_str, punch_force, punch_stun_time, current_pbc, current_efc, punch_type, self)
 
 # FUNZIONE PER L'ATTACCO PUGNO
 func punch():
@@ -338,7 +340,7 @@ func _on_effect_animation_finished():
 
 func _on_effect_frame_changed():
 	if earthquake_effect.animation == "effect" and earthquake_effect.frame%2==0 and stun_timer.is_stopped() and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg", current_str, earthquake_force, 0, 0, 0, earthquake_type)
+		emit_signal("take_dmg", current_str, earthquake_force, 0, 0, 0, earthquake_type, self)
 		emit_signal("shake_camera", true, 60)
 		if player.current_des == player.default_des:
 			player.current_des /= 2.5
@@ -428,18 +430,3 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)

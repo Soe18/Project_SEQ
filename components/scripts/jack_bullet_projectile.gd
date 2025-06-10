@@ -20,7 +20,7 @@ var MAX_LENGHT : int = 10
 
 @onready var collision = $Area_to_impact/CollisionShape2D
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal inflict_knockback(amount, force, sender)
 
 @warning_ignore("unused_signal")
@@ -52,7 +52,7 @@ func _on_area_to_impact_body_entered(body):
 		body.is_in_atk_range = true
 		bullet_force = 0
 		if player:
-			emit_signal("take_dmg", player.default_str, bullet_str, gun_stun_time, player.current_pbc, player.current_efc, atk_type)
+			emit_signal("take_dmg", player.default_str, bullet_str, gun_stun_time, player.current_pbc, player.current_efc, atk_type, self)
 			if knockback_flag:
 				var temp = [10]
 				temp = powerup_handler.apply_powerup_boost("Alvin", temp)

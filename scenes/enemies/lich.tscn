@@ -1,7 +1,6 @@
-[gd_scene load_steps=130 format=3 uid="uid://dtvpbgg4jjwyw"]
+[gd_scene load_steps=129 format=3 uid="uid://dtvpbgg4jjwyw"]
 
 [ext_resource type="Script" uid="uid://cc5jtt0f8ka6r" path="res://components/scripts/lich.gd" id="1_ic8pi"]
-[ext_resource type="PackedScene" uid="uid://336wl2jspobc" path="res://scenes/miscellaneous/hitmarker.tscn" id="2_ob30n"]
 [ext_resource type="Texture2D" uid="uid://bfnqigpq33feg" path="res://components/sprites/enemies/lich/lich_damaged.png" id="3_52rpl"]
 [ext_resource type="PackedScene" uid="uid://b8m3imv5eplab" path="res://scenes/miscellaneous/knockback_controller.tscn" id="3_e8xrc"]
 [ext_resource type="PackedScene" uid="uid://cymi8puqyx10m" path="res://scenes/enemies/projectiles/witchcraft_Projectile.tscn" id="3_xbuw5"]
@@ -900,7 +899,6 @@ collision_mask = 5
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_ic8pi")
-damage_node = ExtResource("2_ob30n")
 knockback_controller_node = ExtResource("3_e8xrc")
 witchcraft_scene = ExtResource("3_xbuw5")
 death_sphere_scene = ExtResource("4_cepbk")

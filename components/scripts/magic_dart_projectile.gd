@@ -24,7 +24,7 @@ var magic_dart_velocity_multiplyer = 800
 
 @onready var time_to_live = $Time_to_live
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, sender)
 
 func _ready():
 	sprite.play("effect")
@@ -59,7 +59,7 @@ func go_to_player():
 
 func _on_area_to_impact_body_entered(body):
 	if body == player:
-		emit_signal("take_dmg",fae_str, magic_dart_force, magic_dart_stun_force, fae_pbc, fae_efc, atk_type)
+		emit_signal("take_dmg",fae_str, magic_dart_force, magic_dart_stun_force, fae_pbc, fae_efc, atk_type, self)
 		queue_free()
 
 func _on_time_to_live_timeout():

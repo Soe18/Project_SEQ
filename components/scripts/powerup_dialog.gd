@@ -8,6 +8,7 @@ var pows : Array
 var rars : Array
 
 signal new_powerup(powerup, rarity)
+signal rarity_selected(rar)
 
 func _ready() -> void:
 	
@@ -18,15 +19,16 @@ func _ready() -> void:
 
 func _on_button_pressed() -> void:
 	emit_signal("new_powerup", pows[0], rars[0])
-	destroy()
+	destroy(rars[0])
 
 func _on_button_2_pressed() -> void:
 	emit_signal("new_powerup", pows[1], rars[1])
-	destroy()
+	destroy(rars[1])
 
 func _on_button_3_pressed() -> void:
 	emit_signal("new_powerup", pows[2], rars[2])
-	destroy()
+	destroy(rars[2])
 
-func destroy():
+func destroy(rar):
+	emit_signal("rarity_selected", rar)
 	self.queue_free()

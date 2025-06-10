@@ -146,7 +146,7 @@ use_texture_padding = false
 0:8/0/y_sort_origin = 20
 
 [sub_resource type="TileSet" id="TileSet_xrsjv"]
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 12
 sources/1 = SubResource("TileSetAtlasSource_fl8jh")
 sources/2 = SubResource("TileSetAtlasSource_k1b2j")
 
@@ -282,6 +282,7 @@ tile_map_data = PackedByteArray("AAAMAAsAAQAoAAAAAAA=")
 tile_set = SubResource("TileSet_xrsjv")
 
 [node name="Background" type="TileMapLayer" parent="."]
+light_mask = 4
 z_index = -1
 y_sort_enabled = true
 use_parent_material = true
@@ -414,6 +415,7 @@ shape = SubResource("RectangleShape2D_1cybo")
 [node name="StaticBody2D" type="StaticBody2D" parent="Change_char"]
 
 [node name="Sprite2D" type="Sprite2D" parent="Change_char/StaticBody2D"]
+light_mask = 2
 scale = Vector2(0.183271, 0.183271)
 texture = ExtResource("10_b0pmh")
 

@@ -1,30 +1,36 @@
 extends Node2D
 
-var player
+var player : CharacterBody2D
 var selected_character
-var paused = false
-var connected = false
-var boss_defeted_count = 1
+var paused : bool = false
+var connected : bool = false
+# serve come indice per scorrere i tileset
+var boss_defeted_count : int = 2
 var active_tileset : Node2D
 var active_enemy_container : Node2D
 @onready var Attack_Types = get_tree().get_first_node_in_group("gm").Attack_Types
 
 # il nodo canvaslayer serve per fissare la gui allo schermo
-@onready var canvas_layer = find_child("CanvasLayer") 
+@onready var canvas_layer : CanvasLayer = find_child("CanvasLayer") 
 # contenitore della gui della scena
-@onready var gui = canvas_layer.find_child("GUI")
+@onready var gui : Control = canvas_layer.find_child("GUI")
 # contenitore della gui di game over
-@onready var game_over_container = gui.find_child("GameOver_container")
+@onready var game_over_container : MarginContainer = gui.find_child("GameOver_container")
 # contenitore della gui del combattimento
-@onready var round_gui = canvas_layer.find_child("Round_GUI")
+@onready var round_gui : Control = canvas_layer.find_child("Round_GUI")
 # music player che contiene le ost
-@onready var ost_player = $Ost_player
+@onready var ost_player : AudioStreamPlayer = $Ost_player
 # variabile che contiene la gui specifica per quel player
 var player_gui
 @onready var powerup_handler : Node = $Powerup_handler
 
-var camera_follower = "res://scenes/miscellaneous/camera_follower.tscn"
+@export var hitmarker_scene : PackedScene
+@export var hit_particles_scene : PackedScene
 
+# percorso che porta al nodo del camera follower
+var camera_follower : String = "res://scenes/miscellaneous/camera_follower.tscn"
+
+# array che contiene i tileset
 var tilesets : Array = ["res://scenes/tilemaps/gray_tile_map.tscn",
 						#"res://scenes/tilemaps/lightblue_tile_map.tscn",
 						"res://scenes/tilemaps/forest_tile_map.tscn",
@@ -35,8 +41,11 @@ var portal_scene = preload("res://scenes/miscellaneous/travel_portal.tscn")
 var portal
 
 func _ready():
-	#Engine.time_scale
+	#Engine.time_scale = 0.5
 	#Engine.physics_ticks_per_second = 100
+	
+	Menu.untangle_player.connect(self._on_untangle_player)
+	
 	var temp : Array
 	for i in tilesets.size():
 		temp.append(i)
@@ -101,6 +110,7 @@ func _on_gui_select_character(char):
 	get_child(get_child_count()-1).name = "Player"
 	player = find_child("Player", true, false)
 	player.scale = Vector2(1.0, 1.0)
+	player.scene_manager = self
 	
 	add_child(load(camera_follower).instantiate(), true)
 	get_child(get_child_count()-1).player = player
@@ -134,14 +144,17 @@ func connect_enemies_with_player(): #connette i segnali tra il player e i nemici
 		
 		#se il nome del nemico contiene "Enemy"
 		if "Enemy" in current_node.name: 
+			current_node.scene_manager = self
 			# assegno il parametro player del nemico con il player attivo
 			current_node.player = player
 			# segnale tra player e nemici per capire se si è in range
 			player.is_in_atk_range.connect(current_node._on_player_is_in_atk_range)
 			# segnale tra player e nemici per infliggere danno
 			player.take_dmg.connect(current_node._on_player_take_dmg)
-			# segnale tra nemici e player per infliggere danno
-			current_node.take_dmg.connect(player._on_enemy_take_dmg)
+			# prima controllo che abbia il segnale (se non ce l'ha vuol dire che ha solo proiettili)
+			if current_node.has_signal("take_dmg"):
+				# segnale tra nemici e player per infliggere danno
+				current_node.take_dmg.connect(player._on_enemy_take_dmg)
 			current_node.shake_camera.connect(player.camera._on_player_shake_camera)
 			
 			# se il player ha scelto nathan
@@ -208,6 +221,44 @@ func calculate_dmg(str, atk_str, tem, pbc, efc, type, caller):
 			shake_amount = 5
 	return [dmg, crit, shake_amount]
 
+# METODO GLOBALE PER FAR COMPARIRE L'HITMARKER 
+func show_hitmarker(dmg, crit, hitmarker_spawnpoint):
+	# istanzio l'hitmarker 
+	var hitmarker = hitmarker_scene.instantiate()
+	# lo posiziono nello spawnpoint
+	hitmarker.position = hitmarker_spawnpoint.global_position
+	
+	# creo il tween per lo spostamento casuale
+	var tween = get_tree().create_tween()
+	tween.tween_property(hitmarker, 
+						"position", 
+						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
+						0.75)
+	
+	# cambio la label nella scena (che sono sicuro sia il child 0) con il danno
+	hitmarker.get_child(0).text = dmg
+	# se il danno è un crit
+	if crit:
+		# cambio il colore della label in oro
+		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
+	# aggiungo l'hitmarker alla scena
+	self.add_child(hitmarker)
+
+# METODO GLOBALE PER SPAWNARE LE PARTICELLE DI HIT
+func emit_hit_particles(attacker, target):
+	# istanzio le particelle
+	var particles : GPUParticles2D = hit_particles_scene.instantiate()
+	# le posiziono sul punto di interesse (il target)
+	particles.global_position = target.global_position
+	# ricavo la direzione di dove indirizzarle
+	var direction_of_spawning = attacker.global_position.direction_to(target.global_position)
+	# metto la direzione ricavata nel process_material
+	particles.process_material.direction = Vector3(direction_of_spawning.x, direction_of_spawning.y, 0)
+	# aggiungo le particelle alla scena
+	self.add_child(particles)
+	# le riproduco 
+	particles.emitting = true
+
 # DIGEST DEL SEGNALE DELLA PLAYER_GUI CHE NOTIFICA QUANDO GLI HP SCENDONO A 0
 func _on_player_death():
 	ost_player.get_stream_playback().switch_to_clip_by_name(&"game_over")
@@ -256,9 +307,6 @@ func _on_boss_defeted():
 	# collego il segnale del portale allo scene manager per cambiare stage
 	portal.change_stage.connect(self._on_change_stage)
 
-func _on_chamber_cleared():
-	powerup_handler
-
 func _on_change_stage():
 	boss_defeted_count += 1
 	
@@ -296,3 +344,7 @@ func _on_canvas_layer_child_exiting_tree(node: Node) -> void:
 	if canvas_layer:
 		for i in canvas_layer.get_children():
 			i.visible = not i.visible
+
+func _on_untangle_player():
+	if is_instance_valid(player):
+		player.global_position = active_enemy_container.boss_spawner.global_position

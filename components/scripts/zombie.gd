@@ -14,8 +14,8 @@ var current_pbc = default_pbc
 @export var default_efc : float = 1.5
 var current_efc = default_efc
 
-@export var damage_node : PackedScene
 @export var knockback_controller_node : PackedScene
+var scene_manager : Node2D
 
 var is_in_atk_range = false
 var moving = true
@@ -26,7 +26,7 @@ var knockbacked = false
 var knockback_target_point
 var knockback_force
 
-signal take_dmg(str, atk_str, sec_stun, pbc, efc, type)
+signal take_dmg(str, atk_str, sec_stun, pbc, efc, type, sender)
 signal got_grabbed(is_grabbed)
 signal shake_camera(shake, strenght)
 
@@ -43,11 +43,11 @@ var choosed_atk
 
 var sprinting = false
 
-@export var bite_force = 5
+@export var bite_force = 15
 @export var bite_stun_time = 0.5
 @onready var bite_type = get_tree().get_first_node_in_group("gm").Attack_Types.PHYSICAL
 
-@export var sprint_force = 10
+@export var sprint_force = 20
 @export var sprint_stun_time = 0.3
 @export var sprint_multiplyer = 5
 @export var sprint_duration = 6.0
@@ -220,21 +220,25 @@ func _on_player_is_in_atk_range(is_in, body):
 		#imposto il tempo di stun con il parametro passato
 		#faccio partire il timer dello stun
 
-func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type):
+func _on_player_take_dmg(atk_str, skill_str, stun_sec, atk_pbc, atk_efc, type, sender):
 	if is_in_atk_range and !grabbed:
-		var dmg_info = get_parent().get_parent().get_parent().calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
+		var dmg_info = scene_manager.calculate_dmg(atk_str, skill_str, self.current_tem, atk_pbc, atk_efc, type, self)
 		var dmg = dmg_info[0]
-		show_hitmarker("-" + str(dmg), dmg_info[1])
+		scene_manager.show_hitmarker("-" + str(dmg), dmg_info[1], hitmarker_spawnpoint)
 		current_vit -= dmg
-		set_health_bar()
 		if dmg > 0:
+			scene_manager.emit_hit_particles(sender, self)
 			hit_flash_player.stop()
 			hit_flash_player.play("hit_flash")
 			emit_signal("shake_camera", true, dmg_info[2])
+		set_health_bar()
 		if sprinting and dmg >= 25:
 			sprinting = false
+			moving = false
 			sprint_collider.set_deferred("disabled", true)
 			sprite.play("damaged")
+			stun_timer.wait_time = 0.1
+			stun_timer.start()
 		if stun_sec > 0:
 			moving = false
 			stun_timer.wait_time = stun_sec
@@ -311,6 +315,7 @@ func set_idle():
 		sprint_collider.set_deferred("disabled", true)
 		sprint_charge_time.stop()
 		sprite.play("idle")
+		bite_effect.play("idle")
 
 func _on_bite_area_body_entered(body):
 	if body == player:
@@ -323,7 +328,7 @@ func _on_bite_area_body_exited(body):
 func _on_sprint_area_body_entered(body):
 	if body == player:
 		player_in_atk_range = true
-		emit_signal("take_dmg", current_str, sprint_force, sprint_stun_time, current_pbc, current_efc, sprint_type)
+		emit_signal("take_dmg", current_str, sprint_force, sprint_stun_time, current_pbc, current_efc, sprint_type, self)
 		sprint_time.start(0.5)
 		update_atk_timer.start(0.5)
 
@@ -333,7 +338,7 @@ func _on_sprint_area_body_exited(body):
 
 func _on_effect_animation_finished():
 	if stun_timer.is_stopped() and bite_effect.animation == "effect" and not grabbed and player_in_atk_range:
-		emit_signal("take_dmg",current_str, bite_force, bite_stun_time, current_pbc, current_efc, bite_type)
+		emit_signal("take_dmg",current_str, bite_force, bite_stun_time, current_pbc, current_efc, bite_type, self)
 		bite_cooldown.start()
 	set_idle()
 
@@ -427,18 +432,3 @@ func _on_change_stats(stat, amount, time_duration, ally_sender):
 
 func _on_status_alert_sprite_animation_finished():
 	status_sprite.play("idle")
-
-func show_hitmarker(dmg, crit):
-	var hitmarker = damage_node.instantiate()
-	hitmarker.position = hitmarker_spawnpoint.global_position
-	
-	var tween = get_tree().create_tween()
-	tween.tween_property(hitmarker, 
-						"position", 
-						hitmarker_spawnpoint.global_position + (Vector2(randf_range(-1,1), -randf()) * 40), 
-						0.75)
-	
-	hitmarker.get_child(0).text = dmg
-	if crit:
-		hitmarker.get_child(0).set("theme_override_colors/font_color", Color.GOLDENROD)
-	get_tree().current_scene.add_child(hitmarker)
